@@ -1,0 +1,10 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this commit (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# Thanos Operator has no release yet; the CRDs are pinned to a main commit.
+monitoring.thanos.io:
+  software: Thanos Operator
+  version: main@1b6edfb
+  source: https://github.com/thanos-community/thanos-operator/tree/1b6edfbba0e54af83870b158ee1124e499455b43/config/crd/bases
+  license: Apache-2.0

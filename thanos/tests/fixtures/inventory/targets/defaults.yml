@@ -1,0 +1,41 @@
+# Defaults: the shortest entry per kind; the generator fills the object
+# storage reference, replicas, replica labels, ruler mode, sharding strategy,
+# retention and the compactor CPU request
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: defaults
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/thanos
+        output_path: manifests/
+
+  namespace: monitoring
+  generators:
+    thanos:
+      object_storage_config: thanos-object-storage
+      thanos_queries:
+        global: {}
+      thanos_receives:
+        ingest:
+          ingester_spec:
+            hashrings:
+              - name: default
+                storage:
+                  size: 10Gi
+      thanos_rulers:
+        rules:
+          alertmanager_url: http://alertmanager.monitoring.svc:9093
+          storage:
+            size: 1Gi
+      thanos_stores:
+        gateway:
+          storage:
+            size: 10Gi
+      thanos_compacts:
+        compactor:
+          storage:
+            size: 10Gi

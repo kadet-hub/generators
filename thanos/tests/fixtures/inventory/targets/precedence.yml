@@ -1,0 +1,46 @@
+# Precedence: defaults < spec < flat keys and shorthands, for the same field
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: precedence
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/thanos
+        output_path: manifests/
+
+  namespace: monitoring
+  generators:
+    thanos:
+      object_storage_config: shared-object-storage
+      thanos_queries:
+        query:
+          replicas: 2
+          spec:
+            replicas: 5
+            replicaLabels: [replica]
+      thanos_stores:
+        store:
+          object_storage_config: store-object-storage
+          storage:
+            size: 10Gi
+          spec:
+            objectStorageConfig:
+              name: spec-object-storage
+              key: thanos.yaml
+            shardingStrategy:
+              type: block
+              shards: 2
+      thanos_compacts:
+        compactor:
+          retention: 90d
+          storage:
+            size: 10Gi
+          spec:
+            objectStorageConfig:
+              name: compact-object-storage
+              key: thanos.yaml
+            retentionConfig:
+              raw: 7d
