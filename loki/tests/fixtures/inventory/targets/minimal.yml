@@ -1,0 +1,27 @@
+# Minimal: one LokiStack from the storage shorthand; schemas and the
+# passthrough tenancy mode come from the generator's defaults
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/loki
+        output_path: manifests/
+
+  namespace: logging
+  generators:
+    loki:
+      loki_stacks:
+        logs:
+          size: 1x.pico
+          storage: s3
+          storage_class_name: standard
+          tenants:
+            passthrough:
+              ca:
+                secretName: logs-gateway-client-ca
+                key: ca.crt

@@ -1,0 +1,19 @@
+# Minimal: one ThanosQuery with its only required field
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/thanos
+        output_path: manifests/
+
+  namespace: monitoring
+  generators:
+    thanos:
+      thanos_queries:
+        query:
+          replicas: 1
