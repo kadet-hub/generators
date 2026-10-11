@@ -1,0 +1,14 @@
+name: calico-resources
+description: Renders Calico network policies, network sets, IP pools and BGP resources (projectcalico.org/v3) from inventory parameters.
+tags: [kubernetes, networking, security]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas
