@@ -1,0 +1,33 @@
+# Minimal: one deployment-mode collector with an OTLP-to-debug pipeline
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/opentelemetry-operator
+        output_path: manifests/
+
+  namespace: observability
+  generators:
+    opentelemetry_operator:
+      collectors:
+        simplest:
+          config:
+            receivers:
+              otlp:
+                protocols:
+                  grpc:
+                    endpoint: 0.0.0.0:4317
+                  http:
+                    endpoint: 0.0.0.0:4318
+            exporters:
+              debug: {}
+            service:
+              pipelines:
+                traces:
+                  receivers: [otlp]
+                  exporters: [debug]

@@ -1,0 +1,9 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+opentelemetry.io:
+  software: OpenTelemetry Operator
+  version: 0.160.0
+  source: https://github.com/open-telemetry/opentelemetry-operator/tree/v0.160.0/config/crd/bases
+  license: Apache-2.0
