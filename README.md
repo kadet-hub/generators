@@ -6,6 +6,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 |---|---|
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
+| [terraform-azurerm](terraform-azurerm/) ([catalog](https://kadet-hub.org/generators/terraform-azurerm/)) | Terraform JSON for Azure: resource group, VNet with derived subnets, NSGs and associations, and hardened storage accounts with CAF names (hashicorp/azurerm 5.9.0) |
 
 Each directory is one generator with its own manifest (`kapitan-generator.yaml`),
 changelog and fixture project under `tests/fixtures`. Releases are tagged

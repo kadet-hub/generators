@@ -1,0 +1,13 @@
+name: terraform-azurerm
+description: Renders Terraform JSON for Azure virtual networks with derived subnets and network security groups, and for storage accounts with private containers.
+tags: [terraform, cloud, networking]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
