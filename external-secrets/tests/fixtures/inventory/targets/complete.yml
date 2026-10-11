@@ -1,0 +1,147 @@
+# Complete: every kind, Vault, OpenBao (via the vault provider) and Conjur,
+# both secretStoreRef shorthands, template passthrough, labels/annotations.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/external-secrets
+        output_path: manifests/
+
+  namespace: default
+  generators:
+    external_secrets:
+      namespace: platform
+      secretstores:
+        vault-backend:
+          namespace: thanos
+          labels:
+            team: observability
+          annotations:
+            example.com/owner: observability
+          spec:
+            provider:
+              vault:
+                server: https://vault.example.internal
+                path: secret
+                version: v2
+                caProvider:
+                  type: ConfigMap
+                  name: platform-ca
+                  key: ca-bundle.crt
+                auth:
+                  jwt:
+                    path: jwt
+                    role: thanos
+                    kubernetesServiceAccountToken:
+                      serviceAccountRef:
+                        name: external-secrets-reader
+                        audiences:
+                          - vault
+        openbao-backend:
+          spec:
+            provider:
+              vault:
+                server: https://openbao.example.internal
+                path: kv
+                version: v2
+                auth:
+                  jwt:
+                    path: jwt
+                    role: platform
+                    kubernetesServiceAccountToken:
+                      serviceAccountRef:
+                        name: external-secrets-reader
+        conjur-backend:
+          namespace: loki
+          spec:
+            provider:
+              conjur:
+                url: https://conjur.example.internal
+                caProvider:
+                  type: ConfigMap
+                  name: platform-ca
+                  key: ca-bundle.crt
+                auth:
+                  jwt:
+                    account: platform
+                    serviceID: k8s-cluster-a
+                    serviceAccountRef:
+                      name: external-secrets-reader
+                      audiences:
+                        - conjur
+      clustersecretstores:
+        shared-vault:
+          spec:
+            provider:
+              vault:
+                server: https://vault.example.internal
+                path: shared
+                version: v2
+                auth:
+                  jwt:
+                    path: jwt
+                    role: shared
+                    kubernetesServiceAccountToken:
+                      serviceAccountRef:
+                        name: external-secrets-reader
+                        namespace: external-secrets
+      externalsecrets:
+        thanos-objstore-config:
+          namespace: thanos
+          store: vault-backend
+          refresh_interval: 1h
+          spec:
+            target:
+              creationPolicy: Owner
+              template:
+                engineVersion: v2
+                data:
+                  objstore.yml: |
+                    type: S3
+                    config:
+                      access_key: "{{ .access_key }}"
+                      secret_key: "{{ .secret_key }}"
+            data:
+              - secretKey: access_key
+                remoteRef:
+                  key: thanos/s3
+                  property: access_key
+              - secretKey: secret_key
+                remoteRef:
+                  key: thanos/s3
+                  property: secret_key
+        loki-credentials:
+          namespace: loki
+          store: conjur-backend
+          refresh_interval: 30m
+          spec:
+            data:
+              - secretKey: password
+                remoteRef:
+                  key: platform/dev/loki/password
+        registry-pull:
+          cluster_store: shared-vault
+          allow_default_refresh: true
+          spec:
+            dataFrom:
+              - extract:
+                  key: registry/pull
+      clusterexternalsecrets:
+        ca-bundle:
+          cluster_store: shared-vault
+          refresh_interval: 12h
+          spec:
+            namespaces:
+              - thanos
+              - loki
+            externalSecretSpec:
+              data:
+                - secretKey: ca.crt
+                  remoteRef:
+                    key: pki/ca
+                    property: certificate

@@ -1,0 +1,42 @@
+# Policy flags enabled with a compliant inventory
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: policy
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/external-secrets
+        output_path: manifests/
+
+  namespace: thanos
+  generators:
+    external_secrets:
+      deny_cluster_scoped: true
+      namespace_key_prefix: platform/dev/
+      secretstores:
+        backend:
+          spec:
+            provider:
+              conjur:
+                url: https://conjur.example.internal
+                auth:
+                  jwt:
+                    account: platform
+                    serviceID: k8s-cluster-a
+                    serviceAccountRef:
+                      name: external-secrets-reader
+      externalsecrets:
+        thanos-objstore-config:
+          store: backend
+          refresh_interval: 1h
+          spec:
+            data:
+              - secretKey: access_key
+                remoteRef:
+                  key: platform/dev/thanos/access_key
+            dataFrom:
+              - extract:
+                  key: platform/dev/thanos/s3

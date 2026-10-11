@@ -1,0 +1,26 @@
+# Minimal: one ScaledObject with the scale_target_ref shorthand
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/keda
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    keda:
+      scaled_objects:
+        web:
+          scale_target_ref: web
+          triggers:
+            - type: cron
+              metadata:
+                timezone: Europe/Berlin
+                start: 0 8 * * 1-5
+                end: 0 18 * * 1-5
+                desiredReplicas: "3"

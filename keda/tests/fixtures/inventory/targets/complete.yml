@@ -1,0 +1,139 @@
+# Complete: every kind, every flat key, both shorthands and spec passthrough
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/keda
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    keda:
+      namespace: workers
+      scaled_objects:
+        orders-consumer:
+          labels:
+            team: orders
+          annotations:
+            example.com/owner: orders
+          scale_target_ref:
+            apiVersion: apps/v1
+            kind: StatefulSet
+            name: orders-consumer
+            envSourceContainerName: consumer
+          min_replica_count: 1
+          max_replica_count: 20
+          idle_replica_count: 0
+          polling_interval: 15
+          cooldown_period: 120
+          initial_cooldown_period: 60
+          fallback:
+            failureThreshold: 3
+            replicas: 5
+          advanced:
+            restoreToOriginalReplicaCount: true
+            horizontalPodAutoscalerConfig:
+              behavior:
+                scaleDown:
+                  stabilizationWindowSeconds: 300
+                  policies:
+                    - type: Percent
+                      value: 50
+                      periodSeconds: 60
+          triggers:
+            - type: rabbitmq
+              name: orders-queue
+              metadata:
+                protocol: amqp
+                queueName: orders
+                mode: QueueLength
+                value: "20"
+              authentication_ref: rabbitmq-auth
+            - type: prometheus
+              metricType: AverageValue
+              metadata:
+                serverAddress: http://prometheus.monitoring.svc:9090
+                query: sum(rate(http_requests_total{app="orders"}[2m]))
+                threshold: "100"
+              authentication_ref:
+                name: prometheus-auth
+                kind: ClusterTriggerAuthentication
+        frontend:
+          namespace: web
+          scale_target_ref: frontend
+          triggers:
+            - type: cpu
+              metricType: Utilization
+              metadata:
+                value: "60"
+          spec:
+            maxReplicaCount: 10
+      scaled_jobs:
+        report-builder:
+          job_target_ref:
+            parallelism: 1
+            completions: 1
+            backoffLimit: 4
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: builder
+                    image: registry.example.com/report-builder:1.0.0
+          env_source_container_name: builder
+          min_replica_count: 0
+          max_replica_count: 10
+          polling_interval: 30
+          successful_jobs_history_limit: 5
+          failed_jobs_history_limit: 5
+          scaling_strategy:
+            strategy: accurate
+          rollout:
+            strategy: gradual
+          triggers:
+            - type: aws-sqs-queue
+              metadata:
+                queueURL: https://sqs.eu-central-1.amazonaws.com/000000000000/reports
+                queueLength: "5"
+                awsRegion: eu-central-1
+              authentication_ref: aws-auth
+      trigger_authentications:
+        rabbitmq-auth:
+          secret_target_ref:
+            - parameter: host
+              name: rabbitmq-credentials
+              key: host
+        aws-auth:
+          pod_identity:
+            provider: aws
+        redis-auth:
+          namespace: web
+          hashi_corp_vault:
+            address: https://vault.example.com
+            authentication: kubernetes
+            role: keda
+            mount: kubernetes
+            secrets:
+              - parameter: password
+                key: password
+                path: secret/data/web/redis
+          env:
+            - parameter: username
+              name: REDIS_USER
+              containerName: frontend
+          config_map_target_ref:
+            - parameter: host
+              name: redis-config
+              key: host
+      cluster_trigger_authentications:
+        prometheus-auth:
+          labels:
+            team: platform
+          bound_service_account_token:
+            - parameter: bearerToken
+              serviceAccountName: keda-prometheus

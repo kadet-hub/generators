@@ -1,0 +1,41 @@
+# Minimal: one Vault SecretStore and one ExternalSecret using the shorthands
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/external-secrets
+        output_path: manifests/
+
+  namespace: thanos
+  generators:
+    external_secrets:
+      secretstores:
+        backend:
+          spec:
+            provider:
+              vault:
+                server: https://vault.example.internal
+                path: secret
+                version: v2
+                auth:
+                  jwt:
+                    path: jwt
+                    role: thanos
+                    kubernetesServiceAccountToken:
+                      serviceAccountRef:
+                        name: external-secrets-reader
+      externalsecrets:
+        thanos-objstore-config:
+          store: backend
+          refresh_interval: 1h
+          spec:
+            data:
+              - secretKey: access_key
+                remoteRef:
+                  key: thanos/s3
+                  property: access_key
