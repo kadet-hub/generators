@@ -1,0 +1,1304 @@
+{
+ "format_version": "1.0",
+ "provider_schemas": {
+  "registry.terraform.io/opentelekomcloud/opentelekomcloud": {
+   "data_source_schemas": {},
+   "provider": {
+    "block": {
+     "attributes": {
+      "access_key": {
+       "description": "The access key for API operations. You can retrieve this\nfrom the 'My Credential' section of the console.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "agency_domain_name": {
+       "description": "The name of domain who created the agency (Identity v3).",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "agency_name": {
+       "description": "The name of agency",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "allow_reauth": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "auth_url": {
+       "description": "The Identity authentication URL.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "backoff_retry_timeout": {
+       "description": "Timeout in seconds for backoff retry",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "cacert_file": {
+       "description": "A Custom CA certificate.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cert": {
+       "description": "A client certificate to authenticate with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud": {
+       "description": "An entry in a `clouds.yaml` file to use.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "delegated_project": {
+       "description": "The name of delegated project (Identity v3).",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "domain_id": {
+       "description": "The ID of the Domain to scope to (Identity v3).",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "domain_name": {
+       "description": "The name of the Domain to scope to (Identity v3).",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "enable_force_new": {
+       "description": "Whether to enable ForceNew",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "endpoint_type": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "enterprise_project_id": {
+       "description": "enterprise project id",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "insecure": {
+       "description": "Trust self-signed certificates.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "key": {
+       "description": "A client private key to authenticate with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "max_backoff_retries": {
+       "description": "How many times HTTP request should be retried when rate limit reached",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "max_retries": {
+       "description": "How many times HTTP connection should be retried until giving up.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "passcode": {
+       "description": "One-time MFA passcode",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "password": {
+       "description": "Password to login with.",
+       "description_kind": "plain",
+       "optional": true,
+       "sensitive": true,
+       "type": "string"
+      },
+      "region": {
+       "description": "The OpenTelekomCloud region to connect to.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "request_timeout": {
+       "description": "Timeout in seconds for HTTP connection setup, TLS handshake, and response headers",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "secret_key": {
+       "description": "The secret key for API operations. You can retrieve this\nfrom the 'My Credential' section of the console.",
+       "description_kind": "plain",
+       "optional": true,
+       "sensitive": true,
+       "type": "string"
+      },
+      "security_token": {
+       "description": "Security token to use for OBS federated authentication.",
+       "description_kind": "plain",
+       "optional": true,
+       "sensitive": true,
+       "type": "string"
+      },
+      "swauth": {
+       "description": "Use Swift's authentication system instead of Keystone. Only used for\ninteraction with Swift.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "tenant_id": {
+       "description": "The ID of the Tenant (Identity v2) or Project (Identity v3)\nto login with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "tenant_name": {
+       "description": "The name of the Tenant (Identity v2) or Project (Identity v3)\nto login with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "token": {
+       "description": "Authentication token to use as an alternative to username/password.",
+       "description_kind": "plain",
+       "optional": true,
+       "sensitive": true,
+       "type": "string"
+      },
+      "user_id": {
+       "description": "User ID to login with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "user_name": {
+       "description": "Username to login with.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      }
+     },
+     "description_kind": "plain"
+    },
+    "version": 0
+   },
+   "resource_schemas": {
+    "opentelekomcloud_kms_key_v1": {
+     "block": {
+      "attributes": {
+       "allow_cancel_deletion": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "creation_date": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "default_key_flag": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "domain_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "expiration_time": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "is_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "key_alias": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "key_description": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "key_state": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "origin": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "pending_days": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "realm": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "rotation_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "rotation_interval": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "rotation_number": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "number"
+       },
+       "scheduled_deletion_date": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_nat_gateway_v2": {
+     "block": {
+      "attributes": {
+       "description": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "internal_network_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "router_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "spec": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tenant_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_nat_snat_rule_v2": {
+     "block": {
+      "attributes": {
+       "cidr": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "description": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "floating_ip_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "nat_gateway_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "source_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_obs_bucket": {
+     "block": {
+      "attributes": {
+       "acl": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "bucket_domain_name": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "bucket_version": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "enterprise_project_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "force_destroy": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "parallel_fs": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "storage_class": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "user_domain_names": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "versioning": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       }
+      },
+      "block_types": {
+       "cors_rule": {
+        "block": {
+         "attributes": {
+          "allowed_headers": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "allowed_methods": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "allowed_origins": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "expose_headers": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "max_age_seconds": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "event_notifications": {
+        "block": {
+         "attributes": {
+          "events": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "id": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "topic": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "filter_rule": {
+           "block": {
+            "attributes": {
+             "name": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "value": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "lifecycle_rule": {
+        "block": {
+         "attributes": {
+          "enabled": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "name": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "prefix": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "abort_incomplete_multipart_upload": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          },
+          "expiration": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          },
+          "noncurrent_version_expiration": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          },
+          "noncurrent_version_transition": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             },
+             "storage_class": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "list"
+          },
+          "tag": {
+           "block": {
+            "attributes": {
+             "key": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             },
+             "value": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "list"
+          },
+          "transition": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             },
+             "storage_class": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "logging": {
+        "block": {
+         "attributes": {
+          "agency": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "target_bucket": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "target_prefix": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "server_side_encryption": {
+        "block": {
+         "attributes": {
+          "algorithm": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "kms_key_id": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "kms_project_id": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       },
+       "website": {
+        "block": {
+         "attributes": {
+          "error_document": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "index_document": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "redirect_all_requests_to": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "routing_rules": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "worm_policy": {
+        "block": {
+         "attributes": {
+          "days": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "years": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_vpc_eip_v1": {
+     "block": {
+      "attributes": {
+       "allow_share_bandwidth_types": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "enterprise_project_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "public_border_group": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "unbind_port": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "value_specs": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "bandwidth": {
+        "block": {
+         "attributes": {
+          "charge_mode": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "id": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "name": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "share_type": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "size": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "min_items": 1,
+        "nesting_mode": "list"
+       },
+       "publicip": {
+        "block": {
+         "attributes": {
+          "ip_address": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "ip_version": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "name": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "port_id": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "type": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "min_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_vpc_subnet_v1": {
+     "block": {
+      "attributes": {
+       "availability_zone": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "cidr": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "cidr_ipv6": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "created_at": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "description": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "dhcp_enable": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "dns_list": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "list",
+         "string"
+        ]
+       },
+       "gateway_ip": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "gateway_ipv6": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_enable": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "ntp_addresses": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "primary_dns": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "scope": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dns": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "status": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "subnet_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "subnet_id_v6": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tenant_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "updated_at": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "vpc_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "opentelekomcloud_vpc_v1": {
+     "block": {
+      "attributes": {
+       "cidr": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "created_at": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "description": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "enterprise_project_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "routes": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": [
+         "list",
+         [
+          "object",
+          {
+           "destination": "string",
+           "nexthop": "string"
+          }
+         ]
+        ]
+       },
+       "secondary_cidr": {
+        "deprecated": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "shared": {
+        "computed": true,
+        "deprecated": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "status": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tenant_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "updated_at": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,3136 @@
+{
+ "format_version": "1.0",
+ "provider_schemas": {
+  "registry.terraform.io/hashicorp/google": {
+   "data_source_schemas": {},
+   "provider": {
+    "block": {
+     "attributes": {
+      "access_approval_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "access_context_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "access_token": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "active_directory_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "add_terraform_attribution_label": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "agent_identity_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "agent_registry_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "agentic_applications_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "alloydb_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "apigee_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "apihub_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "apikeys_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "app_engine_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "apphub_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "artifact_registry_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "assured_workloads_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "backup_dr_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "beyondcorp_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "big_query_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "biglake_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "biglake_hive_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "biglake_iceberg_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_analytics_hub_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_connection_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_data_transfer_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_datapolicy_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_datapolicyv2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigquery_reservation_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "bigtable_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "billing_budgets_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "billing_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "billing_project": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "binary_authorization_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "blockchain_node_engine_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "certificate_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "ces_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "chronicle_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_asset_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_billing_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_build_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_functions_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_identity_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_ids_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_quotas_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_resource_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_run_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_run_v2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_scheduler_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_security_compliance_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_support_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloud_tasks_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloudbuildv2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "clouddeploy_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "clouddomains_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "cloudfunctions2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "colab_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "composer_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "compute_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "config_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "contact_center_insights_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "container_analysis_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "container_attached_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "container_aws_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "container_azure_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "container_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "core_billing_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "credentials": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "data_catalog_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "data_fusion_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "data_lineage_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "data_loss_prevention_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "data_pipeline_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "database_migration_service_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataflow_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataform_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataplex_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataproc_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataproc_gdc_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dataproc_metastore_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "datastream_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "default_labels": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "map",
+        "string"
+       ]
+      },
+      "deletion_policy": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "deployment_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "developer_connect_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dialogflow_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dialogflow_cx_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "discovery_engine_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "dns_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "document_ai_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "document_ai_warehouse_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "edgecontainer_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "edgenetwork_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "essential_contacts_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "eventarc_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "filestore_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firebase_app_check_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firebase_app_hosting_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firebase_data_connect_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firebase_remote_config_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firebaserules_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "firestore_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "gemini_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "gke_backup_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "gke_hub2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "gke_hub_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "gkeonprem_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "healthcare_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "hypercomputecluster_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam3_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam_beta_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam_credentials_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iam_workforce_pool_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "iap_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "identity_platform_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "impersonate_service_account": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "impersonate_service_account_delegates": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "integration_connectors_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "integrations_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "kms_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "license_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "logging_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "looker_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "lustre_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "managed_kafka_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "memcache_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "memorystore_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "migration_center_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "model_armor_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "model_armor_global_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "monitoring_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "netapp_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_connectivity_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_connectivityv1_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_management_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_managementv1_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_security_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "network_services_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "observability_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "oracle_database_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "org_policy_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "os_config_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "os_config_v2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "os_login_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "parallelstore_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "parameter_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "parameter_manager_regional_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "poll_interval": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "prefer_global_endpoints": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "prefer_regional_endpoints": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "privateca_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "privileged_access_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "project": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "public_ca_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "pubsub_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "pubsub_lite_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "recaptcha_enterprise_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "redis_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "region": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "request_reason": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "request_timeout": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "resource_manager3_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "resource_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "resource_manager_v3_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "scopes": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "secret_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "secret_manager_regional_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "secure_source_manager_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "security_center_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "security_center_management_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "security_center_v2_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "securityposture_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "service_directory_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "service_management_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "service_networking_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "service_usage_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "site_verification_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "source_repo_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "spanner_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "sql_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_batch_operations_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_control_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_ftp_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_insights_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "storage_transfer_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "tags_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "tags_location_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "terraform_attribution_label_addition_strategy": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "transcoder_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "universe_domain": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "user_project_override": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "vector_search_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "vertex_ai_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "vmwareengine_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "vpc_access_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "workbench_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "workflows_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "workload_identity_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "workstations_custom_endpoint": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "zone": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      }
+     },
+     "block_types": {
+      "batching": {
+       "block": {
+        "attributes": {
+         "enable_batching": {
+          "description_kind": "plain",
+          "optional": true,
+          "type": "bool"
+         },
+         "send_after": {
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      },
+      "external_credentials": {
+       "block": {
+        "attributes": {
+         "audience": {
+          "description_kind": "plain",
+          "required": true,
+          "type": "string"
+         },
+         "identity_token": {
+          "description_kind": "plain",
+          "required": true,
+          "type": "string"
+         },
+         "service_account_email": {
+          "description_kind": "plain",
+          "required": true,
+          "type": "string"
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      }
+     },
+     "description_kind": "plain"
+    },
+    "version": 0
+   },
+   "resource_schemas": {
+    "google_compute_firewall": {
+     "block": {
+      "attributes": {
+       "creation_timestamp": {
+        "computed": true,
+        "description": "Creation timestamp in RFC3339 text format.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "description": {
+        "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "destination_ranges": {
+        "computed": true,
+        "description": "If destination ranges are specified, the firewall will apply only to\ntraffic that has destination IP address in these ranges. These ranges\nmust be expressed in CIDR format. IPv4 or IPv6 ranges are supported.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "direction": {
+        "computed": true,
+        "description": "Direction of traffic to which this firewall applies; default is\nINGRESS. Note: For INGRESS traffic, one of 'source_ranges',\n'source_tags' or 'source_service_accounts' is required. Possible values: [\"INGRESS\", \"EGRESS\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "disabled": {
+        "description": "Denotes whether the firewall rule is disabled, i.e not applied to the\nnetwork it is associated with. When set to true, the firewall rule is\nnot enforced and the network behaves as if it did not exist. If this\nis unspecified, the firewall rule will be enabled.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_logging": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "Deprecated in favor of log_config",
+        "description": "This field denotes whether to enable logging for a particular firewall rule. If logging is enabled, logs will be exported to Stackdriver.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network": {
+        "description": "The name or self_link of the network to attach this firewall to.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "priority": {
+        "description": "Priority for this rule. This is an integer between 0 and 65535, both\ninclusive. When not specified, the value assumed is 1000. Relative\npriorities determine precedence of conflicting rules. Lower value of\npriority implies higher precedence (eg, a rule with priority 0 has\nhigher precedence than a rule with priority 1). DENY rules take\nprecedence over ALLOW rules having equal priority.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "project": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "self_link": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "source_ranges": {
+        "description": "If source ranges are specified, the firewall will apply only to\ntraffic that has source IP address in these ranges. These ranges must\nbe expressed in CIDR format. One or both of sourceRanges and\nsourceTags may be set. If both properties are set, the firewall will\napply to traffic that has source IP address within sourceRanges OR the\nsource IP that belongs to a tag listed in the sourceTags property. The\nconnection does not need to match both properties for the firewall to\napply. IPv4 or IPv6 ranges are supported. For INGRESS traffic, one of\n'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "source_service_accounts": {
+        "description": "If source service accounts are specified, the firewall will apply only\nto traffic originating from an instance with a service account in this\nlist. Source service accounts cannot be used to control traffic to an\ninstance's external IP address because service accounts are associated\nwith an instance, not an IP address. sourceRanges can be set at the\nsame time as sourceServiceAccounts. If both are set, the firewall will\napply to traffic that has source IP address within sourceRanges OR the\nsource IP belongs to an instance with service account listed in\nsourceServiceAccount. The connection does not need to match both\nproperties for the firewall to apply. sourceServiceAccounts cannot be\nused at the same time as sourceTags or targetTags. For INGRESS traffic,\none of 'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "source_tags": {
+        "description": "If source tags are specified, the firewall will apply only to traffic\nwith source IP that belongs to a tag listed in source tags. Source\ntags cannot be used to control traffic to an instance's external IP\naddress. Because tags are associated with an instance, not an IP\naddress. One or both of sourceRanges and sourceTags may be set. If\nboth properties are set, the firewall will apply to traffic that has\nsource IP address within sourceRanges OR the source IP that belongs to\na tag listed in the sourceTags property. The connection does not need\nto match both properties for the firewall to apply. For INGRESS traffic,\none of 'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "target_service_accounts": {
+        "description": "A list of service accounts indicating sets of instances located in the\nnetwork that may make network connections as specified in allowed[].\ntargetServiceAccounts cannot be used at the same time as targetTags or\nsourceTags. If neither targetServiceAccounts nor targetTags are\nspecified, the firewall rule applies to all instances on the specified\nnetwork.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "target_tags": {
+        "description": "A list of instance tags indicating sets of instances located in the\nnetwork that may make network connections as specified in allowed[].\nIf no targetTags are specified, the firewall rule applies to all\ninstances on the specified network.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "allow": {
+        "block": {
+         "attributes": {
+          "ports": {
+           "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\n\nExample inputs include: [22], [80, 443], and\n[\"12345-12349\"].",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "protocol": {
+           "description": "The IP protocol to which this rule applies. The protocol type is\nrequired when creating a firewall rule. This value can either be\none of the following well known protocol strings (tcp, udp,\nicmp, esp, ah, sctp, ipip, all), or the IP protocol number.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "The list of ALLOW rules specified by this firewall. Each rule\nspecifies a protocol and port-range tuple that describes a permitted\nconnection.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "deny": {
+        "block": {
+         "attributes": {
+          "ports": {
+           "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\n\nExample inputs include: [22], [80, 443], and\n[\"12345-12349\"].",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "protocol": {
+           "description": "The IP protocol to which this rule applies. The protocol type is\nrequired when creating a firewall rule. This value can either be\none of the following well known protocol strings (tcp, udp,\nicmp, esp, ah, sctp, ipip, all), or the IP protocol number.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "The list of DENY rules specified by this firewall. Each rule specifies\na protocol and port-range tuple that describes a denied connection.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "log_config": {
+        "block": {
+         "attributes": {
+          "metadata": {
+           "description": "This field denotes whether to include or exclude metadata for firewall logs. Possible values: [\"EXCLUDE_ALL_METADATA\", \"INCLUDE_ALL_METADATA\"]",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "This field denotes the logging options for a particular firewall rule.\nIf defined, logging is enabled, and logs will be exported to Cloud Logging.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "params": {
+        "block": {
+         "attributes": {
+          "resource_manager_tags": {
+           "description": "Resource manager tags to be bound to the firewall. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456. The field is ignored when empty.\nThe field is immutable and causes resource replacement when mutated. This field is only\nset at create time and modifying this field after creation will trigger recreation.\nTo apply tags to an existing resource, see the google_tags_tag_binding resource.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "map",
+            "string"
+           ]
+          }
+         },
+         "description": "Additional params passed with the request, but not persisted as part of resource payload",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 1
+    },
+    "google_compute_network": {
+     "block": {
+      "attributes": {
+       "auto_create_subnetworks": {
+        "description": "When set to 'true', the network is created in \"auto subnet mode\" and\nit will create a subnet for each region automatically across the\n'10.128.0.0/9' address range.\n\nWhen set to 'false', the network is created in \"custom subnet mode\" so\nthe user can explicitly connect subnetwork resources.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "bgp_always_compare_med": {
+        "computed": true,
+        "description": "Enables/disables the comparison of MED across routes with different Neighbor ASNs.\nThis value can only be set if the --bgp-best-path-selection-mode is STANDARD",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "bgp_best_path_selection_mode": {
+        "computed": true,
+        "description": "The BGP best selection algorithm to be employed. MODE can be LEGACY or STANDARD. Possible values: [\"LEGACY\", \"STANDARD\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "bgp_inter_region_cost": {
+        "computed": true,
+        "description": "Choice of the behavior of inter-regional cost and MED in the BPS algorithm. Possible values: [\"DEFAULT\", \"ADD_COST_TO_MED\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "delete_bgp_always_compare_med": {
+        "description": "If set to 'true', the 'bgp_always_compare_med' field will be cleared.\nIf set to 'false' (the default), 'bgp_always_compare_med' will be set to the value specified in the configuration.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "delete_default_routes_on_create": {
+        "description": "If set to 'true', default routes ('0.0.0.0/0') will be deleted\nimmediately after network creation. Defaults to 'false'.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "description": {
+        "description": "An optional description of this resource. The resource must be\nrecreated to modify this field.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "enable_ula_internal_ipv6": {
+        "description": "Enable ULA internal ipv6 on this network. Enabling this feature will assign\na /48 from google defined ULA prefix fd20::/20.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "gateway_ipv4": {
+        "computed": true,
+        "description": "The gateway address for default routing out of the network. This value\nis selected by GCP.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "internal_ipv6_range": {
+        "computed": true,
+        "description": "When enabling ula internal ipv6, caller optionally can specify the /48 range\nthey want from the google defined ULA prefix fd20::/20. The input must be a\nvalid /48 ULA IPv6 address and must be within the fd20::/20. Operation will\nfail if the speficied /48 is already in used by another resource.\nIf the field is not speficied, then a /48 range will be randomly allocated from fd20::/20 and returned via this field.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "mtu": {
+        "computed": true,
+        "description": "Maximum Transmission Unit in bytes. The default value is 1460 bytes.\nThe minimum value for this field is 1300 and the maximum value is 8896 bytes (jumbo frames).\nNote that packets larger than 1500 bytes (standard Ethernet) can be subject to TCP-MSS clamping or dropped\nwith an ICMP 'Fragmentation-Needed' message if the packets are routed to the Internet or other VPCs\nwith varying MTUs.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "name": {
+        "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network_firewall_policy_enforcement_order": {
+        "description": "Set the order that Firewall Rules and Firewall Policies are evaluated. Default value: \"AFTER_CLASSIC_FIREWALL\" Possible values: [\"BEFORE_CLASSIC_FIREWALL\", \"AFTER_CLASSIC_FIREWALL\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_id": {
+        "computed": true,
+        "description": "The unique identifier for the resource. This identifier is defined by the server.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "network_profile": {
+        "description": "A full or partial URL of the network profile to apply to this network.\nThis field can be set only at resource creation time. For example, the\nfollowing are valid URLs:\n* https://www.googleapis.com/compute/v1/projects/{projectId}/global/networkProfiles/{network_profile_name}\n* projects/{projectId}/global/networkProfiles/{network_profile_name}",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "numeric_id": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "`numeric_id` is deprecated and will be removed in a future major release. Use `network_id` instead.",
+        "description": "The unique identifier for the resource. This identifier is defined by the server.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "project": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "routing_mode": {
+        "computed": true,
+        "description": "The network-wide routing mode to use. If set to 'REGIONAL', this\nnetwork's cloud routers will only advertise routes with subnetworks\nof this network in the same region as the router. If set to 'GLOBAL',\nthis network's cloud routers will advertise routes with all\nsubnetworks of this network, across regions. Possible values: [\"REGIONAL\", \"GLOBAL\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "self_link": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "params": {
+        "block": {
+         "attributes": {
+          "resource_manager_tags": {
+           "description": "Resource manager tags to be bound to the network. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "map",
+            "string"
+           ]
+          }
+         },
+         "description": "Additional params passed with the request, but not persisted as part of resource payload",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "google_compute_router": {
+     "block": {
+      "attributes": {
+       "creation_timestamp": {
+        "computed": true,
+        "description": "Creation timestamp in RFC3339 text format.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "description": {
+        "description": "An optional description of this resource.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "encrypted_interconnect_router": {
+        "description": "Indicates if a router is dedicated for use with encrypted VLAN\nattachments (interconnectAttachments).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description": "Name of the resource. The name must be 1-63 characters long, and\ncomply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?'\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "ncc_gateway": {
+        "description": "A URI of an NCC Gateway spoke",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network": {
+        "description": "A reference to the network to which this router belongs.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "project": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where the router resides.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "self_link": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "bgp": {
+        "block": {
+         "attributes": {
+          "advertise_mode": {
+           "description": "User-specified flag to indicate which mode to use for advertisement. Default value: \"DEFAULT\" Possible values: [\"DEFAULT\", \"CUSTOM\"]",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "advertised_groups": {
+           "description": "User-specified list of prefix groups to advertise in custom mode.\nThis field can only be populated if advertiseMode is CUSTOM and\nis advertised to all peers of the router. These groups will be\nadvertised in addition to any specified prefixes. Leave this field\nblank to advertise no custom groups.\n\nThis enum field has the one valid value: ALL_SUBNETS",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "asn": {
+           "description": "Local BGP Autonomous System Number (ASN). Must be an RFC6996\nprivate ASN, either 16-bit or 32-bit. The value will be fixed for\nthis router resource. All VPN tunnels that link to this router\nwill have the same local ASN.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "number"
+          },
+          "identifier_range": {
+           "computed": true,
+           "description": "Explicitly specifies a range of valid BGP Identifiers for this Router.\nIt is provided as a link-local IPv4 range (from 169.254.0.0/16), of\nsize at least /30, even if the BGP sessions are over IPv6. It must\nnot overlap with any IPv4 BGP session ranges. Other vendors commonly\ncall this router ID.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "keepalive_interval": {
+           "description": "The interval in seconds between BGP keepalive messages that are sent\nto the peer. Hold time is three times the interval at which keepalive\nmessages are sent, and the hold time is the maximum number of seconds\nallowed to elapse between successive keepalive messages that BGP\nreceives from a peer.\n\nBGP will use the smaller of either the local hold time value or the\npeer's hold time value as the hold time for the BGP connection\nbetween the two peers. If set, this value must be between 20 and 60.\nThe default is 20.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "block_types": {
+          "advertised_ip_ranges": {
+           "block": {
+            "attributes": {
+             "description": {
+              "description": "User-specified description for the IP range.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "range": {
+              "description": "The IP range to advertise. The value must be a\nCIDR-formatted string.",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "User-specified list of individual IP ranges to advertise in\ncustom mode. This field can only be populated if advertiseMode\nis CUSTOM and is advertised to all peers of the router. These IP\nranges will be advertised in addition to any specified groups.\nLeave this field blank to advertise no custom IP ranges.",
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          }
+         },
+         "description": "BGP information specific to this router.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "md5_authentication_keys": {
+        "block": {
+         "attributes": {
+          "key": {
+           "description": "Value of the key used for MD5 authentication.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "name": {
+           "description": "Name used to identify the key. Must be unique within a router.\nMust be referenced by exactly one bgpPeer. Must comply with RFC1035.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "Keys used for MD5 authentication.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "params": {
+        "block": {
+         "attributes": {
+          "resource_manager_tags": {
+           "description": "Resource manager tags to be bound to the router. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "map",
+            "string"
+           ]
+          }
+         },
+         "description": "Additional params passed with the request, but not persisted as part of resource payload",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "google_compute_router_nat": {
+     "block": {
+      "attributes": {
+       "auto_network_tier": {
+        "computed": true,
+        "description": "The network tier to use when automatically reserving NAT IP addresses.\nMust be one of: PREMIUM, STANDARD. If not specified, then the current\nproject-level default tier is used. Possible values: [\"PREMIUM\", \"STANDARD\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "drain_nat_ips": {
+        "computed": true,
+        "description": "A list of URLs of the IP resources to be drained. These IPs must be\nvalid static external IPs that have been assigned to the NAT.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "enable_dynamic_port_allocation": {
+        "computed": true,
+        "description": "Enable Dynamic Port Allocation.\nIf minPortsPerVm is set, minPortsPerVm must be set to a power of two greater than or equal to 32.\nIf minPortsPerVm is not set, a minimum of 32 ports will be allocated to a VM from this NAT config.\nIf maxPortsPerVm is set, maxPortsPerVm must be set to a power of two greater than minPortsPerVm.\nIf maxPortsPerVm is not set, a maximum of 65536 ports will be allocated to a VM from this NAT config.\n\nMutually exclusive with enableEndpointIndependentMapping.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_endpoint_independent_mapping": {
+        "computed": true,
+        "description": "Enable endpoint independent mapping.\nFor more information see the [official documentation](https://docs.cloud.google.com/nat/docs/public-nat#specs-rfcs).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "endpoint_types": {
+        "computed": true,
+        "description": "Specifies the endpoint Types supported by the NAT Gateway.\nSupported values include:\n      'ENDPOINT_TYPE_VM', 'ENDPOINT_TYPE_SWG',\n      'ENDPOINT_TYPE_MANAGED_PROXY_LB'.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "list",
+         "string"
+        ]
+       },
+       "icmp_idle_timeout_sec": {
+        "description": "Timeout (in seconds) for ICMP connections. Defaults to 30s if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "initial_nat_ips": {
+        "description": "Self-links of NAT IPs to be used as initial value for creation alongside a RouterNatAddress resource.\nConflicts with natIps and drainNatIps. Only valid if natIpAllocateOption is set to MANUAL_ONLY.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "max_ports_per_vm": {
+        "description": "Maximum number of ports allocated to a VM from this NAT.\nThis field can only be set when enableDynamicPortAllocation is enabled.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "min_ports_per_vm": {
+        "computed": true,
+        "description": "Minimum number of ports allocated to a VM from this NAT. Defaults to 64 for static port allocation and 32 dynamic port allocation if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "name": {
+        "description": "Name of the NAT service. The name must be 1-63 characters long and\ncomply with RFC1035.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "nat_ip_allocate_option": {
+        "description": "How external IPs should be allocated for this NAT. Valid values are\n'AUTO_ONLY' for only allowing NAT IPs allocated by Google Cloud\nPlatform, or 'MANUAL_ONLY' for only user-allocated NAT IP addresses. Possible values: [\"MANUAL_ONLY\", \"AUTO_ONLY\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "nat_ips": {
+        "computed": true,
+        "description": "Self-links of NAT IPs. Only valid if natIpAllocateOption\nis set to MANUAL_ONLY.\nIf this field is used alongside with a count created list of address resources 'google_compute_address.foobar.*.self_link',\nthe access level resource for the address resource must have a 'lifecycle' block with 'create_before_destroy = true' so\nthe number of resources can be increased/decreased without triggering the 'resourceInUseByAnotherResource' error.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "project": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where the router and NAT reside.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "router": {
+        "description": "The name of the Cloud Router in which this NAT will be configured.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "source_subnetwork_ip_ranges_to_nat": {
+        "description": "How NAT should be configured per Subnetwork.\nIf 'ALL_SUBNETWORKS_ALL_IP_RANGES', all of the\nIP ranges in every Subnetwork are allowed to Nat.\nIf 'ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES', all of the primary IP\nranges in every Subnetwork are allowed to Nat.\n'LIST_OF_SUBNETWORKS': A list of Subnetworks are allowed to Nat\n(specified in the field subnetwork below). Note that if this field\ncontains ALL_SUBNETWORKS_ALL_IP_RANGES or\nALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any\nother RouterNat section in any Router for this network in this region. Possible values: [\"ALL_SUBNETWORKS_ALL_IP_RANGES\", \"ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES\", \"LIST_OF_SUBNETWORKS\"]",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "source_subnetwork_ip_ranges_to_nat64": {
+        "description": "Specify the Nat option for NAT64, which can take one of the following values:\nALL_IPV6_SUBNETWORKS: All of the IP ranges in every Subnetwork are allowed to Nat.\nLIST_OF_IPV6_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field nat64Subnetwork below).\nNote that if this field contains NAT64_ALL_V6_SUBNETWORKS no other Router.Nat section in this region can also enable NAT64 for any Subnetworks in this network.\nOther Router.Nat sections can still be present to enable NAT44 only. Possible values: [\"ALL_IPV6_SUBNETWORKS\", \"LIST_OF_IPV6_SUBNETWORKS\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tcp_established_idle_timeout_sec": {
+        "description": "Timeout (in seconds) for TCP established connections.\nDefaults to 1200s if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "tcp_time_wait_timeout_sec": {
+        "description": "Timeout (in seconds) for TCP connections that are in TIME_WAIT state.\nDefaults to 120s if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "tcp_transitory_idle_timeout_sec": {
+        "description": "Timeout (in seconds) for TCP transitory connections.\nDefaults to 30s if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "type": {
+        "description": "Indicates whether this NAT is used for public or private IP translation.\nIf unspecified, it defaults to PUBLIC.\nIf 'PUBLIC' NAT used for public IP translation.\nIf 'PRIVATE' NAT used for private IP translation. Default value: \"PUBLIC\" Possible values: [\"PUBLIC\", \"PRIVATE\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "udp_idle_timeout_sec": {
+        "description": "Timeout (in seconds) for UDP connections. Defaults to 30s if not set.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       }
+      },
+      "block_types": {
+       "log_config": {
+        "block": {
+         "attributes": {
+          "enable": {
+           "description": "Indicates whether or not to export logs.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "filter": {
+           "description": "Specifies the desired filtering of logs on this NAT. Possible values: [\"ERRORS_ONLY\", \"TRANSLATIONS_ONLY\", \"ALL\"]",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "Configuration for logging on NAT",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "nat64_subnetwork": {
+        "block": {
+         "attributes": {
+          "name": {
+           "description": "Self-link of the subnetwork resource that will use NAT64",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "One or more subnetwork NAT configurations whose traffic should be translated by NAT64 Gateway.\nOnly used if 'source_subnetwork_ip_ranges_to_nat64' is set to 'LIST_OF_IPV6_SUBNETWORKS'",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "rules": {
+        "block": {
+         "attributes": {
+          "description": {
+           "description": "An optional description of this rule.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "match": {
+           "description": "CEL expression that specifies the match condition that egress traffic from a VM is evaluated against.\nIf it evaluates to true, the corresponding action is enforced.\n\nThe following examples are valid match expressions for public NAT:\n\n\"inIpRange(destination.ip, '1.1.0.0/16') || inIpRange(destination.ip, '2.2.0.0/16')\"\n\n\"destination.ip == '1.1.0.1' || destination.ip == '8.8.8.8'\"\n\nThe following example is a valid match expression for private NAT:\n\n\"nexthop.hub == 'https://networkconnectivity.googleapis.com/v1alpha1/projects/my-project/global/hub/hub-1'\"",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "rule_number": {
+           "description": "An integer uniquely identifying a rule in the list.\nThe rule number must be a positive value between 0 and 65000, and must be unique among rules within a NAT.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "number"
+          }
+         },
+         "block_types": {
+          "action": {
+           "block": {
+            "attributes": {
+             "source_nat_active_ips": {
+              "description": "A list of URLs of the IP resources used for this NAT rule.\nThese IP addresses must be valid static external IP addresses assigned to the project.\nThis field is used for public NAT.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "source_nat_active_ranges": {
+              "description": "A list of URLs of the subnetworks used as source ranges for this NAT Rule.\nThese subnetworks must have purpose set to PRIVATE_NAT.\nThis field is used for private NAT.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "source_nat_drain_ips": {
+              "description": "A list of URLs of the IP resources to be drained.\nThese IPs must be valid static external IPs that have been assigned to the NAT.\nThese IPs should be used for updating/patching a NAT rule only.\nThis field is used for public NAT.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "source_nat_drain_ranges": {
+              "description": "A list of URLs of subnetworks representing source ranges to be drained.\nThis is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule.\nThis field is used for private NAT.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             }
+            },
+            "description": "The action to be enforced for traffic that matches this rule.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description": "A list of rules associated with this NAT.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "subnetwork": {
+        "block": {
+         "attributes": {
+          "name": {
+           "description": "Self-link of subnetwork to NAT",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "secondary_ip_range_names": {
+           "description": "List of the secondary ranges of the subnetwork that are allowed\nto use NAT. This can be populated only if\n'LIST_OF_SECONDARY_IP_RANGES' is one of the values in\nsourceIpRangesToNat",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "source_ip_ranges_to_nat": {
+           "description": "List of options for which source IPs in the subnetwork\nshould have NAT enabled. Supported values include:\n'ALL_IP_RANGES', 'LIST_OF_SECONDARY_IP_RANGES',\n'PRIMARY_IP_RANGE'.",
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          }
+         },
+         "description": "One or more subnetwork NAT configurations. Only used if\n'source_subnetwork_ip_ranges_to_nat' is set to 'LIST_OF_SUBNETWORKS'",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "google_compute_subnetwork": {
+     "block": {
+      "attributes": {
+       "allow_subnet_cidr_routes_overlap": {
+        "computed": true,
+        "description": "Typically packets destined to IPs within the subnetwork range that do not match\nexisting resources are dropped and prevented from leaving the VPC.\nSetting this field to true will allow these packets to match dynamic routes injected\nvia BGP even if their destinations match existing subnet ranges.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "creation_timestamp": {
+        "computed": true,
+        "description": "Creation timestamp in RFC3339 text format.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "description": {
+        "description": "An optional description of this resource. Provide this property when\nyou create the resource. This field can be set only at resource\ncreation time.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "external_ipv6_prefix": {
+        "computed": true,
+        "description": "The range of external IPv6 addresses that are owned by this subnetwork.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "fingerprint": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "This field is not useful for users, and has been removed as an output.",
+        "description": "Fingerprint of this resource. This field is used internally during updates of this resource.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "gateway_address": {
+        "computed": true,
+        "description": "The gateway address for default routes to reach destination addresses\noutside this subnetwork.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "internal_ipv6_prefix": {
+        "computed": true,
+        "description": "The internal IPv6 address range that is assigned to this subnetwork.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ip_cidr_range": {
+        "computed": true,
+        "description": "The range of internal addresses that are owned by this subnetwork.\nProvide this property when you create the subnetwork. For example,\n10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and\nnon-overlapping within a network. Only IPv4 is supported.\nField is optional when 'reserved_internal_range' is defined, otherwise required.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ip_collection": {
+        "description": "Resource reference of a PublicDelegatedPrefix. The PDP must be a sub-PDP\nin EXTERNAL_IPV6_SUBNETWORK_CREATION or INTERNAL_IPV6_SUBNETWORK_CREATION\nmode. Use one of the following formats to specify a sub-PDP when creating\na dual stack or IPv6-only subnetwork using BYOIP:\nFull resource URL, as in:\n  * 'https://www.googleapis.com/compute/v1/projects/{{projectId}}/regions/{{region}}/publicDelegatedPrefixes/{{sub-pdp-name}}'\nPartial URL, as in:\n  * 'projects/{{projectId}}/regions/region/publicDelegatedPrefixes/{{sub-pdp-name}}'\n  * 'regions/{{region}}/publicDelegatedPrefixes/{{sub-pdp-name}}'",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_access_type": {
+        "description": "The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation\nor the first time the subnet is updated into IPV4_IPV6 dual stack. If the ipv6_type is EXTERNAL then this subnet\ncannot enable direct path. Possible values: [\"EXTERNAL\", \"INTERNAL\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_cidr_range": {
+        "computed": true,
+        "description": "The range of internal IPv6 addresses that are owned by this subnetwork.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "ipv6_gce_endpoint": {
+        "computed": true,
+        "description": "Possible endpoints of this subnetwork. It can be one of the following:\n  * VM_ONLY: The subnetwork can be used for creating instances and IPv6 addresses with VM endpoint type. Such a subnetwork\n  gets external IPv6 ranges from a public delegated prefix and cannot be used to create NetLb.\n  * VM_AND_FR: The subnetwork can be used for creating both VM instances and Forwarding Rules. It can also be used to reserve\n  IPv6 addresses with both VM and FR endpoint types. Such a subnetwork gets its IPv6 range from Google IP Pool directly.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "name": {
+        "description": "The name of the resource, provided by the client when initially\ncreating the resource. The name must be 1-63 characters long, and\ncomply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which\nmeans the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network": {
+        "description": "The network this subnet belongs to.\nOnly networks that are in the distributed mode can have subnetworks.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "private_ip_google_access": {
+        "computed": true,
+        "description": "When enabled, VMs in this subnetwork without external IP addresses can\naccess Google APIs and services by using Private Google Access.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "private_ipv6_google_access": {
+        "computed": true,
+        "description": "The private IPv6 google access type for the VMs in this subnet.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "project": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "purpose": {
+        "computed": true,
+        "description": "The purpose of the resource. This field can be either 'PRIVATE', 'REGIONAL_MANAGED_PROXY', 'GLOBAL_MANAGED_PROXY', 'PRIVATE_SERVICE_CONNECT', 'PEER_MIGRATION' or 'PRIVATE_NAT'([Beta](../guides/provider_versions.html.markdown)).\nA subnet with purpose set to 'REGIONAL_MANAGED_PROXY' is a user-created subnetwork that is reserved for regional Envoy-based load balancers.\nA subnetwork in a given region with purpose set to 'GLOBAL_MANAGED_PROXY' is a proxy-only subnet and is shared between all the cross-regional Envoy-based load balancers.\nA subnetwork with purpose set to 'PRIVATE_SERVICE_CONNECT' reserves the subnet for hosting a Private Service Connect published service.\nA subnetwork with purpose set to 'PEER_MIGRATION' is a user created subnetwork that is reserved for migrating resources from one peered network to another.\nA subnetwork with purpose set to 'PRIVATE_NAT' is used as source range for Private NAT gateways.\nNote that 'REGIONAL_MANAGED_PROXY' is the preferred setting for all regional Envoy load balancers.\nIf unspecified, the purpose defaults to 'PRIVATE'.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "The GCP region for this subnetwork.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "reserved_internal_range": {
+        "description": "The ID of the reserved internal range. Must be prefixed with 'networkconnectivity.googleapis.com'\nE.g. 'networkconnectivity.googleapis.com/projects/{project}/locations/global/internalRanges/{rangeId}'",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "resolve_subnet_mask": {
+        "description": "'Configures subnet mask resolution for this subnetwork.' Possible values: [\"ARP_ALL_RANGES\", \"ARP_PRIMARY_RANGE\", \"ARP_BROADCAST_PRIMARY_RANGE\", \"ARP_BROADCAST_PRIMARY_RANGE_WITH_LEARNING\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "role": {
+        "description": "The role of subnetwork.\nCurrently, this field is only used when 'purpose' is 'REGIONAL_MANAGED_PROXY'.\nThe value can be set to 'ACTIVE' or 'BACKUP'.\nAn 'ACTIVE' subnetwork is one that is currently being used for Envoy-based load balancers in a region.\nA 'BACKUP' subnetwork is one that is ready to be promoted to 'ACTIVE' or is currently draining. Possible values: [\"ACTIVE\", \"BACKUP\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "self_link": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "send_secondary_ip_range_if_empty": {
+        "description": "Controls the removal behavior of secondary_ip_range.\nWhen false, removing secondary_ip_range from config will not produce a diff as\nthe provider will default to the API's value.\nWhen true, the provider will treat removing secondary_ip_range as sending an\nempty list of secondary IP ranges to the API.\nDefaults to false.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "stack_type": {
+        "computed": true,
+        "description": "The stack type for this subnet to identify whether the IPv6 feature is enabled or not.\nIf not specified IPV4_ONLY will be used. Possible values: [\"IPV4_ONLY\", \"IPV4_IPV6\", \"IPV6_ONLY\"]",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "state": {
+        "computed": true,
+        "description": "'The state of the subnetwork, which can be one of the following values:\n READY: Subnetwork is created and ready to use DRAINING: only applicable to subnetworks that have the purpose\n set to INTERNAL_HTTPS_LOAD_BALANCER and indicates that connections to the load balancer are being drained.\n A subnetwork that is draining cannot be used or modified until it reaches a status of READY'",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "subnetwork_id": {
+        "computed": true,
+        "description": "The unique identifier number for the resource. This identifier is defined by the server.",
+        "description_kind": "plain",
+        "type": "number"
+       }
+      },
+      "block_types": {
+       "log_config": {
+        "block": {
+         "attributes": {
+          "aggregation_interval": {
+           "description": "Can only be specified if VPC flow logging for this subnetwork is enabled.\nToggles the aggregation interval for collecting flow logs. Increasing the\ninterval time will reduce the amount of generated flow logs for long\nlasting connections. Default is an interval of 5 seconds per connection. Default value: \"INTERVAL_5_SEC\" Possible values: [\"INTERVAL_5_SEC\", \"INTERVAL_30_SEC\", \"INTERVAL_1_MIN\", \"INTERVAL_5_MIN\", \"INTERVAL_10_MIN\", \"INTERVAL_15_MIN\"]",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "filter_expr": {
+           "description": "Export filter used to define which VPC flow logs should be logged, as as CEL expression. See\nhttps://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.\nThe default value is 'true', which evaluates to include everything.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "flow_sampling": {
+           "description": "Can only be specified if VPC flow logging for this subnetwork is enabled.\nThe value of the field must be in [0, 1]. Set the sampling rate of VPC\nflow logs within the subnetwork where 1.0 means all collected logs are\nreported and 0.0 means no logs are reported. Default is 0.5 which means\nhalf of all collected logs are reported.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "metadata": {
+           "description": "Can only be specified if VPC flow logging for this subnetwork is enabled.\nConfigures whether metadata fields should be added to the reported VPC\nflow logs. Default value: \"INCLUDE_ALL_METADATA\" Possible values: [\"EXCLUDE_ALL_METADATA\", \"INCLUDE_ALL_METADATA\", \"CUSTOM_METADATA\"]",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "metadata_fields": {
+           "description": "List of metadata fields that should be added to reported logs.\nCan only be specified if VPC flow logs for this subnetwork is enabled and \"metadata\" is set to CUSTOM_METADATA.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          }
+         },
+         "description": "This field denotes the VPC flow logging options for this subnetwork. If\nlogging is enabled, logs are exported to Cloud Logging. Flow logging\nisn't supported if the subnet 'purpose' field is set to subnetwork is\n'REGIONAL_MANAGED_PROXY' or 'GLOBAL_MANAGED_PROXY'.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "params": {
+        "block": {
+         "attributes": {
+          "resource_manager_tags": {
+           "description": "Resource manager tags to be bound to the subnetwork. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456. The field is ignored when empty.\nThe field is immutable and causes resource replacement when mutated. This field is only\nset at create time and modifying this field after creation will trigger recreation.\nTo apply tags to an existing resource, see the google_tags_tag_binding resource.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "map",
+            "string"
+           ]
+          }
+         },
+         "description": "Additional params passed with the request, but not persisted as part of resource payload",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "secondary_ip_range": {
+        "block": {
+         "attributes": {
+          "ip_cidr_range": {
+           "computed": true,
+           "description": "The range of IP addresses belonging to this subnetwork secondary\nrange. Provide this property when you create the subnetwork.\nRanges must be unique and non-overlapping with all primary and\nsecondary IP ranges within a network. Only IPv4 is supported.\nField is optional when 'reserved_internal_range' is defined, otherwise required.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "range_name": {
+           "description": "The name associated with this subnetwork secondary range, used\nwhen adding an alias IP range to a VM instance. The name must\nbe 1-63 characters long, and comply with RFC1035. The name\nmust be unique within the subnetwork.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "reserved_internal_range": {
+           "description": "The ID of the reserved internal range. Must be prefixed with 'networkconnectivity.googleapis.com'\nE.g. 'networkconnectivity.googleapis.com/projects/{project}/locations/global/internalRanges/{rangeId}'",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description": "An array of configurations for secondary IP ranges for VM instances\ncontained in this subnetwork. The primary IP of such VM must belong\nto the primary ipCidrRange of the subnetwork. The alias IPs may belong\nto either primary or secondary ranges.\n\n**Note**: This field uses [attr-as-block mode](https://developer.hashicorp.com/terraform/language/attr-as-blocks) to avoid\nbreaking users during the 0.12 upgrade. To explicitly send a list of zero objects,\nset 'send_secondary_ip_range_if_empty = true'",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "google_storage_bucket": {
+     "block": {
+      "attributes": {
+       "default_event_based_hold": {
+        "description": "Whether or not to automatically apply an eventBasedHold to new objects added to the bucket.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "deletion_policy": {
+        "computed": true,
+        "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "effective_labels": {
+        "computed": true,
+        "description": "All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.",
+        "description_kind": "plain",
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "enable_object_retention": {
+        "description": "Enables each object in the bucket to have its own retention policy, which prevents deletion until stored for a specific length of time.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "force_destroy": {
+        "description": "When true, before deleting a bucket, delete all objects within the bucket, or Anywhere Caches caching data for that bucket. Otherwise, buckets with objects/caches will fail. Anywhere Cache requires additional permissions to interact with and will be ignored when those are not present, attempting to delete anyways. This may result in the objects in the bucket getting destroyed but not the bucket itself if there is a cache in use with the bucket. Force deletion may take a long time to delete buckets with lots of objects or with any Anywhere Caches (80m+).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "labels": {
+        "description": "A set of key/value label pairs to assign to the bucket.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "location": {
+        "description": "The Google Cloud Storage location or region.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "name": {
+        "description": "The name of the bucket.",
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "project": {
+        "computed": true,
+        "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "project_number": {
+        "computed": true,
+        "description": "The project number of the project in which the resource belongs.",
+        "description_kind": "plain",
+        "type": "number"
+       },
+       "public_access_prevention": {
+        "computed": true,
+        "description": "Prevents public access to a bucket.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "requester_pays": {
+        "description": "Enables Requester Pays on a storage bucket.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "rpo": {
+        "computed": true,
+        "description": "Specifies the RPO setting of bucket. If set 'ASYNC_TURBO', The Turbo Replication will be enabled for the dual-region bucket. Value 'DEFAULT' will set RPO setting to default. Turbo Replication is only for buckets in dual-regions.See the docs for more details.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "self_link": {
+        "computed": true,
+        "description": "The URI of the created resource.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "storage_class": {
+        "description": "The Storage Class of the new bucket. Supported values include: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "terraform_labels": {
+        "computed": true,
+        "description": "The combination of labels configured directly on the resource and default labels configured on the provider.",
+        "description_kind": "plain",
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "time_created": {
+        "computed": true,
+        "description": "The creation time of the bucket in RFC 3339 format.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "uniform_bucket_level_access": {
+        "computed": true,
+        "description": "Enables uniform bucket-level access on a bucket.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "updated": {
+        "computed": true,
+        "description": "The time at which the bucket's metadata or IAM policy was last updated, in RFC 3339 format.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "url": {
+        "computed": true,
+        "description": "The base URL of the bucket, in the format gs://<bucket-name>.",
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "autoclass": {
+        "block": {
+         "attributes": {
+          "enabled": {
+           "description": "While set to true, autoclass automatically transitions objects in your bucket to appropriate storage classes based on each object's access pattern.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "terminal_storage_class": {
+           "computed": true,
+           "description": "The storage class that objects in the bucket eventually transition to if they are not read for a certain length of time. Supported values include: NEARLINE, ARCHIVE.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description": "The bucket's autoclass configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "cors": {
+        "block": {
+         "attributes": {
+          "max_age_seconds": {
+           "description": "The value, in seconds, to return in the Access-Control-Max-Age header used in preflight responses.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "method": {
+           "description": "The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: \"*\" is permitted in the list of methods, and means \"any method\".",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "origin": {
+           "description": "The list of Origins eligible to receive CORS response headers. Note: \"*\" is permitted in the list of origins, and means \"any Origin\".",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "response_header": {
+           "description": "The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          }
+         },
+         "description": "The bucket's Cross-Origin Resource Sharing (CORS) configuration.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "custom_placement_config": {
+        "block": {
+         "attributes": {
+          "data_locations": {
+           "description": "The list of individual regions that comprise a dual-region bucket. See the docs for a list of acceptable regions. Note: If any of the data_locations changes, it will recreate the bucket.",
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          }
+         },
+         "description": "The bucket's custom location configuration, which specifies the individual regions that comprise a dual-region bucket. If the bucket is designated a single or multi-region, the parameters are empty.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "encryption": {
+        "block": {
+         "attributes": {
+          "default_kms_key_name": {
+           "description": "A Cloud KMS key that will be used to encrypt objects inserted into this bucket, if no encryption method is specified. You must pay attention to whether the crypto key is available in the location that this bucket is created in. See the docs for more details.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "customer_managed_encryption_enforcement_config": {
+           "block": {
+            "attributes": {
+             "effective_time": {
+              "computed": true,
+              "description": "Time from which the config was effective. This is service-provided.",
+              "description_kind": "plain",
+              "type": "string"
+             },
+             "restriction_mode": {
+              "description": "Whether CMEK is restricted for new objects within the bucket. If FullyRestricted, new objects can't be created using CMEK encryption. If NotRestricted or unset, creation of new objects with CMEK encryption is allowed.",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "If omitted, then new objects with CMEK encryption-type is allowed. If FullyRestricted, then new objects created in this bucket must comply with enforcement config. Changing this has no effect on existing objects; it applies to new objects only.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "customer_supplied_encryption_enforcement_config": {
+           "block": {
+            "attributes": {
+             "effective_time": {
+              "computed": true,
+              "description": "Time from which the config was effective. This is service-provided.",
+              "description_kind": "plain",
+              "type": "string"
+             },
+             "restriction_mode": {
+              "description": "Whether CSEK is restricted for new objects within the bucket. If FullyRestricted, new objects can't be created using CSEK encryption. If NotRestricted or unset, creation of new objects with CSEK encryption is allowed.",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "If omitted, then new objects with CSEK encryption-type is allowed. If FullyRestricted, then new objects created in this bucket must comply with enforcement config. Changing this has no effect on existing objects; it applies to new objects only.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "google_managed_encryption_enforcement_config": {
+           "block": {
+            "attributes": {
+             "effective_time": {
+              "computed": true,
+              "description": "Time from which the config was effective. This is service-provided.",
+              "description_kind": "plain",
+              "type": "string"
+             },
+             "restriction_mode": {
+              "description": "Whether GMEK is restricted for new objects within the bucket. If FullyRestricted, new objects can't be created using GMEK encryption. If NotRestricted or unset, creation of new objects with GMEK encryption is allowed.",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "If omitted, then new objects with GMEK encryption-type is allowed. If FullyRestricted, then new objects created in this bucket must comply with enforcement config. Changing this has no effect on existing objects; it applies to new objects only.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description": "The bucket's encryption configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "hierarchical_namespace": {
+        "block": {
+         "attributes": {
+          "enabled": {
+           "description": "Set this field true to organize bucket with logical file system structure.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          }
+         },
+         "description": "The bucket's HNS configuration, which defines bucket can organize folders in logical file system structure.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "ip_filter": {
+        "block": {
+         "attributes": {
+          "allow_all_service_agent_access": {
+           "description": "Whether to allow all service agents to access the bucket regardless of the IP filter configuration.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "allow_cross_org_vpcs": {
+           "description": "Whether to allow cross-org VPCs in the bucket's IP filter configuration.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "mode": {
+           "description": "The mode of the IP filter. Valid values are 'Enabled' and 'Disabled'.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "public_network_source": {
+           "block": {
+            "attributes": {
+             "allowed_ip_cidr_ranges": {
+              "description": "The list of public IPv4, IPv6 cidr ranges that are allowed to access the bucket.",
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             }
+            },
+            "description": "The public network IP address ranges that can access the bucket and its data.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "vpc_network_sources": {
+           "block": {
+            "attributes": {
+             "allowed_ip_cidr_ranges": {
+              "description": "The list of public or private IPv4 and IPv6 CIDR ranges that can access the bucket.",
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "network": {
+              "description": "Name of the network. Format: projects/{PROJECT_ID}/global/networks/{NETWORK_NAME}",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "The list of VPC networks that can access the bucket.",
+            "description_kind": "plain"
+           },
+           "nesting_mode": "list"
+          }
+         },
+         "description": "The bucket IP filtering configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "lifecycle_rule": {
+        "block": {
+         "block_types": {
+          "action": {
+           "block": {
+            "attributes": {
+             "storage_class": {
+              "description": "The target Storage Class of objects affected by this Lifecycle Rule. Supported values include: MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "type": {
+              "description": "The type of the action of this Lifecycle Rule. Supported values include: Delete, SetStorageClass and AbortIncompleteMultipartUpload.",
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description": "The Lifecycle Rule's action configuration. A single block of this type is supported.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "min_items": 1,
+           "nesting_mode": "set"
+          },
+          "condition": {
+           "block": {
+            "attributes": {
+             "age": {
+              "description": "Minimum age of an object in days to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "created_before": {
+              "description": "Creation date of an object in RFC 3339 (e.g. 2017-06-13) to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "custom_time_before": {
+              "description": "Creation date of an object in RFC 3339 (e.g. 2017-06-13) to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "days_since_custom_time": {
+              "description": "Number of days elapsed since the user-specified timestamp set on an object.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "days_since_noncurrent_time": {
+              "description": "Number of days elapsed since the noncurrent timestamp of an object. This\n\t\t\t\t\t\t\t\t\t\tcondition is relevant only for versioned objects.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "matches_prefix": {
+              "description": "One or more matching name prefixes to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "matches_storage_class": {
+              "description": "Storage Class of objects to satisfy this condition. Supported values include: MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE, STANDARD, DURABLE_REDUCED_AVAILABILITY.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "matches_suffix": {
+              "description": "One or more matching name suffixes to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "noncurrent_time_before": {
+              "description": "Creation date of an object in RFC 3339 (e.g. 2017-06-13) to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "num_newer_versions": {
+              "description": "Relevant only for versioned objects. The number of newer versions of an object to satisfy this condition.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "send_age_if_zero": {
+              "description": "While set true, age value will be sent in the request even for zero value of the field. This field is only useful for setting 0 value to the age field. It can be used alone or together with age.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             },
+             "send_days_since_custom_time_if_zero": {
+              "description": "While set true, days_since_custom_time value will be sent in the request even for zero value of the field. This field is only useful for setting 0 value to the days_since_custom_time field. It can be used alone or together with days_since_custom_time.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             },
+             "send_days_since_noncurrent_time_if_zero": {
+              "description": "While set true, days_since_noncurrent_time value will be sent in the request even for zero value of the field. This field is only useful for setting 0 value to the days_since_noncurrent_time field. It can be used alone or together with days_since_noncurrent_time.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             },
+             "send_num_newer_versions_if_zero": {
+              "description": "While set true, num_newer_versions value will be sent in the request even for zero value of the field. This field is only useful for setting 0 value to the num_newer_versions field. It can be used alone or together with num_newer_versions.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             },
+             "size_above_bytes": {
+              "description": "Objects having a size greater than this value in bytes will be matched.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "size_below_bytes": {
+              "description": "Objects having a size less than this value in bytes will be matched.",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "with_state": {
+              "computed": true,
+              "description": "Match to live and/or archived objects. Unversioned buckets have only live objects. Supported values include: \"LIVE\", \"ARCHIVED\", \"ANY\".",
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             }
+            },
+            "description": "The Lifecycle Rule's condition configuration.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "min_items": 1,
+           "nesting_mode": "set"
+          }
+         },
+         "description": "The bucket's Lifecycle Rules configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 100,
+        "nesting_mode": "list"
+       },
+       "logging": {
+        "block": {
+         "attributes": {
+          "log_bucket": {
+           "description": "The bucket that will receive log objects.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "log_object_prefix": {
+           "computed": true,
+           "description": "The object prefix for log objects. If it's not provided, by default Google Cloud Storage sets this to this bucket's name.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description": "The bucket's Access & Storage Logs configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "retention_policy": {
+        "block": {
+         "attributes": {
+          "is_locked": {
+           "description": "If set to true, the bucket will be locked and permanently restrict edits to the bucket's retention policy.  Caution: Locking a bucket is an irreversible action.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "retention_period": {
+           "description": "The period of time, in seconds, that objects in the bucket must be retained and cannot be deleted, overwritten, or archived. The value must be less than 3,155,760,000 seconds.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description": "Configuration of the bucket's data retention policy for how long objects in the bucket should be retained.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "soft_delete_policy": {
+        "block": {
+         "attributes": {
+          "effective_time": {
+           "computed": true,
+           "description": "Server-determined value that indicates the time from which the policy, or one with a greater retention, was effective. This value is in RFC 3339 format.",
+           "description_kind": "plain",
+           "type": "string"
+          },
+          "retention_duration_seconds": {
+           "description": "The duration in seconds that soft-deleted objects in the bucket will be retained and cannot be permanently deleted. Default value is 604800.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "description": "The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted. If it is not provided, by default Google Cloud Storage sets this to default soft delete policy",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       },
+       "versioning": {
+        "block": {
+         "attributes": {
+          "enabled": {
+           "description": "While set to true, versioning is fully enabled for this bucket.",
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          }
+         },
+         "description": "The bucket's Versioning configuration.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "website": {
+        "block": {
+         "attributes": {
+          "main_page_suffix": {
+           "description": "Behaves as the bucket's directory index where missing objects are treated as potential directories.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "not_found_page": {
+           "description": "The custom object to return when a requested resource is not found.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description": "Configuration if the bucket acts as a website.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 4
+    },
+    "google_storage_bucket_iam_member": {
+     "block": {
+      "attributes": {
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "etag": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "member": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "role": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "condition": {
+        "block": {
+         "attributes": {
+          "description": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "expression": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "title": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    }
+   }
+  }
+ }
+}
