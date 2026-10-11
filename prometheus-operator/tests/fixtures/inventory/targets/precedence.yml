@@ -1,0 +1,46 @@
+# Precedence: spec < flat keys and shorthands, for the same field; each
+# overridden field logs a warning.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: precedence
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/prometheus-operator
+        output_path: manifests/prometheus-operator/
+
+  namespace: monitoring
+  generators:
+    prometheus_operator:
+      prometheuses:
+        main:
+          replicas: 2
+          service_monitor_selector:
+            team: platform
+          storage: 50Gi
+          spec:
+            replicas: 5
+            serviceMonitorSelector:
+              matchLabels:
+                team: other
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 10Gi
+            walCompression: true
+      probes:
+        website:
+          prober: blackbox-exporter.monitoring.svc:9115
+          targets:
+            - https://www.example.com
+          spec:
+            module: http_2xx
+            targets:
+              staticConfig:
+                static:
+                  - https://old.example.com
