@@ -1,0 +1,133 @@
+# Complete: every kind, the CA bootstrap, the Let's Encrypt shorthands,
+# spec passthrough on top of defaults, generator and per-resource namespace,
+# name override and the type filter. Internal PKI with trust distribution.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/certmanager
+        output_path: manifests/
+
+  namespace: platform
+  generators:
+    certmanager:
+      namespace: cert-manager
+      ca_issuers:
+        internal-ca:
+          common_name: Internal Root CA
+        partner-ca:
+          namespace: pki
+          # common_name wins over certificate.commonName
+          common_name: Partner Root CA
+          certificate:
+            commonName: partner-root
+            duration: 87600h
+            subject:
+              organizations:
+                - Example
+            privateKey:
+              size: 384
+      clusterissuers:
+        letsencrypt-prod:
+          letsencrypt: production
+          email: platform-team@example.com
+          http01_ingress_class: nginx
+          # shorthands win over spec: email and solvers below are replaced,
+          # profile is kept
+          spec:
+            acme:
+              profile: tlsserver
+              email: pki-team@example.com
+              solvers:
+                - dns01:
+                    cloudDNS:
+                      project: example-project
+        letsencrypt-dns:
+          spec:
+            acme:
+              server: https://acme-v02.api.letsencrypt.org/directory
+              email: platform-team@example.com
+              solvers:
+                - dns01:
+                    cloudDNS:
+                      project: example-project
+        legacy-ca:
+          spec:
+            ca:
+              secretName: legacy-ca-key-pair
+      issuers:
+        app-ca-issuer:
+          namespace: applications
+          spec:
+            ca:
+              secretName: app-ca-key-pair
+        letsencrypt-staging:
+          letsencrypt: staging
+          email: platform-team@example.com
+          http01_ingress_class: nginx
+      certs:
+        wildcard-internal:
+          spec:
+            secretName: wildcard-internal-tls
+            issuerRef:
+              name: internal-ca
+              kind: ClusterIssuer
+            dnsNames:
+              - "*.internal.example.com"
+            duration: 2160h
+            renewBefore: 720h
+        api-gateway:
+          name: api-gateway-tls
+          namespace: applications
+          spec:
+            secretName: api-gateway-tls
+            issuerRef:
+              name: letsencrypt-prod
+              kind: ClusterIssuer
+            dnsNames:
+              - api.example.com
+              - api-v2.example.com
+            privateKey:
+              algorithm: ECDSA
+        legacy-tls:
+          type: external
+      bundles:
+        internal-ca-bundle:
+          spec:
+            sources:
+              - configMap:
+                  name: internal-ca-root
+                  key: ca.crt
+            target:
+              configMap:
+                key: ca-bundle.crt
+              namespaceSelector:
+                matchLabels:
+                  trust-internal-ca: "true"
+        combined-ca-bundle:
+          spec:
+            sources:
+              - useDefaultCAs: true
+              - configMap:
+                  name: internal-ca-root
+                  key: ca.crt
+            target:
+              configMap:
+                key: ca-bundle.crt
+              additionalFormats:
+                jks:
+                  key: truststore.jks
+                pkcs12:
+                  key: truststore.p12
+              namespaceSelector:
+                matchExpressions:
+                  - key: environment
+                    operator: In
+                    values:
+                      - production
+                      - staging

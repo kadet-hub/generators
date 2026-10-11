@@ -1,0 +1,25 @@
+# Minimal: one Certificate in parameters.namespace
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/certmanager
+        output_path: manifests/
+
+  namespace: default
+  generators:
+    certmanager:
+      certs:
+        my-app-tls:
+          spec:
+            secretName: my-app-tls
+            issuerRef:
+              name: letsencrypt-prod
+              kind: ClusterIssuer
+            dnsNames:
+              - example.com
