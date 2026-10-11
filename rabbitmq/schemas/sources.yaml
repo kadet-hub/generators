@@ -1,0 +1,22 @@
+# QA-7: rabbitmq.com schemas from the openAPIV3Schema of the upstream CRDs at
+# these releases (MPL-2.0, notice in rabbitmq.com/NOTICE), closed like
+# kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# RabbitmqCluster comes from the Cluster Operator, every other kind from the
+# Messaging Topology Operator; both share the group.
+# core schemas are the kubernetes-json-schema standalone-strict files of this
+# Kubernetes release, unchanged.
+rabbitmq.com:
+  software: RabbitMQ Cluster Operator / Messaging Topology Operator
+  version: 2.23.0 / 1.20.3
+  source: https://github.com/rabbitmq/cluster-operator/tree/v2.23.0/config/crd/bases https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.3/config/crd/bases
+  license: MPL-2.0
+  copyright:
+    - Copyright 2020 VMware, Inc. All Rights Reserved.
+    - Copyright 2021-2022 VMware, Inc.
+core:
+  software: Kubernetes
+  version: 1.35.0
+  source: https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict
+  license: Apache-2.0

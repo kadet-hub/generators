@@ -1,0 +1,165 @@
+# Complete: every kind, rabbitmq_resources, configs and secrets, the
+# generator-wide cluster_reference and a flat key overriding spec
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/rabbitmq
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    rabbitmq:
+      namespace: messaging
+      cluster_reference: production
+
+      rabbitmqcluster:
+        production:
+          labels:
+            team: platform
+          annotations:
+            rabbitmq.com/topology-allowed-namespaces: analytics
+          spec:
+            replicas: 3
+            resources:
+              requests:
+                cpu: "1"
+                memory: 2Gi
+              limits:
+                memory: 4Gi
+            persistence:
+              storageClassName: standard
+              storage: 50Gi
+            rabbitmq:
+              additionalPlugins:
+                - rabbitmq_federation
+                - rabbitmq_shovel
+              additionalConfig: |
+                vm_memory_high_watermark.relative = 0.6
+
+      queue:
+        orders:
+          spec:
+            type: quorum
+            vhost: orders
+        notifications:
+          spec:
+            type: quorum
+            arguments:
+              x-delivery-limit: 20
+        reports:
+          namespace: analytics
+          # flat key wins over spec and logs a warning
+          cluster_reference:
+            name: production
+            namespace: messaging
+          spec:
+            name: analytics.reports
+            type: quorum
+            rabbitmqClusterReference:
+              name: production
+
+      exchange:
+        events:
+          spec:
+            type: topic
+            durable: true
+
+      binding:
+        notifications-binding:
+          spec:
+            source: events
+            destination: notifications
+            destinationType: queue
+            routingKey: notification.*
+
+      policy:
+        orders-limits:
+          spec:
+            vhost: orders
+            pattern: ^orders$
+            applyTo: queues
+            definition:
+              max-length: 100000
+              overflow: reject-publish
+        federate-events:
+          spec:
+            pattern: ^events$
+            applyTo: exchanges
+            definition:
+              federation-upstream: upstream-dc
+
+      federation:
+        upstream-dc:
+          spec:
+            uriSecret:
+              name: upstream-dc-uri
+            exchange: events
+            ackMode: on-confirm
+
+      shovel:
+        orders-archive:
+          spec:
+            uriSecret:
+              name: orders-archive-uris
+            vhost: orders
+            srcQueue: orders
+            destQueue: orders-archive
+            ackMode: on-confirm
+
+      rabbitmq_resources:
+        vhosts:
+          orders: {}
+        users:
+          # generated credentials; the Permission gets userReference
+          orders-app:
+            user_tags:
+              - management
+            permissions:
+              orders-app-orders:
+                vhost: orders
+                configure_permission: ^orders.*
+                write_permission: ^orders.*
+                read_permission: ^orders.*
+          # Secret delivered by External Secrets, username "billing";
+          # the explicit user wins over the default userReference
+          billing-app:
+            secret_name: billing-app-credentials
+            permissions:
+              billing-app-default:
+                user: billing
+                vhost: /
+                write_permission: ^events$
+                read_permission: ""
+                configure_permission: ""
+
+      secrets:
+        upstream-dc-uri:
+          string_data:
+            uri:
+              value: amqps://upstream.example.com:5671?auth_mechanism=external
+        orders-archive-uris:
+          labels:
+            app.kubernetes.io/part-of: orders
+          string_data:
+            srcUri:
+              value: amqp://
+            destUri:
+              value: amqps://archive.example.com:5671?auth_mechanism=external
+
+      configs:
+        orders-client:
+          versioned: true
+          labels:
+            app.kubernetes.io/part-of: orders
+          data:
+            amqp.properties:
+              value: |
+                host=production.messaging.svc
+                port=5672
+                vhost=orders

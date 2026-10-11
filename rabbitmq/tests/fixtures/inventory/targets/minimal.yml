@@ -1,0 +1,23 @@
+# Minimal: a RabbitmqCluster on operator defaults and one quorum queue in it
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/rabbitmq
+        output_path: manifests/
+
+  namespace: messaging
+  generators:
+    rabbitmq:
+      rabbitmqcluster:
+        production: {}
+      queue:
+        orders:
+          cluster_reference: production
+          spec:
+            type: quorum
