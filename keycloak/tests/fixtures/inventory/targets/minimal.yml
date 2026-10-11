@@ -1,0 +1,32 @@
+# Minimal: one Keycloak with the fields the server needs to start in production
+# mode, and a realm import that takes its name and keycloakCRName from defaults
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/keycloak
+        output_path: manifests/
+
+  namespace: identity
+  generators:
+    keycloak:
+      instances:
+        sso:
+          db:
+            vendor: postgres
+            host: keycloak-db-rw
+            database: app
+            credentials_secret: keycloak-db-app
+          hostname:
+            hostname: sso.example.com
+          http:
+            tls_secret: sso-tls
+      realm_imports:
+        apps:
+          realm:
+            enabled: true
