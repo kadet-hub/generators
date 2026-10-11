@@ -1,0 +1,26 @@
+# Minimal: one VirtualMachine from a container disk and one blank DataVolume
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubevirt
+        output_path: manifests/
+
+  namespace: vms
+  generators:
+    kubevirt:
+      virtual_machines:
+        minimal-vm:
+          run_strategy: Always
+          memory: 256Mi
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+      data_volumes:
+        minimal-dv:
+          size: 1Gi
+          source:
+            blank: {}

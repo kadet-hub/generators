@@ -1,0 +1,14 @@
+name: kubevirt
+description: Renders KubeVirt VirtualMachines, VMIs, pools, snapshots and CDI DataVolumes from inventory parameters.
+tags: [kubernetes, operators]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas

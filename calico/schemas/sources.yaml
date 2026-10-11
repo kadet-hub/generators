@@ -1,0 +1,12 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# installation_v1.json is written without indentation to stay below the 1 MiB
+# file limit; its content is unchanged.
+# Tigera operator v1.44.0 is the operator of Calico v3.33.0.
+operator.tigera.io:
+  software: Tigera operator
+  version: 1.44.0
+  source: https://github.com/tigera/operator/tree/v1.44.0/pkg/imports/crds/operator
+  license: Apache-2.0

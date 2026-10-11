@@ -1,0 +1,22 @@
+# Minimal: the Installation from the upstream custom-resources.yaml, VXLAN overlay without BGP
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/calico
+        output_path: manifests/
+
+  generators:
+    calico:
+      installation:
+        calico_network:
+          bgp: Disabled
+          ip_pools:
+            - cidr: 10.244.0.0/16
+              encapsulation: VXLANCrossSubnet
+              nat_outgoing: Enabled

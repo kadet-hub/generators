@@ -5,10 +5,15 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | Generator | Renders |
 |---|---|
 | [argocd](argocd/) ([catalog](https://kadet-hub.org/generators/argocd/)) | Argo CD Applications, ApplicationSets and AppProjects, with an in-cluster destination shorthand and one Application per target publishing a Kapitan topic |
+| [calico](calico/) ([catalog](https://kadet-hub.org/generators/calico/)) | Tigera operator Installation, APIServer, ImageSet, and opt-in Goldmane and Whisker, with provider-aware CNI defaults |
+| [calico-resources](calico-resources/) ([catalog](https://kadet-hub.org/generators/calico-resources/)) | Calico projectcalico.org/v3 network policies, network sets, IP pools and BGP peers and configuration, with selector and port shorthands |
 | [certmanager](certmanager/) ([catalog](https://kadet-hub.org/generators/certmanager/)) | cert-manager Certificates, Issuers and ClusterIssuers with Let's Encrypt and CA bootstrap shorthands, and trust-manager Bundles |
 | [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
+| [grafana](grafana/) ([catalog](https://kadet-hub.org/generators/grafana/)) | Grafana Operator instances, dashboards, folders, datasources, alert rules, contact points, notification policies and more, with instance selector defaults |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
+| [keycloak](keycloak/) ([catalog](https://kadet-hub.org/generators/keycloak/)) | Keycloak Operator Keycloak instances, realm imports and OIDC and SAML clients, with database credential and CR reference defaults |
+| [kubevirt](kubevirt/) ([catalog](https://kadet-hub.org/generators/kubevirt/)) | KubeVirt VirtualMachines, pools, snapshots, clones and the KubeVirt CR, and CDI DataVolumes and DataSources |
 | [kyverno](kyverno/) ([catalog](https://kadet-hub.org/generators/kyverno/)) | Kyverno ClusterPolicies, Policies, PolicyExceptions and cleanup policies with a match_kinds shorthand |
 | [linkerd](linkerd/) ([catalog](https://kadet-hub.org/generators/linkerd/)) | Linkerd Servers, AuthorizationPolicies, mTLS and network authentications, HTTPRoutes and ServiceProfiles with refs and group defaults |
 | [loki](loki/) ([catalog](https://kadet-hub.org/generators/loki/)) | Loki Operator LokiStacks with storage and schema defaults, and alerting and recording rules bound to their stack |
