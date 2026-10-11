@@ -1,0 +1,51 @@
+# Complete: NAT per AZ, a regional NAT without public subnets, a KMS bucket, default tags
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-aws
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-aws:
+      region: eu-central-1
+      default_tags:
+        Environment: production
+        ManagedBy: kapitan
+      vpc:
+        prod:
+          cidr: 10.10.0.0/16
+          azs: [eu-central-1a, eu-central-1b, eu-central-1c]
+          subnet_newbits: 4
+          public_offset: 0
+          private_offset: 8
+          nat: per_az
+          enable_dns_hostnames: true
+          enable_dns_support: true
+          lock_default_sg: true
+          tags:
+            Team: platform
+        batch-jobs:
+          cidr: 10.20.0.0/20
+          azs: [eu-central-1a, eu-central-1b]
+          subnet_newbits: 4
+          private_offset: 4
+          public_subnets: false
+          nat: regional
+          enable_dns_hostnames: false
+          lock_default_sg: false
+      s3_bucket:
+        audit-logs:
+          bucket: example-audit-logs-eu-central-1
+          versioning: false
+          kms_key_arn: arn:aws:kms:eu-central-1:123456789012:key/00000000-0000-0000-0000-000000000000
+          deny_insecure_transport: true
+          force_destroy: true
+          tags:
+            DataClass: internal
