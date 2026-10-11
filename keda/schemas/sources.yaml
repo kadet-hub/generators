@@ -1,0 +1,6 @@
+# QA-7: JSON Schemas extracted from the CRDs of the upstream release (Apache-2.0).
+keda.sh:
+  software: KEDA
+  version: 2.21.0
+  source: https://github.com/kedacore/keda/tree/v2.21.0/config/crd/bases
+  license: Apache-2.0

@@ -11,3 +11,4 @@ unparsed_outputs: []
 charts: []
 inventory_backends: [reclass-rs, omegaconf]
 fixtures: tests/fixtures
+schemas: schemas

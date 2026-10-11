@@ -1,0 +1,6 @@
+# QA-7: JSON Schemas extracted from the CRDs of the upstream release (Apache-2.0).
+external-secrets.io:
+  software: External Secrets Operator
+  version: 2.11.0
+  source: https://github.com/external-secrets/external-secrets/tree/v2.11.0/config/crds/bases
+  license: Apache-2.0
