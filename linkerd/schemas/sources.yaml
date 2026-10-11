@@ -1,0 +1,16 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# The CRDs are Helm templates; template lines are dropped before parsing, and
+# the implicit apiVersion, kind and metadata fields are added where the CRD omits them.
+linkerd.io:
+  software: Linkerd
+  version: edge-26.6.3
+  source: https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates
+  license: Apache-2.0
+policy.linkerd.io:
+  software: Linkerd
+  version: edge-26.6.3
+  source: https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates/policy
+  license: Apache-2.0
