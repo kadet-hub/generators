@@ -1,0 +1,31 @@
+# Minimal: one AppProject and an Application in it, deploying the upstream
+# guestbook example to the guestbook namespace of the local cluster.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/argocd
+        output_path: manifests/
+
+  generators:
+    argocd:
+      projects:
+        guestbook:
+          source_repos:
+            - https://github.com/argoproj/argocd-example-apps.git
+          destinations:
+            - namespace: guestbook
+              server: https://kubernetes.default.svc
+      applications:
+        guestbook:
+          project: guestbook
+          destination: guestbook
+          source:
+            repoURL: https://github.com/argoproj/argocd-example-apps.git
+            path: guestbook
+            targetRevision: HEAD

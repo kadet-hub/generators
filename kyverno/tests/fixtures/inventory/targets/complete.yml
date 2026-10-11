@@ -1,0 +1,124 @@
+# Complete: all five kinds, the match_kinds shorthand on rules, exceptions and
+# cleanup policies, spec passthrough, and a flat key overriding spec (logs a warning).
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kyverno
+        output_path: manifests/
+
+  namespace: platform
+  generators:
+    kyverno:
+      namespace: shop
+      cluster_policies:
+        disallow-privileged-containers:
+          annotations:
+            policies.kyverno.io/title: Disallow Privileged Containers
+            policies.kyverno.io/category: Pod Security Standards (Baseline)
+            policies.kyverno.io/severity: medium
+          labels:
+            policy-type: validation
+          validation_failure_action: Enforce
+          webhook_configuration:
+            failurePolicy: Fail
+            timeoutSeconds: 10
+          rules:
+            - name: privileged-containers
+              match_kinds:
+                - Pod
+              validate:
+                cel:
+                  expressions:
+                    - expression: >-
+                        object.spec.containers.all(c, !has(c.securityContext) ||
+                        !has(c.securityContext.privileged) || c.securityContext.privileged == false)
+                      message: "Privileged mode is disallowed."
+        add-managed-by-label:
+          # flat background wins over spec.background and logs a warning
+          background: false
+          spec:
+            background: true
+            mutateExistingOnPolicyUpdate: false
+          rules:
+            - name: add-managed-by
+              skipBackgroundRequests: true
+              match:
+                any:
+                  - resources:
+                      kinds:
+                        - Pod
+                        - Service
+              mutate:
+                patchStrategicMerge:
+                  metadata:
+                    labels:
+                      +(app.kubernetes.io/managed-by): kapitan
+      policies:
+        require-memory-limits:
+          rules:
+            - name: check-memory-limits
+              match_kinds:
+                - Pod
+              validate:
+                failureAction: Audit
+                message: "Memory limits are required"
+                pattern:
+                  spec:
+                    containers:
+                      - resources:
+                          limits:
+                            memory: "?*"
+      policy_exceptions:
+        node-exporter-host-access:
+          namespace: monitoring
+          match:
+            any:
+              - resources:
+                  kinds:
+                    - Pod
+                  namespaces:
+                    - monitoring
+                  names:
+                    - "node-exporter-*"
+          exceptions:
+            - policy_name: disallow-privileged-containers
+              rule_names:
+                - privileged-containers
+        ci-runner-pods:
+          namespace: ci
+          match_kinds:
+            - Pod
+          exceptions:
+            - policy_name: disallow-privileged-containers
+              rule_names:
+                - privileged-containers
+      cluster_cleanup_policies:
+        failed-jobs:
+          schedule: "0 0 * * *"
+          match_kinds:
+            - Job
+          conditions:
+            all:
+              - key: "{{ target.status.failed || `0` }}"
+                operator: GreaterThan
+                value: 0
+      cleanup_policies:
+        preview-pods:
+          namespace: shop
+          schedule: "*/30 * * * *"
+          spec:
+            deletionPropagationPolicy: Foreground
+          match:
+            any:
+              - resources:
+                  kinds:
+                    - Pod
+                  selector:
+                    matchLabels:
+                      env: preview

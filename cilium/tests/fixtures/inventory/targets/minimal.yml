@@ -1,0 +1,22 @@
+# Minimal: one CiliumNetworkPolicy that lets the app resolve DNS
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/cilium
+        output_path: manifests/
+
+  namespace: default
+  generators:
+    cilium:
+      network_policies:
+        allow-dns:
+          endpoint_selector:
+            match_labels:
+              app: my-app
+          allow_dns: true

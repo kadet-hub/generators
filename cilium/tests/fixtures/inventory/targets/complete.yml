@@ -1,0 +1,102 @@
+# Complete: every kind, the shorthands, the L2 default and spec passthrough
+# with a flat key overriding it
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/cilium
+        output_path: manifests/
+
+  generators:
+    cilium:
+      namespace: shop
+      network_policies:
+        web:
+          labels:
+            team: web
+          annotations:
+            example.com/owner: web
+          endpoint_selector:
+            match_labels:
+              app: web
+          description: Web frontend, reachable from the ingress controller, calls the API
+          enable_default_deny:
+            ingress: true
+            egress: true
+          ingress:
+            - fromEndpoints:
+                - matchLabels:
+                    k8s:io.kubernetes.pod.namespace: ingress-nginx
+                    app.kubernetes.io/name: ingress-nginx
+              ports: [8080]
+          egress:
+            - toEndpoints:
+                - matchLabels:
+                    app: api
+              ports: [3000/TCP]
+          allow_dns: true
+        payments-egress:
+          namespace: payments
+          endpoint_selector:
+            match_expressions:
+              - key: app
+                operator: In
+                values: [payments, refunds]
+          description: Payments, egress only to the payment provider API
+          egress:
+            - toFQDNs:
+                - matchName: api.payments.example.com
+              ports: [443/TCP]
+          allow_dns:
+            - api.payments.example.com
+          spec:
+            description: overridden by the flat key
+            egressDeny:
+              - toEntities: [world]
+                ports: [25/TCP]
+      clusterwide_policies:
+        node-health-check:
+          node_selector:
+            match_labels:
+              kubernetes.io/os: linux
+          ingress:
+            - fromEntities:
+                - health
+      lb_ip_pools:
+        internal-pool:
+          cidrs:
+            - cidr: 10.20.0.0/24
+          labels:
+            env: staging
+        public-pool:
+          blocks:
+            - 192.0.2.0/28
+            - 198.51.100.10-198.51.100.20
+          spec:
+            allowFirstLastIPs: "No"
+            serviceSelector:
+              matchLabels:
+                pool: public
+      l2_announcement_policies:
+        workers-lb:
+          node_selector:
+            match_expressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+          interfaces:
+            - ^eth[0-9]+
+        workers-external:
+          node_selector:
+            match_expressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+          external_ips: true
+          spec:
+            serviceSelector:
+              matchLabels:
+                announce: external
