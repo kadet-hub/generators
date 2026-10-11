@@ -1,0 +1,14 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+cert-manager.io:
+  software: cert-manager
+  version: 1.21.2
+  source: https://github.com/cert-manager/cert-manager/tree/v1.21.2/deploy/crds
+  license: Apache-2.0
+trust.cert-manager.io:
+  software: trust-manager
+  version: 0.25.0
+  source: https://github.com/cert-manager/trust-manager/tree/v0.25.0/deploy/crds
+  license: Apache-2.0
