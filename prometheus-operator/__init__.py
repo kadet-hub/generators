@@ -1,12 +1,15 @@
 """Prometheus Operator resource generators for Kapitan.
 
 Renders monitoring.coreos.com Prometheus, PrometheusAgent, Alertmanager,
-AlertmanagerConfig, ThanosRuler, Probe and ScrapeConfig from
-``parameters.generators.prometheus_operator``. Common fields are flat
-snake_case keys; ``spec`` passes everything else through. ``rbac: true`` on a
-Prometheus or PrometheusAgent adds its ServiceAccount, ClusterRole and
-ClusterRoleBinding. Shorthands expand selectors, storage sizes and Probe
-targets. See README.md for the inventory contract.
+AlertmanagerConfig, ThanosRuler, Probe, ScrapeConfig, ServiceMonitor,
+PodMonitor and PrometheusRule from ``parameters.generators.prometheus_operator``.
+Common fields are flat snake_case keys; ``spec`` passes everything else
+through. ``rbac: true`` on a Prometheus or PrometheusAgent adds its
+ServiceAccount, ClusterRole and ClusterRoleBinding. Shorthands expand
+selectors, storage sizes, Probe targets, scrape endpoints, namespace lists and
+a single rule group. ``release_label`` adds the kube-prometheus-stack
+``release`` label to the kinds that chart selects by it. See README.md for the
+inventory contract.
 """
 
 from __future__ import annotations
@@ -19,7 +22,7 @@ from kapitan.inputs.kadet import BaseObj, inventory
 from . import k8s
 
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +78,16 @@ def _merge_spec_passthrough(spec_target: Any, config: dict) -> None:
 
 def _expand(flat_key: str, value: Any) -> Any:
     """Expand a shorthand to its CRD form; any other value passes through."""
+    if flat_key == "namespace_selector" and isinstance(value, list):
+        return {"matchNames": value}
+    if flat_key in ("endpoints", "pod_metrics_endpoints"):
+        if isinstance(value, str):
+            return [{"port": value}]
+        if isinstance(value, list):
+            return [{"port": v} if isinstance(v, str) else v for v in value]
     if (
-        flat_key.endswith("_selector")
+        (flat_key == "selector" or flat_key.endswith("_selector"))
+        and flat_key != "namespace_selector"
         and isinstance(value, dict)
         and value
         and not {"matchLabels", "matchExpressions"} & value.keys()
@@ -130,6 +141,8 @@ class PrometheusOperatorBase(k8s.Base):
     API_VERSION = f"{GROUP}/v1"
     KIND = ""
     _FLAT_KEY_MAP: dict[str, str] = {}
+    # kube-prometheus-stack selects this kind by the label release: <release>.
+    _RELEASE_SELECTED = False
 
     def new(self) -> None:
         self.need("config")
@@ -158,6 +171,9 @@ class PrometheusOperatorBase(k8s.Base):
         if include_namespace:
             self.add_namespace(self._resource_namespace(config))
         self.add_annotations(_convert_to_dict(config.get("annotations", {})))
+        release = self.kwargs.get("release_label")
+        if self._RELEASE_SELECTED and release:
+            self.add_label("release", release)
         self.add_labels(_convert_to_dict(config.get("labels", {})))
 
 
@@ -245,6 +261,7 @@ class ThanosRuler(PrometheusOperatorBase):
 
 class Probe(PrometheusOperatorBase):
     KIND = "Probe"
+    _RELEASE_SELECTED = True
     _FLAT_KEY_MAP = {
         "prober": "prober",
         "module": "module",
@@ -258,6 +275,7 @@ class Probe(PrometheusOperatorBase):
 class ScrapeConfig(PrometheusOperatorBase):
     API_VERSION = f"{GROUP}/v1alpha1"
     KIND = "ScrapeConfig"
+    _RELEASE_SELECTED = True
     _FLAT_KEY_MAP = {
         "job_name": "jobName",
         "static_configs": "staticConfigs",
@@ -267,6 +285,57 @@ class ScrapeConfig(PrometheusOperatorBase):
         "metrics_path": "metricsPath",
         "scheme": "scheme",
     }
+
+
+class ServiceMonitor(PrometheusOperatorBase):
+    KIND = "ServiceMonitor"
+    _RELEASE_SELECTED = True
+    _FLAT_KEY_MAP = {
+        "selector": "selector",
+        "namespace_selector": "namespaceSelector",
+        "endpoints": "endpoints",
+        "job_label": "jobLabel",
+        "target_labels": "targetLabels",
+        "pod_target_labels": "podTargetLabels",
+        "sample_limit": "sampleLimit",
+    }
+
+
+class PodMonitor(PrometheusOperatorBase):
+    KIND = "PodMonitor"
+    _RELEASE_SELECTED = True
+    _FLAT_KEY_MAP = {
+        "selector": "selector",
+        "namespace_selector": "namespaceSelector",
+        "pod_metrics_endpoints": "podMetricsEndpoints",
+        "job_label": "jobLabel",
+        "pod_target_labels": "podTargetLabels",
+        "sample_limit": "sampleLimit",
+    }
+
+
+class PrometheusRule(PrometheusOperatorBase):
+    """``rules: [...]`` is one group named after the resource."""
+
+    KIND = "PrometheusRule"
+    _RELEASE_SELECTED = True
+    _FLAT_KEY_MAP = {"groups": "groups"}
+
+    def body(self) -> None:
+        super().body()
+        config = self.kwargs.config
+        rules = config.get("rules")
+        if rules is None:
+            return
+        if config.get("groups") is not None:
+            raise ValueError(
+                f"prometheus-operator PrometheusRule '{self.kwargs.name}': "
+                "set either rules or groups, not both"
+            )
+        _warn_collisions(config, {"rules": "groups"}, self.kwargs.name)
+        self.root.spec.groups = [
+            {"name": self.kwargs.name, "rules": _convert_to_dict(rules)}
+        ]
 
 
 # =============================================================================
@@ -385,6 +454,9 @@ SECTIONS: dict[str, tuple[type[PrometheusOperatorBase], str]] = {
     "thanos_rulers": (ThanosRuler, "ruler"),
     "probes": (Probe, "prb"),
     "scrape_configs": (ScrapeConfig, "scfg"),
+    "service_monitors": (ServiceMonitor, "smon"),
+    "pod_monitors": (PodMonitor, "pmon"),
+    "prometheus_rules": (PrometheusRule, "promrule"),
 }
 
 _RBAC_KINDS = (Prometheus, PrometheusAgent)
@@ -396,13 +468,16 @@ def main(input_params: dict | None = None) -> BaseObj:
     generator_config = _convert_to_dict(
         inv.parameters.get("generators", {}).get("prometheus_operator", {}) or {}
     )
+    release_label = generator_config.get("release_label")
     counts = {}
     for section, (resource_class, suffix) in SECTIONS.items():
         entries = generator_config.get(section) or {}
         counts[section] = len(entries)
         for name, config in entries.items():
             config = config or {}
-            resource = resource_class(name=name, config=config)
+            resource = resource_class(
+                name=name, config=config, release_label=release_label
+            )
             namespace = resource.root.metadata.namespace
             obj.root[f"{namespace}/{name}-{suffix}"] = resource
             if resource_class in _RBAC_KINDS and config.get("rbac"):
@@ -416,14 +491,17 @@ __all__ = [
     "AlertmanagerConfig",
     "ClusterRole",
     "ClusterRoleBinding",
+    "PodMonitor",
     "Probe",
     "Prometheus",
     "PrometheusAgent",
     "PrometheusOperatorBase",
+    "PrometheusRule",
     "RBAC_RULES",
     "SECTIONS",
     "ScrapeConfig",
     "ServiceAccount",
+    "ServiceMonitor",
     "ThanosRuler",
     "inv",
     "k8s",

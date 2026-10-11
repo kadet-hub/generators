@@ -1,6 +1,9 @@
 # Every kind and every flat key at least once, plus rbac on a Prometheus
 # and a PrometheusAgent, rbac: false on a second Prometheus, and every
-# shorthand (audit Prometheus, agent selectors, api Probe).
+# shorthand (audit Prometheus, agent selectors, api Probe, the monitors and
+# rules). release_label adds release: kube-prometheus-stack to the Probes,
+# the ScrapeConfig, the monitors and the rules; ServiceMonitor alertmanager
+# shows a flat key overriding spec (logs a warning).
 classes: []
 
 parameters:
@@ -17,6 +20,7 @@ parameters:
   generators:
     prometheus_operator:
       namespace: monitoring
+      release_label: kube-prometheus-stack
       prometheuses:
         main:
           rbac: true
@@ -220,3 +224,86 @@ parameters:
             - role: Node
           http_sd_configs:
             - url: https://sd.example.com/targets
+      # Monitors for the Services and Pods the operator creates for the
+      # Prometheus, Alertmanager and ThanosRuler above.
+      service_monitors:
+        alertmanager:
+          labels:
+            team: platform
+          selector:
+            operated-alertmanager: "true"
+          endpoints: web
+          spec:
+            endpoints:
+              - port: tcp-mesh
+            targetLimit: 10
+        prometheus:
+          labels:
+            team: platform
+          selector:
+            operated-prometheus: "true"
+          namespace_selector:
+            any: true
+          endpoints:
+            - web
+        thanos-ruler:
+          labels:
+            team: platform
+          selector:
+            matchLabels:
+              operated-thanos-ruler: "true"
+          namespace_selector:
+            - monitoring
+          endpoints:
+            - port: web
+              interval: 30s
+              path: /metrics
+          job_label: app.kubernetes.io/name
+          target_labels:
+            - operated-thanos-ruler
+          pod_target_labels:
+            - app.kubernetes.io/instance
+          sample_limit: 50000
+      pod_monitors:
+        alertmanager:
+          labels:
+            team: platform
+          selector:
+            app.kubernetes.io/name: alertmanager
+          namespace_selector:
+            - monitoring
+          pod_metrics_endpoints:
+            - web
+            - reloader-web
+          job_label: app.kubernetes.io/name
+          pod_target_labels:
+            - app.kubernetes.io/instance
+          sample_limit: 10000
+        thanos-ruler:
+          labels:
+            team: platform
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: thanos-ruler
+          pod_metrics_endpoints: web
+      prometheus_rules:
+        platform-alerts:
+          labels:
+            team: platform
+          rules:
+            - alert: AlertmanagerDown
+              expr: absent(up{job="alertmanager-operated"} == 1)
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: No Alertmanager target is up.
+        platform-records:
+          labels:
+            team: platform
+          groups:
+            - name: node.rules
+              interval: 1m
+              rules:
+                - record: instance:node_cpu_seconds:rate5m
+                  expr: sum by (instance) (rate(node_cpu_seconds_total{mode!="idle"}[5m]))
