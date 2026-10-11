@@ -1,0 +1,21 @@
+# QA-7: monitoring.coreos.com schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# core and rbac.authorization.k8s.io schemas are the kubernetes-json-schema
+# standalone-strict files of this Kubernetes release, unchanged.
+monitoring.coreos.com:
+  software: Prometheus Operator
+  version: 0.94.1
+  source: https://github.com/prometheus-operator/prometheus-operator/tree/v0.94.1/example/prometheus-operator-crd
+  license: Apache-2.0
+core:
+  software: Kubernetes
+  version: 1.35.0
+  source: https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict
+  license: Apache-2.0
+rbac.authorization.k8s.io:
+  software: Kubernetes
+  version: 1.35.0
+  source: https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict
+  license: Apache-2.0

@@ -1,0 +1,222 @@
+# Every kind and every flat key at least once, plus rbac on a Prometheus
+# and a PrometheusAgent, rbac: false on a second Prometheus, and every
+# shorthand (audit Prometheus, agent selectors, api Probe).
+classes: []
+
+parameters:
+  namespace: default
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/prometheus-operator
+        output_path: manifests/prometheus-operator/
+
+  generators:
+    prometheus_operator:
+      namespace: monitoring
+      prometheuses:
+        main:
+          rbac: true
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          replicas: 2
+          shards: 1
+          version: v3.5.0
+          image: quay.io/prometheus/prometheus:v3.5.0
+          scrape_interval: 30s
+          evaluation_interval: 30s
+          retention: 15d
+          retention_size: 50GB
+          external_labels:
+            cluster: cluster-a
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          storage:
+            volumeClaimTemplate:
+              spec:
+                resources:
+                  requests:
+                    storage: 50Gi
+          remote_write:
+            - url: https://metrics.example.com/api/v1/write
+          service_monitor_selector:
+            matchLabels:
+              team: platform
+          service_monitor_namespace_selector: {}
+          pod_monitor_selector:
+            matchLabels:
+              team: platform
+          pod_monitor_namespace_selector: {}
+          probe_selector:
+            matchLabels:
+              team: platform
+          probe_namespace_selector: {}
+          scrape_config_selector:
+            matchLabels:
+              team: platform
+          scrape_config_namespace_selector: {}
+          rule_selector:
+            matchLabels:
+              team: platform
+          rule_namespace_selector: {}
+          alerting:
+            alertmanagers:
+              - name: alertmanager-operated
+                namespace: monitoring
+                port: web
+          spec:
+            enableAdminAPI: false
+            walCompression: true
+        audit:
+          namespace: audit
+          rbac: false
+          service_account_name: prometheus-audit
+          storage: 20Gi
+          service_monitor_selector:
+            team: audit
+          rule_selector:
+            matchExpressions:
+              - key: team
+                operator: In
+                values:
+                  - audit
+      prometheus_agents:
+        agent:
+          rbac: true
+          service_account_name: prometheus-agent
+          mode: StatefulSet
+          replicas: 1
+          shards: 2
+          version: v3.5.0
+          image: quay.io/prometheus/prometheus:v3.5.0
+          scrape_interval: 15s
+          external_labels:
+            cluster: cluster-a
+          resources:
+            requests:
+              memory: 512Mi
+          storage:
+            emptyDir:
+              medium: Memory
+          remote_write:
+            - url: https://metrics.example.com/api/v1/write
+          service_monitor_selector:
+            team: platform
+          service_monitor_namespace_selector:
+            monitoring: enabled
+          pod_monitor_selector:
+            team: platform
+          pod_monitor_namespace_selector: {}
+          probe_selector:
+            matchLabels:
+              team: platform
+          probe_namespace_selector: {}
+          scrape_config_selector:
+            matchLabels:
+              team: platform
+          scrape_config_namespace_selector: {}
+      alertmanagers:
+        main:
+          replicas: 3
+          retention: 120h
+          service_account_name: alertmanager
+          config_secret: alertmanager-main-config
+          alertmanager_config_selector:
+            matchLabels:
+              team: platform
+          alertmanager_config_namespace_selector: {}
+          storage:
+            volumeClaimTemplate:
+              spec:
+                resources:
+                  requests:
+                    storage: 1Gi
+      alertmanager_configs:
+        platform:
+          labels:
+            team: platform
+          route:
+            receiver: team-mail
+            groupBy:
+              - alertname
+          receivers:
+            - name: team-mail
+              emailConfigs:
+                - to: oncall@example.com
+          inhibit_rules:
+            - sourceMatch:
+                - name: severity
+                  value: critical
+                  matchType: "="
+              targetMatch:
+                - name: severity
+                  value: warning
+                  matchType: "="
+              equal:
+                - alertname
+          mute_time_intervals:
+            # weekdays/months: the upstream schema patterns use Go-only regex
+            # flags that Python's jsonschema validator rejects.
+            - name: nights
+              timeIntervals:
+                - times:
+                    - startTime: "00:00"
+                      endTime: "06:00"
+      thanos_rulers:
+        main:
+          replicas: 2
+          retention: 24h
+          evaluation_interval: 1m
+          service_account_name: thanos-ruler
+          rule_selector:
+            matchLabels:
+              team: platform
+          rule_namespace_selector: {}
+          query_endpoints:
+            - dnssrv+_http._tcp.thanos-query.monitoring.svc
+          query_config:
+            name: thanos-ruler-query
+            key: query.yaml
+          alertmanagers_url:
+            - dnssrv+_web._tcp.alertmanager-operated.monitoring.svc
+          alertmanagers_config:
+            name: thanos-ruler-alertmanagers
+            key: alertmanagers.yaml
+      probes:
+        website:
+          job_name: website
+          module: http_2xx
+          interval: 60s
+          scrape_timeout: 10s
+          prober:
+            url: blackbox-exporter.monitoring.svc:9115
+          targets:
+            staticConfig:
+              static:
+                - https://example.com
+        api:
+          module: http_2xx
+          prober: blackbox-exporter.monitoring.svc:9115
+          targets:
+            - https://api.example.com/healthz
+            - https://www.example.com
+      scrape_configs:
+        nodes:
+          job_name: nodes
+          scrape_interval: 30s
+          metrics_path: /metrics
+          scheme: HTTPS
+          static_configs:
+            - targets:
+                - node-1.example.com:9100
+          kubernetes_sd_configs:
+            - role: Node
+          http_sd_configs:
+            - url: https://sd.example.com/targets

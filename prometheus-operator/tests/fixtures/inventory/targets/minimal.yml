@@ -1,0 +1,22 @@
+# Minimal: one Prometheus with its RBAC and the selector shorthand
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/prometheus-operator
+        output_path: manifests/prometheus-operator/
+
+  namespace: monitoring
+  generators:
+    prometheus_operator:
+      prometheuses:
+        main:
+          rbac: true
+          service_account_name: prometheus
+          service_monitor_selector:
+            team: platform
