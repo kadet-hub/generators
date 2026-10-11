@@ -1,0 +1,35 @@
+# Minimal: one Grafana instance, a Prometheus datasource and a grafana.com
+# dashboard, bound to the instance by the generator-wide instance_selector
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/grafana
+        output_path: manifests/
+
+  namespace: monitoring
+  generators:
+    grafana:
+      instance_selector:
+        dashboards: grafana
+      instances:
+        main:
+          labels:
+            dashboards: grafana
+      datasources:
+        prometheus:
+          datasource:
+            name: Prometheus
+            type: prometheus
+            access: proxy
+            url: http://prometheus-operated.monitoring.svc:9090
+            isDefault: true
+      dashboards:
+        node-exporter-full:
+          grafana_com:
+            id: 1860
