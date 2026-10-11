@@ -1,0 +1,158 @@
+# Complete: the Argo CD target of a platform repository. It renders the
+# AppProjects, Applications and an ApplicationSet, and publishes itself to the
+# argocd topic, so its own compiled output is synced by a root Application.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/argocd
+        output_path: manifests/
+    topics:
+      argocd:
+        consume: true
+        parameters:
+          name: argocd-apps
+          source:
+            path: compiled/complete/manifests
+          destination: argocd
+
+  generators:
+    argocd:
+      namespace: argocd
+
+      # Defaults for every target that publishes the argocd topic.
+      topics:
+        argocd:
+          project: platform
+          source:
+            repoURL: https://git.example.com/platform/deploy.git
+            targetRevision: main
+          destination:
+            server: https://kubernetes.default.svc
+
+      projects:
+        platform:
+          source_repos:
+            - https://git.example.com/platform/deploy.git
+            - https://charts.example.com
+          destinations:
+            - namespace: argocd
+              server: https://kubernetes.default.svc
+            - namespace: web
+              server: https://kubernetes.default.svc
+            - namespace: shop
+              server: https://kubernetes.default.svc
+          cluster_resource_whitelist:
+            - group: ''
+              kind: Namespace
+          namespace_resource_blacklist:
+            - group: ''
+              kind: ResourceQuota
+            - group: ''
+              kind: LimitRange
+          orphaned_resources:
+            warn: true
+          roles:
+            - name: developer
+              description: Read and sync Applications of the platform project
+              policies:
+                - p, proj:platform:developer, applications, get, platform/*, allow
+                - p, proj:platform:developer, applications, sync, platform/*, allow
+              groups:
+                - platform-developers
+          labels:
+            team: platform
+
+        # Opts into the cascade-delete finalizer explicitly.
+        addons:
+          finalizers:
+            - resources-finalizer.argocd.argoproj.io
+          source_repos:
+            - https://git.example.com/platform/cluster-addons.git
+          destinations:
+            - namespace: kube-system
+              server: '*'
+
+      applications:
+        # Namespace shorthand, explicit automated sync and cascade delete.
+        web:
+          project: platform
+          cascade_delete: true
+          destination: web
+          source:
+            repoURL: https://git.example.com/platform/deploy.git
+            path: compiled/web/manifests
+            targetRevision: main
+          sync_policy:
+            automated:
+              prune: true
+              selfHeal: true
+            syncOptions:
+              - CreateNamespace=true
+          ignore_differences:
+            - group: apps
+              kind: Deployment
+              jsonPointers:
+                - /spec/replicas
+          revision_history_limit: 5
+          labels:
+            team: web
+          annotations:
+            notifications.argoproj.io/subscribe.on-sync-failed.slack: web-alerts
+
+        # Multi-source: a Helm chart with values from the deploy repository.
+        # The destination has no server, so the generator sets the local cluster.
+        shop:
+          project: platform
+          destination:
+            namespace: shop
+          sources:
+            - repoURL: https://charts.example.com
+              chart: shop
+              targetRevision: 2.4.1
+              helm:
+                valueFiles:
+                  - $values/values/shop/production.yaml
+            - repoURL: https://git.example.com/platform/deploy.git
+              targetRevision: main
+              ref: values
+
+        # Precedence: the flat project overrides spec.project and logs a warning.
+        docs:
+          project: platform
+          spec:
+            project: default
+            destination:
+              server: https://kubernetes.default.svc
+              namespace: web
+            source:
+              repoURL: https://git.example.com/platform/deploy.git
+              path: compiled/docs/manifests
+              targetRevision: main
+
+      application_sets:
+        cluster-addons:
+          generators:
+            - clusters: {}
+          go_template: true
+          go_template_options:
+            - missingkey=error
+          template:
+            metadata:
+              name: '{{.name}}-addons'
+            spec:
+              project: addons
+              source:
+                repoURL: https://git.example.com/platform/cluster-addons.git
+                targetRevision: main
+                path: 'clusters/{{.name}}'
+              destination:
+                server: '{{.server}}'
+                namespace: kube-system
+          sync_policy:
+            applicationsSync: create-update
