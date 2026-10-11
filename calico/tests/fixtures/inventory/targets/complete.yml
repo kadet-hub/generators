@@ -1,0 +1,56 @@
+# Complete: Installation with BGP and IPIP, APIServer, ImageSet, Goldmane and Whisker for Calico v3.33.0
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/calico
+        output_path: manifests/
+
+  generators:
+    calico:
+      installation:
+        labels:
+          team: platform
+        annotations:
+          example.com/owner: platform
+        variant: Calico
+        kubernetes_provider: ""
+        cni:
+          ipam:
+            type: Calico
+          specVersion: "1.0.0"
+        calico_network:
+          bgp: Enabled
+          linux_dataplane: Iptables
+          node_address_autodetection_v4:
+            kubernetes: NodeInternalIP
+          ip_pools:
+            - name: default-ipv4-ippool
+              cidr: 10.244.0.0/16
+              encapsulation: IPIP
+              nat_outgoing: Enabled
+              node_selector: all()
+              block_size: 26
+        control_plane_replicas: 2
+        spec:
+          controlPlaneReplicas: 3
+          nodeMetricsPort: 9091
+      api_server: {}
+      imageset:
+        name: calico-v3.33.0
+        images:
+          - image: calico/calico
+            digest: sha256:4ebc20730127bc9e8bf1db5f5a2d8b58cf37fe0e891b3c7b5471992221d213e5
+          - image: calico/node
+            digest: sha256:565d8db3200e443955557f8f28ff44ab8a4a456754bc74a19c4f2f3444af9b1c
+          - image: calico/third-party-cni-plugins
+            digest: sha256:0f32f48279484c0d6f0e0d0e767b2d0e1a6c6ca34cb3421a61b989d992f3df41
+          - image: calico/whisker
+            digest: sha256:4802f246acbc4ac08d1ce6b5c229a518dc4d85e33b50b4d1366b05a49459497c
+      goldmane: {}
+      whisker: {}
