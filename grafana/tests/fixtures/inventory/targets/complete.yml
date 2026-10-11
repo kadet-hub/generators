@@ -1,0 +1,246 @@
+# Complete: every kind, the selector shorthand and its full form, entry-key
+# defaults, spec passthrough, flat keys overriding spec (logs a warning),
+# a cross-namespace import opt-in and the legacy generate_manifests function
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/grafana
+        output_path: manifests/
+      - input_type: kadet
+        input_paths:
+          - lib/grafana
+        output_path: legacy/
+        input_params:
+          function: generate_manifests
+
+  namespace: apps
+  generators:
+    grafana:
+      namespace: monitoring
+      instance_selector:
+        dashboards: grafana
+
+      instances:
+        main:
+          image: docker.io/grafana/grafana:13.1.3
+          labels:
+            dashboards: grafana
+          annotations:
+            example.com/owner: platform
+          persistence:
+            enabled: true
+            storageclass: standard
+            size: 10Gi
+          ingress:
+            enabled: true
+            hostname: grafana.example.com
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt
+          config:
+            log:
+              mode: console
+            server:
+              root_url: https://grafana.example.com
+          spec:
+            config:
+              log:
+                mode: file
+            deployment:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: grafana
+                        resources:
+                          requests:
+                            cpu: 100m
+                            memory: 256Mi
+
+      folders:
+        infrastructure:
+          title: Infrastructure
+        team-a:
+          uid: team-a
+          parent_folder_ref: infrastructure
+          permissions: |
+            {"items": [{"role": "Viewer", "permission": 1}]}
+
+      datasources:
+        prometheus:
+          uid: prometheus
+          datasource:
+            name: Prometheus
+            type: prometheus
+            access: proxy
+            url: http://prometheus-operated.monitoring.svc:9090
+            isDefault: true
+        loki:
+          instance_selector:
+            matchLabels:
+              dashboards: grafana
+            matchExpressions:
+              - key: environment
+                operator: NotIn
+                values: [sandbox]
+          uid: loki
+          datasource:
+            name: Loki
+            type: loki
+            access: proxy
+            url: http://loki-gateway.monitoring.svc:80
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+          values_from:
+            - targetPath: secureJsonData.httpHeaderValue1
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-loki-tenant
+                  key: tenant
+
+      dashboards:
+        node-exporter-full:
+          folder_ref: infrastructure
+          grafana_com:
+            id: 1860
+            revision: 37
+          datasources:
+            - inputName: DS_PROMETHEUS
+              datasourceName: Prometheus
+          resync_period: 1h
+        team-a-overview:
+          namespace: team-a
+          allow_cross_namespace_import: true
+          folder_uid: team-a
+          uid: team-a-overview
+          json: '{"title": "Team A overview", "panels": []}'
+          labels:
+            team: team-a
+
+      library_panels:
+        cpu-gauge:
+          folder_ref: infrastructure
+          uid: cpu-gauge
+          json: '{"type": "gauge", "title": "CPU usage", "fieldConfig": {"defaults": {"unit": "percent"}}}'
+
+      alert_rule_groups:
+        node-alerts:
+          folder_ref: infrastructure
+          interval: 5m
+          spec:
+            interval: 1m
+          rules:
+            - uid: node-high-cpu
+              title: Node high CPU
+              condition: B
+              for: 10m
+              noDataState: NoData
+              execErrState: Error
+              labels:
+                severity: critical
+              annotations:
+                summary: CPU usage above 90 percent
+              data:
+                - refId: A
+                  datasourceUid: prometheus
+                  relativeTimeRange:
+                    from: 600
+                    to: 0
+                  model:
+                    expr: 100 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100
+                    instant: true
+                    refId: A
+                - refId: B
+                  datasourceUid: __expr__
+                  model:
+                    type: threshold
+                    expression: A
+                    conditions:
+                      - evaluator:
+                          type: gt
+                          params: [90]
+                    refId: B
+
+      contact_points:
+        oncall-slack:
+          receivers:
+            - type: slack
+              settings:
+                recipient: "#oncall"
+                title: '{{ template "slack.title" . }}'
+              valuesFrom:
+                - targetPath: url
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-slack-webhook
+                      key: url
+
+        # kapitan-generators form: converted into one receivers entry
+        platform-email:
+          type: email
+          uid: platform-email
+          disable_resolve_message: true
+          settings:
+            subject: Grafana alert
+          values_from:
+            - targetPath: addresses
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-alert-contacts
+                  key: platform
+
+      notification_templates:
+        slack:
+          template: |
+            {{ define "slack.title" }}[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}{{ end }}
+
+      mute_timings:
+        maintenance:
+          time_intervals:
+            - weekdays: [saturday]
+              times:
+                - start_time: "02:00"
+                  end_time: "04:00"
+          editable: false
+
+      notification_policies:
+        root:
+          route:
+            receiver: oncall-slack
+            group_by: [grafana_folder, alertname]
+            routes:
+              - receiver: oncall-slack
+                routeSelector:
+                  matchLabels:
+                    route: critical
+
+      notification_policy_routes:
+        critical:
+          labels:
+            route: critical
+          receiver: oncall-slack
+          matchers:
+            - name: severity
+              value: critical
+              type: "="
+            - name: namespace
+              value: kube-.*
+              type: "=~"
+          group_by: [alertname, instance]
+          group_wait: 30s
+          repeat_interval: 4h
+          mute_time_intervals: [maintenance]
+          continue: false
+
+      service_accounts:
+        dashboard-reader:
+          instance_name: main
+          role: Viewer
+          tokens:
+            - name: dashboard-reader
+              expires: "2027-12-31T23:59:59Z"

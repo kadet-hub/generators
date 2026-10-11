@@ -1,0 +1,32 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at these releases (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# KubeVirt and CDI ship no CRD YAML in their trees; virt-operator and
+# cdi-operator install the CRDs from the generated Go sources linked below.
+# KubeVirt applies one schema to every served version of a CRD.
+kubevirt.io:
+  software: KubeVirt
+  version: 1.9.0
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  license: Apache-2.0
+pool.kubevirt.io:
+  software: KubeVirt
+  version: 1.9.0
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  license: Apache-2.0
+clone.kubevirt.io:
+  software: KubeVirt
+  version: 1.9.0
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  license: Apache-2.0
+snapshot.kubevirt.io:
+  software: KubeVirt
+  version: 1.9.0
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  license: Apache-2.0
+cdi.kubevirt.io:
+  software: KubeVirt Containerized Data Importer (CDI)
+  version: 1.66.1
+  source: https://github.com/kubevirt/containerized-data-importer/blob/v1.66.1/pkg/operator/resources/crds_generated.go
+  license: Apache-2.0

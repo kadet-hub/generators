@@ -1,0 +1,26 @@
+# Minimal: one NetworkPolicy using the selector and ports shorthands
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/calico-resources
+        output_path: manifests/
+
+  namespace: shop
+  generators:
+    calico_resources:
+      network_policies:
+        web:
+          selector:
+            app: web
+          ingress:
+            - action: Allow
+              source:
+                namespaceSelector:
+                  kubernetes.io/metadata.name: ingress-nginx
+              ports: [8080]

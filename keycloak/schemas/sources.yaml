@@ -1,0 +1,11 @@
+# QA-7: k8s.keycloak.org schemas from the openAPIV3Schema of the upstream CRDs
+# at this release (Apache-2.0): Keycloak and KeycloakRealmImport at v2beta1,
+# KeycloakOIDCClient and KeycloakSAMLClient at v2alpha1 (their only version).
+# Closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+k8s.keycloak.org:
+  software: Keycloak Operator
+  version: 26.8.0
+  source: https://github.com/keycloak/keycloak-k8s-resources/tree/26.8.0/kubernetes
+  license: Apache-2.0

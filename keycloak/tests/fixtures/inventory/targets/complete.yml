@@ -1,0 +1,226 @@
+# Complete: every section, spec passthrough with a flat key overriding it,
+# realm content maps with Secret refs, and two instances in one namespace so
+# keycloak_cr_name has to be named explicitly there; operator-managed OIDC and
+# SAML clients (client-admin-api:v2 enabled where they point)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/keycloak
+        output_path: manifests/
+
+  namespace: identity
+  generators:
+    keycloak:
+      instances:
+        sso:
+          labels:
+            app.kubernetes.io/part-of: identity
+          annotations:
+            description: Production Keycloak
+          spec:
+            instances: 2
+            startOptimized: false
+          instances: 3
+          image: quay.io/keycloak/keycloak:26.8.0
+          image_pull_secrets:
+            - name: registry-credentials
+          db:
+            vendor: postgres
+            host: keycloak-db-rw
+            port: 5432
+            database: app
+            pool_min_size: 10
+            pool_max_size: 100
+            credentials_secret: keycloak-db-app
+          hostname:
+            hostname: sso.example.com
+            admin: sso-admin.example.com
+            strict_backchannel: true
+          http:
+            tls_secret: sso-tls
+          ingress:
+            enabled: true
+            class_name: nginx
+            annotations:
+              nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+              nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+          features:
+            enabled:
+              - docker
+              - client-admin-api:v2
+            disabled:
+              - impersonation
+          transaction:
+            xa_enabled: false
+          cache:
+            config_map_file:
+              name: sso-cache
+              key: cache-ispn.xml
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          scheduling:
+            priority_class_name: identity-critical
+            topologySpreadConstraints:
+              - maxSkew: 1
+                topologyKey: topology.kubernetes.io/zone
+                whenUnsatisfiable: DoNotSchedule
+                labelSelector:
+                  matchLabels:
+                    app: keycloak
+                    app.kubernetes.io/instance: sso
+          additional_options:
+            - name: log-level
+              value: INFO
+          unsupported:
+            podTemplate:
+              metadata:
+                labels:
+                  team: identity
+        sso-staging:
+          namespace: identity-staging
+          db:
+            vendor: postgres
+            host: keycloak-staging-db-rw
+            database: app
+            credentials_secret: keycloak-staging-db-app
+          hostname:
+            hostname: sso.staging.example.com
+          features:
+            enabled:
+              - client-admin-api:v2
+          http:
+            tls_secret: sso-staging-tls
+        sso-canary:
+          namespace: identity-staging
+          db:
+            vendor: postgres
+            host: keycloak-staging-db-rw
+            database: canary
+            username_secret:
+              name: keycloak-staging-db-canary
+              key: username
+            password_secret:
+              name: keycloak-staging-db-canary
+              key: password
+          hostname:
+            hostname: sso-canary.staging.example.com
+          http:
+            tls_secret: sso-canary-tls
+      realm_imports:
+        apps:
+          realm:
+            enabled: true
+            displayName: Applications
+            sslRequired: external
+            bruteForceProtected: true
+          clients:
+            portal:
+              public_client: true
+              redirect_uris:
+                - https://portal.example.com/*
+              web_origins:
+                - https://portal.example.com
+              attributes:
+                pkce.code.challenge.method: S256
+            orders-api:
+              standard_flow_enabled: false
+              service_accounts_enabled: true
+              secret_ref:
+                name: orders-api-oidc
+                key: client-secret
+          client_scopes:
+            orders-audience:
+              protocol: openid-connect
+              protocol_mappers:
+                - name: orders-audience
+                  protocol: openid-connect
+                  protocolMapper: oidc-audience-mapper
+                  config:
+                    included.client.audience: orders-api
+                    access.token.claim: "true"
+          roles:
+            realm:
+              admin:
+                description: Administrator role
+              user: {}
+            client:
+              orders-api:
+                reader: {}
+          groups:
+            platform:
+              realm_roles:
+                - admin
+              sub_groups:
+                operators:
+                  client_roles:
+                    orders-api:
+                      - reader
+          identity_providers:
+            corporate:
+              provider_id: oidc
+              display_name: Corporate SSO
+              trust_email: true
+              client_secret_ref:
+                name: corporate-idp
+                key: client-secret
+              config:
+                clientId: keycloak
+                issuer: https://login.example.com
+                syncMode: IMPORT
+        staging-apps:
+          namespace: identity-staging
+          keycloak_cr_name: sso-staging
+          realm:
+            realm: apps
+            enabled: true
+      oidc_clients:
+        billing:
+          realm: apps
+          client:
+            displayName: Billing
+            loginFlows:
+              - STANDARD
+            redirectUris:
+              - https://billing.example.com/oauth2/callback
+            webOrigins:
+              - https://billing.example.com
+            auth:
+              method: client-secret
+              secretRef:
+                name: billing-oidc
+                key: client-secret
+        reports-worker:
+          namespace: identity-staging
+          keycloak_cr_name: sso-staging
+          realm: apps
+          client:
+            loginFlows:
+              - SERVICE_ACCOUNT
+            auth:
+              method: client-secret
+              secretRef:
+                name: reports-worker-oidc
+                key: client-secret
+      saml_clients:
+        hr-portal:
+          realm: apps
+          spec:
+            client:
+              nameIdFormat: email
+          client:
+            nameIdFormat: persistent
+            signDocuments: true
+            signAssertions: true
+            forcePostBinding: true
+            redirectUris:
+              - https://hr.example.com/saml/acs
