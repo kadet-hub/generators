@@ -1,0 +1,35 @@
+# Minimal: one network with two derived subnets and a storage account in its resource group.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-azurerm
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-azurerm:
+      network:
+        shop:
+          workload: shop
+          environment: dev
+          location: westeurope
+          address_space: 10.10.0.0/16
+          subnets:
+            web:
+              newbits: 8
+            app:
+              newbits: 8
+      storage:
+        shop:
+          workload: shop
+          environment: dev
+          location: westeurope
+          resource_group: shop
+          containers:
+            - uploads

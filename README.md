@@ -7,6 +7,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
 | [terraform-aws](terraform-aws/) ([catalog](https://kadet-hub.org/generators/terraform-aws/)) | Terraform JSON for AWS: VPC with derived subnets, routing and NAT, and hardened S3 buckets (hashicorp/aws 6.68.0) |
+| [terraform-azurerm](terraform-azurerm/) ([catalog](https://kadet-hub.org/generators/terraform-azurerm/)) | Terraform JSON for Azure: resource group, VNet with derived subnets, NSGs and associations, and hardened storage accounts with CAF names (hashicorp/azurerm 5.9.0) |
 | [terraform-google](terraform-google/) ([catalog](https://kadet-hub.org/generators/terraform-google/)) | Terraform JSON for Google Cloud: custom-mode VPC with subnets, Cloud NAT and baseline firewall, and hardened GCS buckets (hashicorp/google 8.6.0) |
 | [terraform-opentelekomcloud](terraform-opentelekomcloud/) ([catalog](https://kadet-hub.org/generators/terraform-opentelekomcloud/)) | Terraform JSON for Open Telekom Cloud: VPC with derived subnets, NAT gateway and SNAT, and KMS-encrypted OBS buckets (opentelekomcloud/opentelekomcloud 1.37.10) |
 

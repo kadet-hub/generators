@@ -1,0 +1,94 @@
+# Every option: an explicit prefix ahead of derived subnets, a subnet without
+# NSG, security rules, and two storage accounts with different settings and
+# firewall rules (a subnet of the network, public IPv4 addresses).
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-azurerm
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-azurerm:
+      network:
+        hub:
+          workload: platform
+          environment: prod
+          location: westeurope
+          location_short: weu
+          instance: "002"
+          address_space: 10.20.0.0/16
+          tags:
+            owner: platform-team
+            environment: prod
+          subnets:
+            web:
+              newbits: 8
+              security_rules:
+                - name: allow-https-inbound
+                  description: HTTPS from the internet
+                  priority: 100
+                  direction: Inbound
+                  access: Allow
+                  protocol: Tcp
+                  source_port_range: "*"
+                  destination_port_ranges: ["443", "8443"]
+                  source_address_prefix: Internet
+                  destination_address_prefix: VirtualNetwork
+                - name: deny-internet-outbound
+                  priority: 4000
+                  direction: Outbound
+                  access: Deny
+                  protocol: "*"
+                  source_port_range: "*"
+                  destination_port_range: "*"
+                  source_address_prefix: VirtualNetwork
+                  destination_address_prefix: Internet
+            app:
+              newbits: 4
+              default_outbound_access_enabled: true
+              private_endpoint_network_policies: NetworkSecurityGroupEnabled
+            data:
+              prefix: 10.20.0.0/24
+              nsg: false
+      storage:
+        artifacts:
+          workload: platform
+          environment: prod
+          location: westeurope
+          location_short: weu
+          resource_group: hub
+          public_network_access: Enabled
+          allowed_subnets:
+            - app
+          ip_rules:
+            - 203.0.113.0/24
+          containers:
+            - releases
+            - builds
+        logs:
+          workload: logs
+          environment: prod
+          location: westeurope
+          location_short: weu
+          instance: "002"
+          resource_group_name: rg-shared-prod-weu-001
+          account_replication_type: LRS
+          public_network_access: Enabled
+          shared_access_key_enabled: true
+          infrastructure_encryption_enabled: true
+          versioning_enabled: false
+          delete_retention_days: 30
+          container_delete_retention_days: 14
+          ip_rules:
+            - 198.51.100.7
+          containers:
+            - audit
+          tags:
+            owner: platform-team
