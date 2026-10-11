@@ -1,0 +1,10 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# The CRDs are the native projectcalico.org/v3 CRDs of manifests/v3_projectcalico_org.yaml.
+projectcalico.org:
+  software: Calico
+  version: 3.33.0
+  source: https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml
+  license: Apache-2.0

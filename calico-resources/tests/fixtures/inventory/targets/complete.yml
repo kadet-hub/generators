@@ -1,0 +1,106 @@
+# Complete: every kind, both shorthands and spec passthrough
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/calico-resources
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    calico_resources:
+      namespace: shop
+      network_policies:
+        api:
+          labels:
+            team: shop
+          annotations:
+            example.com/owner: shop
+          selector:
+            app: api
+          order: 200
+          spec:
+            order: 100
+            types: [Ingress, Egress]
+          ingress:
+            - action: Allow
+              source:
+                selector:
+                  app: web
+              ports: [3000]
+          egress:
+            - action: Allow
+              destination:
+                namespaceSelector:
+                  kubernetes.io/metadata.name: db
+                selector:
+                  app: postgres
+              ports: [5432]
+            - action: Allow
+              destination:
+                selector: role == 'partner'
+              ports: ["443", "8443:8445"]
+        metrics:
+          namespace: monitoring
+          selector: app.kubernetes.io/name == 'prometheus'
+          egress:
+            - action: Allow
+              protocol: TCP
+              destination:
+                ports: [metrics]
+      global_network_policies:
+        deny-app-policy:
+          namespace_selector: kubernetes.io/metadata.name not in {"calico-system", "kube-public", "kube-system", "tigera-operator"}
+          types: [Ingress, Egress]
+          egress:
+            - action: Allow
+              destination:
+                selector:
+                  k8s-app: kube-dns
+              ports: [53/UDP, 53/TCP]
+        block-threat-feed:
+          order: 10
+          selector: all()
+          types: [Ingress]
+          ingress:
+            - action: Deny
+              source:
+                selector:
+                  threat-feed: blocked
+      network_sets:
+        partner-api:
+          labels:
+            role: partner
+          nets:
+            - 198.51.100.0/24
+      global_network_sets:
+        threat-feed:
+          labels:
+            threat-feed: blocked
+          nets:
+            - 203.0.113.0/24
+      ip_pools:
+        shop-pool:
+          cidr: 10.245.0.0/16
+          block_size: 26
+          vxlan_mode: CrossSubnet
+          nat_outgoing: true
+          namespace_selector:
+            kubernetes.io/metadata.name: shop
+      bgp_configurations:
+        default:
+          as_number: 64512
+          node_to_node_mesh_enabled: false
+          service_cluster_ips:
+            - cidr: 10.96.0.0/12
+      bgp_peers:
+        rack1-tor:
+          peer_ip: 192.0.2.1
+          as_number: 64513
+          node_selector:
+            rack: rack1
