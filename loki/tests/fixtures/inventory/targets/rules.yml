@@ -1,0 +1,49 @@
+# Rules: with a single LokiStack every rule is bound to it; the stack gets a
+# selector for that binding and a namespace selector for the rule namespaces
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: rules
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/loki
+        output_path: manifests/
+
+  namespace: logging
+  generators:
+    loki:
+      loki_stacks:
+        logs:
+          size: 1x.extra-small
+          storage: s3
+          storage_class_name: standard
+          rules:
+            enabled: true
+          tenants:
+            passthrough:
+              ca:
+                secretName: logs-gateway-client-ca
+                key: ca.crt
+      alerting_rules:
+        web-errors:
+          namespace: web
+          tenant_id: application
+          groups:
+            - name: web
+              interval: 1m
+              rules:
+                - alert: WebErrors
+                  expr: sum(rate({app="web"} |= "error" [5m])) > 10
+                  for: 10m
+      recording_rules:
+        ingest-rate:
+          tenant_id: application
+          groups:
+            - name: ingest
+              interval: 1m
+              rules:
+                - record: logs:ingest:rate5m
+                  expr: sum(rate({app="web"}[5m]))

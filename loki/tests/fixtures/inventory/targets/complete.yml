@@ -1,0 +1,187 @@
+# Complete: all four kinds, every flat key, spec passthrough, a
+# per-resource namespace override, the storage shorthand, the schema default
+# (edge, audit) and the tenancy mode derived from the tenants block (logs:
+# static, edge: dynamic) or set explicitly (audit), rules bound to a stack by
+# loki_stack (audit) next to an explicit rules selector (logs), and a flat key
+# winning over the same field in spec (audit size)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/loki
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    loki:
+      namespace: logging
+      loki_stacks:
+        logs:
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          size: 1x.small
+          storage:
+            schemas:
+              - version: v13
+                effectiveDate: "2024-10-01"
+            secret:
+              name: logs-s3
+              type: s3
+              credentialMode: static
+            tls:
+              caName: logs-s3-ca
+          storage_class_name: standard
+          hash_ring:
+            type: memberlist
+            memberlist:
+              instanceAddrType: podIP
+          limits:
+            global:
+              ingestion:
+                ingestionRate: 8
+              retention:
+                days: 14
+          management_state: Managed
+          network_policies:
+            ruleSet: None
+          proxy:
+            httpsProxy: http://proxy.example.com:3128
+            noProxy: .svc,.cluster.local
+          replication:
+            factor: 2
+          rules:
+            enabled: true
+            selector:
+              matchLabels:
+                loki.grafana.com/rules: logs
+            namespaceSelector:
+              matchLabels:
+                loki.grafana.com/rules: enabled
+          template:
+            ingester:
+              replicas: 2
+          tenants:
+            authentication:
+              - tenantName: application
+                tenantId: application
+                oidc:
+                  secret:
+                    name: application-oidc
+                  issuerURL: https://idp.example.com/
+            authorization:
+              roles:
+                - name: read-write
+                  permissions:
+                    - read
+                    - write
+                  resources:
+                    - logs
+                  tenants:
+                    - application
+              roleBindings:
+                - name: read-write
+                  roles:
+                    - read-write
+                  subjects:
+                    - kind: group
+                      name: developers
+        edge:
+          namespace: edge-logging
+          size: 1x.extra-small
+          storage:
+            secret:
+              name: edge-gcs
+              type: gcs
+          storage_class_name: fast
+          tenants:
+            authentication:
+              - tenantName: edge
+                tenantId: edge
+                oidc:
+                  secret:
+                    name: edge-oidc
+                  issuerURL: https://idp.example.com/
+            authorization:
+              opa:
+                url: http://opa.edge-logging.svc:8181/v1/data/loki/authz
+          spec:
+            managementState: Unmanaged
+        audit:
+          size: 1x.medium
+          spec:
+            size: 1x.demo
+          storage: azure
+          rules:
+            enabled: true
+          storage_class_name: standard
+          tenants:
+            mode: openshift-logging
+            openshift:
+              adminGroups:
+                - logging-admins
+      alerting_rules:
+        audit-denied:
+          loki_stack: audit
+          namespace: audit-apps
+          tenant_id: application
+          groups:
+            - name: audit
+              interval: 1m
+              rules:
+                - alert: AccessDenied
+                  expr: sum(count_over_time({app="api"} |= "denied" [5m])) > 0
+        high-error-rate:
+          labels:
+            loki.grafana.com/rules: logs
+          tenant_id: application
+          groups:
+            - name: errors
+              interval: 1m
+              limit: 10
+              rules:
+                - alert: HighErrorRate
+                  expr: sum(rate({app="web"} |= "error" [5m])) > 10
+                  for: 10m
+                  labels:
+                    severity: warning
+                  annotations:
+                    summary: High error rate in web
+      recording_rules:
+        request-rates:
+          labels:
+            loki.grafana.com/rules: logs
+          tenant_id: application
+          groups:
+            - name: rates
+              interval: 1m
+              rules:
+                - record: web:requests:rate5m
+                  expr: sum(rate({app="web"}[5m]))
+      ruler_configs:
+        logs:
+          evaluation_interval: 1m
+          poll_interval: 2m
+          alertmanager:
+            enableV2: true
+            endpoints:
+              - http://alertmanager.monitoring.svc:9093
+          remote_write:
+            enabled: true
+            refreshPeriod: 10s
+            client:
+              name: metrics
+              url: http://prometheus.monitoring.svc:9090/api/v1/write
+              authorization: basic
+              authorizationSecretName: ruler-remote-write
+          overrides:
+            application:
+              alertmanager:
+                endpoints:
+                  - http://alertmanager-app.monitoring.svc:9093
