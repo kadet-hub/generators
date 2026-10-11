@@ -1,0 +1,14 @@
+# Changelog
+
+## 1.0.0
+
+First release on kadet-hub, migrated from kapitan-generators.
+
+- Built for Linkerd 2.20 (`edge-26.6.3`). Ships the CRD schemas of that release under `schemas/`, taken from the `linkerd-crds` chart instead of the CRDs catalog; the kadet-hub gate validates the compiled output against them (QA-7).
+- New flat keys and shorthands, documented with their sources in the README. Precedence, lowest first: generator defaults, `spec`, flat keys and shorthands; a flat key that overrides `spec` logs a warning.
+  - AuthorizationPolicy `target_ref: <server>` and `required_authentication_refs: [<name>]`, which resolves names against the generator's own `meshtls_authentications` and `network_authentications`.
+  - MeshTLSAuthentication `identities` and `identity_refs: [<service account>]`.
+  - NetworkAuthentication `networks: [<cidr>]`.
+- AuthorizationPolicy refs of kind `Server`, `MeshTLSAuthentication` or `NetworkAuthentication` without `group` get `group: policy.linkerd.io`, also in `spec`. Before, Linkerd read them as core group refs and rejected the policy.
+- Server is emitted as `policy.linkerd.io/v1beta3`; `v1beta1` is deprecated upstream. The inventory keys and shorthands are unchanged.
+- Fixture targets set `parameters.kapitan.vars.target`, as the gate requires.

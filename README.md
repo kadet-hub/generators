@@ -7,6 +7,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [certmanager](certmanager/) ([catalog](https://kadet-hub.org/generators/certmanager/)) | cert-manager Certificates, Issuers and ClusterIssuers with Let's Encrypt and CA bootstrap shorthands, and trust-manager Bundles |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
+| [linkerd](linkerd/) ([catalog](https://kadet-hub.org/generators/linkerd/)) | Linkerd Servers, AuthorizationPolicies, mTLS and network authentications, HTTPRoutes and ServiceProfiles with refs and group defaults |
 | [loki](loki/) ([catalog](https://kadet-hub.org/generators/loki/)) | Loki Operator LokiStacks with storage and schema defaults, and alerting and recording rules bound to their stack |
 | [terraform-aws](terraform-aws/) ([catalog](https://kadet-hub.org/generators/terraform-aws/)) | Terraform JSON for AWS: VPC with derived subnets, routing and NAT, and hardened S3 buckets (hashicorp/aws 6.68.0) |
 | [terraform-azurerm](terraform-azurerm/) ([catalog](https://kadet-hub.org/generators/terraform-azurerm/)) | Terraform JSON for Azure: resource group, VNet with derived subnets, NSGs and associations, and hardened storage accounts with CAF names (hashicorp/azurerm 5.9.0) |

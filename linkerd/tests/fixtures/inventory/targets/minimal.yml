@@ -1,0 +1,21 @@
+# Minimal: one Server selecting the web pods on port 8080
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/linkerd
+        output_path: manifests/
+
+  namespace: linkerd-test
+  generators:
+    linkerd:
+      servers:
+        web-server:
+          selector_labels:
+            app: web
+          port: 8080

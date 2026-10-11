@@ -1,0 +1,144 @@
+# Complete: all seven kinds, flat keys and shorthands, spec passthrough, the
+# namespace tiers and precedence (defaults < spec < flat keys and shorthands)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/linkerd
+        output_path: manifests/
+
+  namespace: linkerd-test
+  generators:
+    linkerd:
+      namespace: api-namespace
+      servers:
+        api-server:
+          selector_labels:
+            app: api
+            tier: backend
+          port: 8080
+          labels:
+            team: platform
+          annotations:
+            description: API server endpoint
+          spec:
+            proxyProtocol: HTTP/2
+        web:
+          namespace: web-namespace
+          selector_labels:
+            app: web
+          port: http
+          spec:
+            podSelector:
+              matchLabels:
+                app: old
+            port: 9090
+
+      server_authorizations:
+        api-auth:
+          selector_labels:
+            server: api-server
+          client:
+            meshTLS:
+              serviceAccounts:
+                - name: api-client
+                  namespace: api-namespace
+        web-authz:
+          namespace: web-namespace
+          selector_labels:
+            app: web
+          client:
+            unauthenticated: true
+          spec:
+            client:
+              networks:
+                - cidr: 10.0.0.0/8
+
+      authorization_policies:
+        api-policy:
+          target_ref: api-server
+          required_authentication_refs:
+            - api-meshtls
+        api-route-policy:
+          target_ref:
+            group: policy.linkerd.io
+            kind: HTTPRoute
+            name: api-route
+          required_authentication_refs:
+            - internal-network
+            - kind: ServiceAccount
+              name: api-client
+        web-policy:
+          namespace: web-namespace
+          required_authentication_refs:
+            - api-meshtls
+          spec:
+            targetRef:
+              kind: Server
+              name: web
+            requiredAuthenticationRefs:
+              - kind: ServiceAccount
+                name: web-client
+        namespace-policy:
+          spec:
+            targetRef:
+              kind: Namespace
+              name: api-namespace
+            requiredAuthenticationRefs:
+              - kind: MeshTLSAuthentication
+                name: all-meshed
+
+      meshtls_authentications:
+        api-meshtls:
+          identity_refs:
+            - api-client
+            - kind: ServiceAccount
+              name: web
+              namespace: web-namespace
+        all-meshed:
+          spec:
+            identities:
+              - "*.api-namespace.serviceaccount.identity.linkerd.cluster.local"
+          identities:
+            - "*"
+
+      network_authentications:
+        internal-network:
+          networks:
+            - 10.0.0.0/8
+            - cidr: 172.16.0.0/12
+              except:
+                - 172.16.1.0/24
+
+      service_profiles:
+        api-service.api-namespace.svc.cluster.local:
+          spec:
+            routes:
+              - name: GET /api/v1/users
+                condition:
+                  method: GET
+                  pathRegex: /api/v1/users
+                responseClasses:
+                  - condition:
+                      status:
+                        min: 200
+                        max: 299
+                    isFailure: false
+
+      http_routes:
+        api-route:
+          spec:
+            parentRefs:
+              - name: api-server
+                kind: Server
+                group: policy.linkerd.io
+            rules:
+              - matches:
+                  - path:
+                      type: PathPrefix
+                      value: /api
