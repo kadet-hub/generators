@@ -1,5 +1,5 @@
 name: prometheus-operator
-description: Renders Prometheus Operator Prometheus, PrometheusAgent, Alertmanager, AlertmanagerConfig, ThanosRuler, Probe and ScrapeConfig resources, plus Prometheus RBAC, from inventory parameters.
+description: Renders Prometheus Operator Prometheus, PrometheusAgent, Alertmanager, AlertmanagerConfig, ThanosRuler, Probe, ScrapeConfig, ServiceMonitor, PodMonitor and PrometheusRule resources, plus Prometheus RBAC, from inventory parameters.
 tags: [kubernetes, operators, observability]
 license: Apache-2.0
 owners: [3042152]

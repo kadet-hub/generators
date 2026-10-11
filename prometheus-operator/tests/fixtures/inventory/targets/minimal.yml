@@ -1,4 +1,5 @@
-# Minimal: one Prometheus with its RBAC and the selector shorthand
+# Minimal: one Prometheus with its RBAC and the selector shorthand, and a
+# ServiceMonitor for its own Service that this Prometheus selects.
 classes: []
 
 parameters:
@@ -20,3 +21,10 @@ parameters:
           service_account_name: prometheus
           service_monitor_selector:
             team: platform
+      service_monitors:
+        prometheus:
+          labels:
+            team: platform
+          selector:
+            operated-prometheus: "true"
+          endpoints: web

@@ -44,3 +44,37 @@ parameters:
               staticConfig:
                 static:
                   - https://old.example.com
+      service_monitors:
+        prometheus:
+          selector:
+            operated-prometheus: "true"
+          namespace_selector:
+            - monitoring
+          endpoints: web
+          spec:
+            selector:
+              matchLabels:
+                app: other
+            namespaceSelector:
+              any: true
+            endpoints:
+              - port: metrics
+      pod_monitors:
+        alertmanager:
+          selector:
+            app.kubernetes.io/name: alertmanager
+          pod_metrics_endpoints: web
+          spec:
+            podMetricsEndpoints:
+              - port: metrics
+      prometheus_rules:
+        platform-alerts:
+          rules:
+            - alert: AlertmanagerDown
+              expr: absent(up{job="alertmanager-operated"} == 1)
+          spec:
+            groups:
+              - name: old
+                rules:
+                  - alert: Old
+                    expr: vector(1)
