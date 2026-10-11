@@ -1,4 +1,7 @@
-# QA-7: JSON Schemas extracted from the CRDs of the upstream release (Apache-2.0).
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 external-secrets.io:
   software: External Secrets Operator
   version: 2.11.0
