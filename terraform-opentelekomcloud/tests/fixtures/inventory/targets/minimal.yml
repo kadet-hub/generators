@@ -1,0 +1,25 @@
+# Minimal: one VPC with two derived subnets behind a NAT gateway, one bucket with defaults
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-opentelekomcloud
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-opentelekomcloud:
+      tenant_name: eu-de_example
+      network:
+        main:
+          cidr: 10.0.0.0/16
+          subnets:
+            app: {}
+            data: {}
+      bucket:
+        example-state: {}

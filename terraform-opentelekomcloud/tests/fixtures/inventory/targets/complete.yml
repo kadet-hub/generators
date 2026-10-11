@@ -1,0 +1,69 @@
+# Every option of the generator, so the gate compiles and checks all of them.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-opentelekomcloud
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-opentelekomcloud:
+      # A base project: KMS keys need no second provider block.
+      tenant_name: eu-nl
+      auth_url: https://iam.eu-nl.otc.t-systems.com/v3
+      region: eu-nl
+      network:
+        main:
+          cidr: 10.20.0.0/16
+          tags:
+            env: prod
+            team: platform
+          dns:
+            - 100.125.4.25
+            - 100.125.129.199
+            - 192.0.2.53
+          subnets:
+            app: {}
+            db:
+              cidr: 10.20.200.0/24
+            ops:
+              newbits: 4
+              index: 15
+              egress: false
+          nat:
+            spec: "1"
+            bandwidth_mbit: 200
+            subnet: app
+        isolated:
+          cidr: 172.16.0.0/24
+          subnets:
+            only:
+              newbits: 4
+          nat:
+            enabled: false
+      bucket:
+        backups:
+          bucket: example-backups
+          force_destroy: true
+          kms:
+            key_id: 00000000-0000-4000-8000-000000000000
+          noncurrent_expiration_days: null
+          abort_multipart_days: null
+          tags:
+            env: prod
+        logs:
+          bucket: logs.example
+          versioning: false
+          kms:
+            pending_days: 30
+          noncurrent_expiration_days: null
+          abort_multipart_days: 3
+        scratch:
+          kms:
+            create_key: false

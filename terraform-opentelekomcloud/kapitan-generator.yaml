@@ -1,0 +1,13 @@
+name: terraform-opentelekomcloud
+description: Renders Terraform JSON for Open Telekom Cloud VPC networks with NAT egress and KMS-encrypted OBS buckets.
+tags: [terraform, cloud, networking]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
