@@ -5,6 +5,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | Generator | Renders |
 |---|---|
 | [certmanager](certmanager/) ([catalog](https://kadet-hub.org/generators/certmanager/)) | cert-manager Certificates, Issuers and ClusterIssuers with Let's Encrypt and CA bootstrap shorthands, and trust-manager Bundles |
+| [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
 | [linkerd](linkerd/) ([catalog](https://kadet-hub.org/generators/linkerd/)) | Linkerd Servers, AuthorizationPolicies, mTLS and network authentications, HTTPRoutes and ServiceProfiles with refs and group defaults |

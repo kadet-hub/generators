@@ -1,0 +1,14 @@
+name: cilium
+description: Renders Cilium network policies, LB-IPAM pools and L2 announcement policies from inventory parameters.
+tags: [kubernetes, networking, security]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas
