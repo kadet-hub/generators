@@ -1,5 +1,7 @@
 # External Secrets Generator
 
+Published on [kadet-hub](https://kadet-hub.org/generators/external-secrets/): pin a released version by digest from its catalog page.
+
 Kapitan kadet generator for [External Secrets Operator](https://external-secrets.io/) resources (`external-secrets.io/v1`):
 
 - **SecretStore**: namespaced provider configuration
