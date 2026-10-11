@@ -9,6 +9,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
+| [kubevirt](kubevirt/) ([catalog](https://kadet-hub.org/generators/kubevirt/)) | KubeVirt VirtualMachines, pools, snapshots, clones and the KubeVirt CR, and CDI DataVolumes and DataSources |
 | [kyverno](kyverno/) ([catalog](https://kadet-hub.org/generators/kyverno/)) | Kyverno ClusterPolicies, Policies, PolicyExceptions and cleanup policies with a match_kinds shorthand |
 | [linkerd](linkerd/) ([catalog](https://kadet-hub.org/generators/linkerd/)) | Linkerd Servers, AuthorizationPolicies, mTLS and network authentications, HTTPRoutes and ServiceProfiles with refs and group defaults |
 | [loki](loki/) ([catalog](https://kadet-hub.org/generators/loki/)) | Loki Operator LokiStacks with storage and schema defaults, and alerting and recording rules bound to their stack |
