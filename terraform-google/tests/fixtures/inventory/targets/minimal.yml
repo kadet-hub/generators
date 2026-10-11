@@ -1,0 +1,26 @@
+# Minimal: one network with one subnet and one bucket, all defaults
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-google
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-google:
+      project: example-project
+      network:
+        main:
+          subnets:
+            app:
+              region: europe-west3
+              cidr: 10.10.0.0/20
+      buckets:
+        example-project-assets:
+          location: EU
