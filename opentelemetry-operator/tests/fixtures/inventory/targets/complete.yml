@@ -1,0 +1,157 @@
+# Complete: every kind - a gateway collector (flat replicas overrides
+# spec.replicas with a warning), a sidecar collector, a collector linked to a
+# standalone TargetAllocator by the target_allocator shorthand (mode defaults
+# to statefulset), an Instrumentation and an OpAMPBridge reporting
+# only
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/opentelemetry-operator
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    opentelemetry_operator:
+      namespace: observability
+      collectors:
+        gateway:
+          mode: deployment
+          image: otel/opentelemetry-collector-contrib:0.160.0
+          replicas: 2
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          autoscaler:
+            minReplicas: 2
+            maxReplicas: 5
+            targetCPUUtilization: 80
+          ingress:
+            type: ingress
+            hostname: otlp.example.com
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          config:
+            receivers:
+              otlp:
+                protocols:
+                  grpc:
+                    endpoint: 0.0.0.0:4317
+                  http:
+                    endpoint: 0.0.0.0:4318
+            processors:
+              memory_limiter:
+                check_interval: 1s
+                limit_percentage: 75
+                spike_limit_percentage: 15
+              batch:
+                send_batch_size: 10000
+                timeout: 10s
+            exporters:
+              otlphttp:
+                endpoint: http://tempo.observability.svc:4318
+            extensions:
+              health_check: {}
+            service:
+              extensions: [health_check]
+              pipelines:
+                traces:
+                  receivers: [otlp]
+                  processors: [memory_limiter, batch]
+                  exporters: [otlphttp]
+          spec:
+            priorityClassName: observability
+            replicas: 1
+        sidecar:
+          namespace: web
+          mode: sidecar
+          config:
+            receivers:
+              otlp:
+                protocols:
+                  grpc:
+                    endpoint: 0.0.0.0:4317
+            exporters:
+              otlp:
+                endpoint: gateway-collector.observability.svc:4317
+                tls:
+                  insecure: true
+            service:
+              pipelines:
+                traces:
+                  receivers: [otlp]
+                  exporters: [otlp]
+        metrics:
+          target_allocator: metrics
+          config:
+            receivers:
+              prometheus:
+                config:
+                  scrape_configs: []
+            exporters:
+              prometheusremotewrite:
+                endpoint: http://prometheus.monitoring.svc:9090/api/v1/write
+            service:
+              pipelines:
+                metrics:
+                  receivers: [prometheus]
+                  exporters: [prometheusremotewrite]
+      target_allocators:
+        metrics:
+          allocation_strategy: per-node
+          prometheus_cr:
+            enabled: true
+            scrapeInterval: 30s
+            podMonitorSelector: {}
+            serviceMonitorSelector: {}
+          scrape_configs:
+            - job_name: otel-collector
+              scrape_interval: 10s
+              static_configs:
+                - targets: ["0.0.0.0:8888"]
+      instrumentations:
+        default:
+          namespace: web
+          exporter:
+            endpoint: http://localhost:4318
+          propagators:
+            - tracecontext
+            - baggage
+          sampler:
+            type: parentbased_traceidratio
+            argument: "0.25"
+          resource:
+            addK8sUIDAttributes: true
+          java:
+            env:
+              - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
+                value: "false"
+          python:
+            env:
+              - name: OTEL_EXPORTER_OTLP_ENDPOINT
+                value: http://localhost:4318
+      opamp_bridges:
+        bridge:
+          endpoint: ws://opamp-server.observability.svc:4320/v1/opamp
+          capabilities:
+            ReportsEffectiveConfig: true
+            ReportsHealth: true
+          components_allowed:
+            receivers: [otlp]
+            processors: [memory_limiter, batch]
+            exporters: [otlphttp, debug]
