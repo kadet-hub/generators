@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Run the kadet-hub gate's ruff rules and sandbox compile on a generator.
+#
+# Usage: ./check <generator dir>
+# Needs: docker, git. REGISTRY_REF selects the kadet-hub/registry commit
+# whose gate scripts and sandbox image are used (default: main, what the
+# gate runs). Without gVisor the syscall trace is not judged, and the
+# secret, malware and code scans run only in the gate itself.
+set -euo pipefail
+gen=$(cd -- "${1:?usage: ./check <generator dir>}" && pwd)
+name=$(basename -- "$gen")
+ref=${REGISTRY_REF:-main}
+work=$(mktemp -d)
+trap 'rm -rf -- "$work"' EXIT
+
+git -c advice.detachedHead=false clone -q --depth 1 --branch "$ref" https://github.com/kadet-hub/registry.git "$work/registry" 2>/dev/null \
+  || { git init -q "$work/registry" && git -C "$work/registry" fetch -q --depth 1 https://github.com/kadet-hub/registry.git "$ref" \
+       && git -C "$work/registry" -c advice.detachedHead=false checkout -q FETCH_HEAD; }
+reg=$work/registry
+echo "registry $(git -C "$reg" rev-parse --short HEAD)"
+
+echo "## sandbox image"
+docker build -q -t kadet-hub/sandbox "$reg/sandbox" >/dev/null
+
+echo "## ruff (QA-3)"
+ruff=$(sed -n 's/^ruff==\([^ ]*\).*/\1/p' "$reg/scan/requirements.txt")
+docker run --rm --mount "type=bind,src=$gen,dst=/src,readonly" --mount "type=bind,src=$reg/policy,dst=/policy,readonly" \
+  python:3.13-slim sh -c "pip install -q --disable-pip-version-check --root-user-action=ignore ruff==$ruff && cd /tmp && ruff check --config /policy/ruff.toml --no-cache --ignore-noqa --output-format concise /src"
+
+echo "## compile, tags, schemas"
+SANDBOX_TRACE=0 "$reg/sandbox/gate-compile" "$gen" "$name"
+echo "check passed"

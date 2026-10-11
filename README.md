@@ -28,3 +28,6 @@ changelog and fixture project under `tests/fixtures`. Releases are tagged
 `<generator>-v<semver>`. To use one, pin it by digest as described in
 [Using marketplace generators](https://github.com/kadet-hub/registry/blob/main/docs/consumers.md);
 the registry itself is [kadet-hub/registry](https://github.com/kadet-hub/registry).
+
+`./check <generator>` runs the gate's ruff rules and sandbox compile locally (needs docker);
+the `check` workflow runs it for every generator a pull request changes.
