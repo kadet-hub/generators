@@ -1,0 +1,93 @@
+# Complete: every option, two regions, GKE ranges, project override, bucket IAM
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/terraform-google
+        output_path: terraform/
+        output_type: json
+
+  generators:
+    terraform-google:
+      project: example-project
+      region: europe-west3
+      default_labels:
+        managed-by: kapitan
+        team: platform
+      network:
+        shared:
+          project: example-network-project
+          routing_mode: REGIONAL
+          delete_default_routes_on_create: false
+          mtu: 1500
+          subnets:
+            gke:
+              region: europe-west3
+              cidr: 10.20.0.0/20
+              private_google_access: true
+              flow_logs:
+                enabled: true
+                aggregation_interval: INTERVAL_1_MIN
+                flow_sampling: 0.25
+                metadata: EXCLUDE_ALL_METADATA
+              secondary_ranges:
+                batch: 10.24.0.0/20
+              gke:
+                pods: 10.32.0.0/14
+                services: 10.36.0.0/20
+            data:
+              region: europe-west4
+              cidr: 10.21.0.0/20
+              private_google_access: false
+              flow_logs:
+                enabled: false
+          nat:
+            enabled: true
+            source_ranges: ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES
+            log_filter: null
+          firewall:
+            iap_ssh: true
+            health_checks: true
+            internal: true
+      buckets:
+        logs:
+          name: example-project-logs
+          location: europe-west3
+          storage_class: STANDARD
+          uniform_bucket_level_access: true
+          public_access_prevention: enforced
+          versioning: true
+          soft_delete_retention_seconds: 1209600
+          force_destroy: false
+          labels:
+            data-class: internal
+          lifecycle_rules:
+            - action:
+                type: SetStorageClass
+                storage_class: NEARLINE
+              condition:
+                age: 30
+                matches_storage_class:
+                  - STANDARD
+            - action:
+                type: Delete
+              condition:
+                age: 0
+                matches_prefix:
+                  - tmp/
+            - action:
+                type: Delete
+              condition:
+                num_newer_versions: 3
+                with_state: ARCHIVED
+          iam:
+            roles/storage.objectViewer:
+              - group:platform@example.com
+              - serviceAccount:reader@example-project.iam.gserviceaccount.com
+            roles/storage.objectCreator:
+              - serviceAccount:writer@example-project.iam.gserviceaccount.com

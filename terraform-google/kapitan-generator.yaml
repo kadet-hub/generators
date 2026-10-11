@@ -1,0 +1,13 @@
+name: terraform-google
+description: Renders Google Cloud VPC networks with subnets, Cloud NAT and firewall rules, and Cloud Storage buckets with IAM members, as Terraform JSON.
+tags: [terraform, cloud, networking]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
