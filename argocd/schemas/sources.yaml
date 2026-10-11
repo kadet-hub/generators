@@ -1,0 +1,11 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# applicationset_v1alpha1.json is written without indentation to stay below
+# the 1 MiB file limit; its content is unchanged.
+argoproj.io:
+  software: Argo CD
+  version: 3.5.4
+  source: https://github.com/argoproj/argo-cd/tree/v3.5.4/manifests/crds
+  license: Apache-2.0

@@ -4,6 +4,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 
 | Generator | Renders |
 |---|---|
+| [argocd](argocd/) ([catalog](https://kadet-hub.org/generators/argocd/)) | Argo CD Applications, ApplicationSets and AppProjects, with an in-cluster destination shorthand and one Application per target publishing a Kapitan topic |
 | [certmanager](certmanager/) ([catalog](https://kadet-hub.org/generators/certmanager/)) | cert-manager Certificates, Issuers and ClusterIssuers with Let's Encrypt and CA bootstrap shorthands, and trust-manager Bundles |
 | [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
