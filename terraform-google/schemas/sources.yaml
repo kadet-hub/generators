@@ -1,0 +1,6 @@
+# Provider schema extract for QA-8: terraform providers schema -json (Terraform 1.16.5)
+# reduced with kadet-hub/registry sandbox/tf_schema.py extract to the types the fixtures emit.
+terraform/hashicorp/google:
+  software: hashicorp/google
+  version: 8.6.0
+  source: https://registry.terraform.io/providers/hashicorp/google/8.6.0

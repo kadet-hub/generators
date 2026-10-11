@@ -1,0 +1,4557 @@
+{
+ "format_version": "1.0",
+ "provider_schemas": {
+  "registry.terraform.io/hashicorp/aws": {
+   "data_source_schemas": {},
+   "provider": {
+    "block": {
+     "attributes": {
+      "access_key": {
+       "description": "The access key for API operations. You can retrieve this\nfrom the 'Security & Credentials' section of the AWS console.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "allowed_account_ids": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "set",
+        "string"
+       ]
+      },
+      "custom_ca_bundle": {
+       "description": "File containing custom root and intermediate certificates. Can also be configured using the `AWS_CA_BUNDLE` environment variable. (Setting `ca_bundle` in the shared config file is not supported.)",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "ec2_metadata_service_endpoint": {
+       "description": "Address of the EC2 metadata service endpoint to use. Can also be configured using the `AWS_EC2_METADATA_SERVICE_ENDPOINT` environment variable.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "ec2_metadata_service_endpoint_mode": {
+       "description": "Protocol to use with EC2 metadata service endpoint.Valid values are `IPv4` and `IPv6`. Can also be configured using the `AWS_EC2_METADATA_SERVICE_ENDPOINT_MODE` environment variable.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "forbidden_account_ids": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "set",
+        "string"
+       ]
+      },
+      "http_proxy": {
+       "description": "URL of a proxy to use for HTTP requests when accessing the AWS API. Can also be set using the `HTTP_PROXY` or `http_proxy` environment variables.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "https_proxy": {
+       "description": "URL of a proxy to use for HTTPS requests when accessing the AWS API. Can also be set using the `HTTPS_PROXY` or `https_proxy` environment variables.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "insecure": {
+       "description": "Explicitly allow the provider to perform \"insecure\" SSL requests. If omitted, default value is `false`",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "max_retries": {
+       "description": "The maximum number of times an AWS API request is\nbeing executed. If the API request still fails, an error is\nthrown.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "no_proxy": {
+       "description": "Comma-separated list of hosts that should not use HTTP or HTTPS proxies. Can also be set using the `NO_PROXY` or `no_proxy` environment variables.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "profile": {
+       "description": "The profile for API operations. If not set, the default profile\ncreated with `aws configure` will be used.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "region": {
+       "description": "The region where AWS operations will take place. Examples\nare us-east-1, us-west-2, etc.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "retry_mode": {
+       "description": "Specifies how retries are attempted. Valid values are `standard` and `adaptive`. Can also be configured using the `AWS_RETRY_MODE` environment variable.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "s3_us_east_1_regional_endpoint": {
+       "description": "Specifies whether S3 API calls in the `us-east-1` region use the legacy global endpoint or a regional endpoint. Valid values are `legacy` or `regional`. Can also be configured using the `AWS_S3_US_EAST_1_REGIONAL_ENDPOINT` environment variable or the `s3_us_east_1_regional_endpoint` shared config file parameter",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "s3_use_path_style": {
+       "description": "Set this to true to enable the request to use path-style addressing,\ni.e., https://s3.amazonaws.com/BUCKET/KEY. By default, the S3 client will\nuse virtual hosted bucket addressing when possible\n(https://BUCKET.s3.amazonaws.com/KEY). Specific to the Amazon S3 service.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "secret_key": {
+       "description": "The secret key for API operations. You can retrieve this\nfrom the 'Security & Credentials' section of the AWS console.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "shared_config_files": {
+       "description": "List of paths to shared config files. If not set, defaults to [~/.aws/config].",
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "shared_credentials_files": {
+       "description": "List of paths to shared credentials files. If not set, defaults to [~/.aws/credentials].",
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "skip_credentials_validation": {
+       "description": "Skip the credentials validation via STS API. Used for AWS API implementations that do not have STS available/implemented.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "skip_metadata_api_check": {
+       "description": "Skip the AWS Metadata API check. Used for AWS API implementations that do not have a metadata api endpoint.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "skip_region_validation": {
+       "description": "Skip static validation of region name. Used by users of alternative AWS-like APIs or users w/ access to regions that are not public (yet).",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "skip_requesting_account_id": {
+       "description": "Skip requesting the account ID. Used for AWS API implementations that do not have IAM/STS API and/or metadata API.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "sts_region": {
+       "description": "The region where AWS STS operations will take place. Examples\nare us-east-1 and us-west-2.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "tag_policy_compliance": {
+       "description": "The severity with which to enforce organizational tagging policies on resources managed by this provider instance. At this time this only includes compliance with required tag keys by resource type. Valid values are \"error\", \"warning\", and \"disabled\". When unset or \"disabled\", tag policy compliance will not be enforced by the provider. Can also be configured with the TF_AWS_TAG_POLICY_COMPLIANCE environment variable.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "token": {
+       "description": "session token. A session token is only required if you are\nusing temporary security credentials.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "token_bucket_rate_limiter_capacity": {
+       "description": "The capacity of the AWS SDK's token bucket rate limiter.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "number"
+      },
+      "use_dualstack_endpoint": {
+       "description": "Resolve an endpoint with DualStack capability",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "use_fips_endpoint": {
+       "description": "Resolve an endpoint with FIPS capability",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "user_agent": {
+       "description": "Product details to append to the User-Agent string sent in all AWS API calls.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      }
+     },
+     "block_types": {
+      "assume_role": {
+       "block": {
+        "attributes": {
+         "duration": {
+          "description": "The duration, between 15 minutes and 12 hours, of the role session. Valid time units are ns, us (or \u00b5s), ms, s, h, or m.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "external_id": {
+          "description": "A unique identifier that might be required when you assume a role in another account.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "policy": {
+          "description": "IAM Policy JSON describing further restricting permissions for the IAM Role being assumed.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "policy_arns": {
+          "description": "Amazon Resource Names (ARNs) of IAM Policies describing further restricting permissions for the IAM Role being assumed.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "set",
+           "string"
+          ]
+         },
+         "role_arn": {
+          "description": "Amazon Resource Name (ARN) of an IAM Role to assume prior to making API calls.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "session_name": {
+          "description": "An identifier for the assumed role session.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "source_identity": {
+          "description": "Source identity specified by the principal assuming the role.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "tags": {
+          "description": "Assume role session tags.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "map",
+           "string"
+          ]
+         },
+         "transitive_tag_keys": {
+          "description": "Assume role session tag keys to pass to any subsequent sessions.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "set",
+           "string"
+          ]
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      },
+      "assume_role_with_web_identity": {
+       "block": {
+        "attributes": {
+         "duration": {
+          "description": "The duration, between 15 minutes and 12 hours, of the role session. Valid time units are ns, us (or \u00b5s), ms, s, h, or m.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "policy": {
+          "description": "IAM Policy JSON describing further restricting permissions for the IAM Role being assumed.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "policy_arns": {
+          "description": "Amazon Resource Names (ARNs) of IAM Policies describing further restricting permissions for the IAM Role being assumed.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "set",
+           "string"
+          ]
+         },
+         "role_arn": {
+          "description": "Amazon Resource Name (ARN) of an IAM Role to assume prior to making API calls.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "session_name": {
+          "description": "An identifier for the assumed role session.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "web_identity_token": {
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "web_identity_token_file": {
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      },
+      "default_tags": {
+       "block": {
+        "attributes": {
+         "tags": {
+          "description": "Resource tags to default across all resources. Can also be configured with environment variables like `TF_AWS_DEFAULT_TAGS_<tag_name>`.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "map",
+           "string"
+          ]
+         }
+        },
+        "description": "Configuration block with settings to default resource tags across all resources.",
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      },
+      "endpoints": {
+       "block": {
+        "attributes": {
+         "accessanalyzer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "account": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "accountaccess": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "acm": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "acmpca": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "agentregistry": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "amg": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "amp": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "amplify": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "apigateway": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "apigatewayv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appautoscaling": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appconfig": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appfabric": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appflow": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appintegrations": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appintegrationsservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "applicationautoscaling": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "applicationinsights": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "applicationsignals": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appmesh": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appregistry": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "apprunner": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appstream": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "appsync": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "arcregionswitch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "arczonalshift": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "athena": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "auditmanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "autoscaling": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "autoscalingplans": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "backup": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "batch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "bcmdataexports": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "beanstalk": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "bedrock": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "bedrockagent": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "bedrockagentcore": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "bedrockruntime": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "billing": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "budgets": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ce": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "chatbot": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "chime": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "chimesdkmediapipelines": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "chimesdkvoice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cleanrooms": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloud9": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudcontrol": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudcontrolapi": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudformation": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudfront": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudfrontkeyvaluestore": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudhsm": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudhsmv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudsearch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudtrail": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchevents": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchevidently": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchlog": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchlogs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchobservabilityaccessmanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchomni": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cloudwatchrum": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codeartifact": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codebuild": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codecatalyst": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codecommit": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codeconnections": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codedeploy": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codeguruprofiler": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codegurureviewer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codepipeline": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codestarconnections": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "codestarnotifications": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cognitoidentity": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cognitoidentityprovider": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cognitoidp": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "comprehend": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "computeoptimizer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "config": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "configservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "connect": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "connectcases": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "controltower": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "costandusagereportservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "costexplorer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "costoptimizationhub": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "cur": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "customerprofiles": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "databasemigration": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "databasemigrationservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "databrew": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dataexchange": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "datapipeline": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "datasync": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "datazone": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dax": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "deploy": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "detective": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "devicefarm": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "devopsagent": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "devopsguru": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "directconnect": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "directoryservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "directoryservicedata": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dlm": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dms": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "docdb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "docdbelastic": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "drs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ds": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dsql": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "dynamodb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ec2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ecr": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ecrpublic": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ecs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "efs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "eks": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticache": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticbeanstalk": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticloadbalancing": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticloadbalancingv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticsearch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elasticsearchservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elastictranscoder": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "elbv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "emr": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "emrcontainers": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "emrserverless": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "es": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "eventbridge": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "eventbridgev2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "events": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "evidently": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "evs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "finspace": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "firehose": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "fis": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "fms": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "fsx": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "gamelift": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "glacier": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "globalaccelerator": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "glue": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "gluedatabrew": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "grafana": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "greengrass": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "groundstation": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "guardduty": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "healthlake": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "iam": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "identitystore": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "imagebuilder": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "inspector": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "inspector2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "inspectorv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "interconnect": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "internetmonitor": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "invoicing": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "iot": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ivs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ivschat": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kafka": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kafkaconnect": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kendra": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "keyspaces": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kinesis": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kinesisanalytics": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kinesisanalyticsv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kinesisvideo": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "kms": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lakeformation": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lambda": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lambdacore": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lambdamicrovms": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lambdaweb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "launchwizard": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lex": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lexmodelbuilding": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lexmodelbuildingservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lexmodels": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lexmodelsv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lexv2models": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "licensemanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "lightsail": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "location": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "locationservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "logs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "m2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "macie2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mailmanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "managedgrafana": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediaconnect": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediaconvert": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "medialive": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediapackage": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediapackagev2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediapackagevod": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mediastore": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "memorydb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mgn": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mpa": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mq": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "msk": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mwaa": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "mwaaserverless": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "neptune": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "neptunegraph": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "networkfirewall": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "networkflowmonitor": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "networkmanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "networkmonitor": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "networksecuritymanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "notifications": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "notificationscontacts": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "oam": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "observabilityadmin": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "odb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "opensearch": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "opensearchingestion": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "opensearchserverless": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "opensearchservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "organizations": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "osis": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "outposts": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "paymentcryptography": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pcaconnectorad": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pcs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pinpoint": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pinpointsmsvoicev2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pipes": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "polly": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "pricing": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "prometheus": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "prometheusservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "qbusiness": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "qldb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "quicksight": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ram": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rbin": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rds": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rdsdata": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rdsdataservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "recyclebin": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "redshift": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "redshiftdata": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "redshiftdataapiservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "redshiftserverless": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rekognition": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resiliencehub": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resiliencehubv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resourceexplorer2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resourcegroups": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resourcegroupstagging": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "resourcegroupstaggingapi": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rolesanywhere": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53domains": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53profiles": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53recoverycontrolconfig": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53recoveryreadiness": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "route53resolver": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "rum": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3api": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3control": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3files": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3outposts": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3tables": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "s3vectors": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sagemaker": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "savingsplans": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "scheduler": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "schemas": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "secretsmanager": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "securityhub": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "securitylake": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "serverlessapplicationrepository": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "serverlessapprepo": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "serverlessrepo": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "servicecatalog": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "servicecatalogappregistry": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "servicediscovery": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "servicequotas": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ses": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sesv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sfn": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "shield": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "signer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sns": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sqs": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssm": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssmcontacts": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssmincidents": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssmquicksetup": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssmsap": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sso": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "ssoadmin": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "stepfunctions": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "storagegateway": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "sts": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "swf": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "synthetics": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "taxsettings": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "timestreaminfluxdb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "timestreamquery": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "timestreamwrite": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "transcribe": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "transcribeservice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "transfer": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "uxc": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "verifiedpermissions": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "vpclattice": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "waf": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "wafregional": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "wafv2": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "wellarchitected": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "workmail": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "workspaces": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "workspacesweb": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         },
+         "xray": {
+          "description": "Use this to override the default service endpoint URL",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "string"
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "set"
+      },
+      "ignore_tags": {
+       "block": {
+        "attributes": {
+         "key_prefixes": {
+          "description": "Resource tag key prefixes to ignore across all resources. Can also be configured with the TF_AWS_IGNORE_TAGS_KEY_PREFIXES environment variable.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "set",
+           "string"
+          ]
+         },
+         "keys": {
+          "description": "Resource tag keys to ignore across all resources. Can also be configured with the TF_AWS_IGNORE_TAGS_KEYS environment variable.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": [
+           "set",
+           "string"
+          ]
+         }
+        },
+        "description": "Configuration block with settings to ignore resource tags across all resources.",
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      }
+     },
+     "description_kind": "plain"
+    },
+    "version": 0
+   },
+   "resource_schemas": {
+    "aws_default_security_group": {
+     "block": {
+      "attributes": {
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "description": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "egress": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "cidr_blocks": [
+            "list",
+            "string"
+           ],
+           "description": "string",
+           "from_port": "number",
+           "ipv6_cidr_blocks": [
+            "list",
+            "string"
+           ],
+           "prefix_list_ids": [
+            "list",
+            "string"
+           ],
+           "protocol": "string",
+           "security_groups": [
+            "set",
+            "string"
+           ],
+           "self": "bool",
+           "to_port": "number"
+          }
+         ]
+        ]
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ingress": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "cidr_blocks": [
+            "list",
+            "string"
+           ],
+           "description": "string",
+           "from_port": "number",
+           "ipv6_cidr_blocks": [
+            "list",
+            "string"
+           ],
+           "prefix_list_ids": [
+            "list",
+            "string"
+           ],
+           "protocol": "string",
+           "security_groups": [
+            "set",
+            "string"
+           ],
+           "self": "bool",
+           "to_port": "number"
+          }
+         ]
+        ]
+       },
+       "name": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "name_prefix": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "revoke_rules_on_delete": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "vpc_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 1
+    },
+    "aws_eip": {
+     "block": {
+      "attributes": {
+       "address": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "allocation_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "associate_with_private_ip": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "association_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "carrier_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "customer_owned_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "customer_owned_ipv4_pool": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "domain": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "instance": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipam_pool_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_border_group": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_interface": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "private_dns": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "private_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "ptr_record": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "public_dns": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "public_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "public_ipv4_pool": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_internet_gateway": {
+     "block": {
+      "attributes": {
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "vpc_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_nat_gateway": {
+     "block": {
+      "attributes": {
+       "allocation_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "association_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "auto_provision_zones": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "auto_scaling_ips": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "availability_mode": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "connectivity_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_interface_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "private_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "public_ip": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "regional_nat_gateway_address": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "allocation_id": "string",
+           "association_id": "string",
+           "availability_zone": "string",
+           "availability_zone_id": "string",
+           "network_interface_id": "string",
+           "public_ip": "string",
+           "status": "string"
+          }
+         ]
+        ]
+       },
+       "regional_nat_gateway_auto_mode": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "route_table_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_allocation_ids": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "secondary_private_ip_address_count": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "secondary_private_ip_addresses": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "subnet_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "vpc_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "availability_zone_address": {
+        "block": {
+         "attributes": {
+          "allocation_ids": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "availability_zone": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "availability_zone_id": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_route": {
+     "block": {
+      "attributes": {
+       "carrier_gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "core_network_arn": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "destination_cidr_block": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "destination_ipv6_cidr_block": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "destination_prefix_list_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "egress_only_gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "instance_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "instance_owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "local_gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "nat_gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_interface_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "odb_network_arn": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "origin": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "route_table_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "state": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "transit_gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "vpc_endpoint_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "vpc_peering_connection_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_route_table": {
+     "block": {
+      "attributes": {
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "propagating_vgws": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "route": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "carrier_gateway_id": "string",
+           "cidr_block": "string",
+           "core_network_arn": "string",
+           "destination_prefix_list_id": "string",
+           "egress_only_gateway_id": "string",
+           "gateway_id": "string",
+           "ipv6_cidr_block": "string",
+           "local_gateway_id": "string",
+           "nat_gateway_id": "string",
+           "network_interface_id": "string",
+           "odb_network_arn": "string",
+           "transit_gateway_id": "string",
+           "vpc_endpoint_id": "string",
+           "vpc_peering_connection_id": "string"
+          }
+         ]
+        ]
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "vpc_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_route_table_association": {
+     "block": {
+      "attributes": {
+       "gateway_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "route_table_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "subnet_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket": {
+     "block": {
+      "attributes": {
+       "acceleration_status": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "acceleration_status is deprecated. Use the aws_s3_bucket_accelerate_configuration resource instead.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "acl": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "acl is deprecated. Use the aws_s3_bucket_acl resource instead.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "bucket": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "bucket_domain_name": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "bucket_namespace": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "bucket_prefix": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "bucket_region": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "bucket_regional_domain_name": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "force_destroy": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "hosted_zone_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "object_lock_enabled": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "policy": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "policy is deprecated. Use the aws_s3_bucket_policy resource instead.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "request_payer": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "request_payer is deprecated. Use the aws_s3_bucket_request_payment_configuration resource instead.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "website_domain": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "website_domain is deprecated. Use the aws_s3_bucket_website_configuration resource instead.",
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "website_endpoint": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "website_endpoint is deprecated. Use the aws_s3_bucket_website_configuration resource instead.",
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "cors_rule": {
+        "block": {
+         "attributes": {
+          "allowed_headers": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "allowed_methods": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "allowed_origins": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "expose_headers": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "max_age_seconds": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "cors_rule is deprecated. Use the aws_s3_bucket_cors_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "grant": {
+        "block": {
+         "attributes": {
+          "id": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "permissions": {
+           "description_kind": "plain",
+           "required": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "type": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "uri": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "grant is deprecated. Use the aws_s3_bucket_acl resource instead.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "set"
+       },
+       "lifecycle_rule": {
+        "block": {
+         "attributes": {
+          "abort_incomplete_multipart_upload_days": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "enabled": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "id": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "prefix": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "tags": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "map",
+            "string"
+           ]
+          }
+         },
+         "block_types": {
+          "expiration": {
+           "block": {
+            "attributes": {
+             "date": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "expired_object_delete_marker": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "noncurrent_version_expiration": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "noncurrent_version_transition": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "storage_class": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          },
+          "transition": {
+           "block": {
+            "attributes": {
+             "date": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "storage_class": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "set"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "lifecycle_rule is deprecated. Use the aws_s3_bucket_lifecycle_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "logging": {
+        "block": {
+         "attributes": {
+          "target_bucket": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "target_prefix": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "logging is deprecated. Use the aws_s3_bucket_logging resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "object_lock_configuration": {
+        "block": {
+         "attributes": {
+          "object_lock_enabled": {
+           "deprecated": true,
+           "deprecation_message": "object_lock_enabled is deprecated. Use the top-level parameter object_lock_enabled instead.",
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "rule": {
+           "block": {
+            "block_types": {
+             "default_retention": {
+              "block": {
+               "attributes": {
+                "days": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "number"
+                },
+                "mode": {
+                 "description_kind": "plain",
+                 "required": true,
+                 "type": "string"
+                },
+                "years": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "number"
+                }
+               },
+               "description_kind": "plain"
+              },
+              "max_items": 1,
+              "min_items": 1,
+              "nesting_mode": "list"
+             }
+            },
+            "deprecated": true,
+            "deprecation_message": "rule is deprecated. Use the aws_s3_bucket_object_lock_configuration resource instead.",
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "object_lock_configuration is deprecated. Use the top-level parameter object_lock_enabled and the aws_s3_bucket_object_lock_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "replication_configuration": {
+        "block": {
+         "attributes": {
+          "role": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "rules": {
+           "block": {
+            "attributes": {
+             "delete_marker_replication_status": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "id": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "prefix": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "priority": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "status": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "block_types": {
+             "destination": {
+              "block": {
+               "attributes": {
+                "account_id": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "string"
+                },
+                "bucket": {
+                 "description_kind": "plain",
+                 "required": true,
+                 "type": "string"
+                },
+                "replica_kms_key_id": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "string"
+                },
+                "storage_class": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "string"
+                }
+               },
+               "block_types": {
+                "access_control_translation": {
+                 "block": {
+                  "attributes": {
+                   "owner": {
+                    "description_kind": "plain",
+                    "required": true,
+                    "type": "string"
+                   }
+                  },
+                  "description_kind": "plain"
+                 },
+                 "max_items": 1,
+                 "nesting_mode": "list"
+                },
+                "metrics": {
+                 "block": {
+                  "attributes": {
+                   "minutes": {
+                    "description_kind": "plain",
+                    "optional": true,
+                    "type": "number"
+                   },
+                   "status": {
+                    "description_kind": "plain",
+                    "optional": true,
+                    "type": "string"
+                   }
+                  },
+                  "description_kind": "plain"
+                 },
+                 "max_items": 1,
+                 "nesting_mode": "list"
+                },
+                "replication_time": {
+                 "block": {
+                  "attributes": {
+                   "minutes": {
+                    "description_kind": "plain",
+                    "optional": true,
+                    "type": "number"
+                   },
+                   "status": {
+                    "description_kind": "plain",
+                    "optional": true,
+                    "type": "string"
+                   }
+                  },
+                  "description_kind": "plain"
+                 },
+                 "max_items": 1,
+                 "nesting_mode": "list"
+                }
+               },
+               "description_kind": "plain"
+              },
+              "max_items": 1,
+              "min_items": 1,
+              "nesting_mode": "list"
+             },
+             "filter": {
+              "block": {
+               "attributes": {
+                "prefix": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "string"
+                },
+                "tags": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": [
+                  "map",
+                  "string"
+                 ]
+                }
+               },
+               "description_kind": "plain"
+              },
+              "max_items": 1,
+              "nesting_mode": "list"
+             },
+             "source_selection_criteria": {
+              "block": {
+               "block_types": {
+                "sse_kms_encrypted_objects": {
+                 "block": {
+                  "attributes": {
+                   "enabled": {
+                    "description_kind": "plain",
+                    "required": true,
+                    "type": "bool"
+                   }
+                  },
+                  "description_kind": "plain"
+                 },
+                 "max_items": 1,
+                 "nesting_mode": "list"
+                }
+               },
+               "description_kind": "plain"
+              },
+              "max_items": 1,
+              "nesting_mode": "list"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "min_items": 1,
+           "nesting_mode": "set"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "replication_configuration is deprecated. Use the aws_s3_bucket_replication_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "server_side_encryption_configuration": {
+        "block": {
+         "block_types": {
+          "rule": {
+           "block": {
+            "attributes": {
+             "bucket_key_enabled": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             }
+            },
+            "block_types": {
+             "apply_server_side_encryption_by_default": {
+              "block": {
+               "attributes": {
+                "kms_master_key_id": {
+                 "description_kind": "plain",
+                 "optional": true,
+                 "type": "string"
+                },
+                "sse_algorithm": {
+                 "description_kind": "plain",
+                 "required": true,
+                 "type": "string"
+                }
+               },
+               "description_kind": "plain"
+              },
+              "max_items": 1,
+              "min_items": 1,
+              "nesting_mode": "list"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "min_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "server_side_encryption_configuration is deprecated. Use the aws_s3_bucket_server_side_encryption_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       },
+       "versioning": {
+        "block": {
+         "attributes": {
+          "enabled": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "mfa_delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "versioning is deprecated. Use the aws_s3_bucket_versioning resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "website": {
+        "block": {
+         "attributes": {
+          "error_document": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "index_document": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "redirect_all_requests_to": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "routing_rules": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "deprecated": true,
+         "deprecation_message": "website is deprecated. Use the aws_s3_bucket_website_configuration resource instead.",
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket_ownership_controls": {
+     "block": {
+      "attributes": {
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "rule": {
+        "block": {
+         "attributes": {
+          "object_ownership": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "min_items": 1,
+        "nesting_mode": "list"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket_policy": {
+     "block": {
+      "attributes": {
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "policy": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket_public_access_block": {
+     "block": {
+      "attributes": {
+       "block_public_acls": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "block_public_policy": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ignore_public_acls": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "restrict_public_buckets": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "skip_destroy": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket_server_side_encryption_configuration": {
+     "block": {
+      "attributes": {
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "expected_bucket_owner": {
+        "deprecated": true,
+        "deprecation_message": "expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "rule": {
+        "block": {
+         "attributes": {
+          "blocked_encryption_types": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "bucket_key_enabled": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          }
+         },
+         "block_types": {
+          "apply_server_side_encryption_by_default": {
+           "block": {
+            "attributes": {
+             "kms_master_key_id": {
+              "computed": true,
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "sse_algorithm": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "min_items": 1,
+        "nesting_mode": "set"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_s3_bucket_versioning": {
+     "block": {
+      "attributes": {
+       "bucket": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "expected_bucket_owner": {
+        "deprecated": true,
+        "deprecation_message": "expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "mfa": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "versioning_configuration": {
+        "block": {
+         "attributes": {
+          "mfa_delete": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "status": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "min_items": 1,
+        "nesting_mode": "list"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "aws_subnet": {
+     "block": {
+      "attributes": {
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "assign_ipv6_address_on_creation": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "availability_zone": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "availability_zone_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "cidr_block": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "customer_owned_ipv4_pool": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "enable_dns64": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_lni_at_device_index": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "enable_resource_name_dns_a_record_on_launch": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_resource_name_dns_aaaa_record_on_launch": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv4_ipam_pool_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv4_netmask_length": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "ipv6_cidr_block": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_cidr_block_association_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "ipv6_ipam_pool_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_native": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "ipv6_netmask_length": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "map_customer_owned_ip_on_launch": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "map_public_ip_on_launch": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "outpost_arn": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "private_dns_hostname_type_on_launch": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "vpc_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 1
+    },
+    "aws_vpc": {
+     "block": {
+      "attributes": {
+       "arn": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "assign_generated_ipv6_cidr_block": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "cidr_block": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "default_network_acl_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "default_route_table_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "default_security_group_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "dhcp_options_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "enable_dns_hostnames": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_dns_support": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "enable_network_address_usage_metrics": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "instance_tenancy": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv4_ipam_pool_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv4_netmask_length": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "ipv6_association_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "ipv6_cidr_block": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_cidr_block_network_border_group": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_ipam_pool_id": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "ipv6_netmask_length": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "main_route_table_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "owner_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "region": {
+        "computed": true,
+        "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the [provider configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#aws-configuration-reference).",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "tags_all": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 1
+    }
+   }
+  }
+ }
+}

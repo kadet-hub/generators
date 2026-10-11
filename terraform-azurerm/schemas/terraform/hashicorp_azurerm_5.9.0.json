@@ -1,0 +1,2464 @@
+{
+ "format_version": "1.0",
+ "provider_schemas": {
+  "registry.terraform.io/hashicorp/azurerm": {
+   "data_source_schemas": {},
+   "provider": {
+    "block": {
+     "attributes": {
+      "ado_pipeline_service_connection_id": {
+       "description": "The Azure DevOps Pipeline Service Connection ID.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "auxiliary_tenant_ids": {
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "client_certificate": {
+       "description": "Base64 encoded PKCS#12 certificate bundle to use when authenticating as a Service Principal using a Client Certificate",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_certificate_password": {
+       "description": "The password associated with the Client Certificate. For use when authenticating as a Service Principal using a Client Certificate",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_certificate_path": {
+       "description": "The path to the Client Certificate associated with the Service Principal for use when authenticating as a Service Principal using a Client Certificate.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_id": {
+       "description": "The Client ID which should be used.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_id_file_path": {
+       "description": "The path to a file containing the Client ID which should be used.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_secret": {
+       "description": "The Client Secret which should be used. For use When authenticating as a Service Principal using a Client Secret.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "client_secret_file_path": {
+       "description": "The path to a file containing the Client Secret which should be used. For use When authenticating as a Service Principal using a Client Secret.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "disable_correlation_request_id": {
+       "description": "This will disable the x-ms-correlation-request-id header.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "disable_terraform_partner_id": {
+       "description": "This will disable the Terraform Partner ID which is used if a custom `partner_id` isn't specified.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "environment": {
+       "description": "The Cloud Environment which should be used. Possible values are public, usgovernment, and china. Defaults to public. Not used and should not be specified when `metadata_host` is specified.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "metadata_host": {
+       "description": "The Hostname which should be used for the Azure Metadata Service.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "msi_api_version": {
+       "description": "The API version to use for Managed Service Identity (IMDS) - for cases where the default API version is not supported by the endpoint. e.g. for Azure Container Apps.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "msi_endpoint": {
+       "description": "The path to a custom endpoint for Managed Service Identity - in most circumstances this should be detected automatically.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "oidc_request_token": {
+       "description": "The bearer token for the request to the OIDC provider. For use when authenticating as a Service Principal using OpenID Connect.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "oidc_request_url": {
+       "description": "The URL for the OIDC provider from which to request an ID token. For use when authenticating as a Service Principal using OpenID Connect.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "oidc_token": {
+       "description": "The OIDC ID token for use when authenticating as a Service Principal using OpenID Connect.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "oidc_token_file_path": {
+       "description": "The path to a file containing an OIDC ID token for use when authenticating as a Service Principal using OpenID Connect.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "partner_id": {
+       "description": "A GUID/UUID that is registered with Microsoft to facilitate partner resource usage attribution.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "resource_provider_registrations": {
+       "description": "The set of Resource Providers which should be automatically registered for the subscription.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "resource_providers_to_register": {
+       "description": "A list of Resource Providers to explicitly register for the subscription, in addition to those specified by the `resource_provider_registrations` property.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": [
+        "list",
+        "string"
+       ]
+      },
+      "storage_use_azuread": {
+       "description": "Should the AzureRM Provider use Azure AD Authentication when accessing the Storage Data Plane APIs?",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "subscription_id": {
+       "description": "The Subscription ID which should be used.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "tenant_id": {
+       "description": "The Tenant ID which should be used.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "string"
+      },
+      "use_aks_workload_identity": {
+       "description": "Allow Azure AKS Workload Identity to be used for Authentication.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "use_cli": {
+       "description": "Allow Azure CLI to be used for Authentication.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "use_msi": {
+       "description": "Allow Managed Service Identity to be used for Authentication.",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      },
+      "use_oidc": {
+       "description": "Allow OpenID Connect to be used for authentication",
+       "description_kind": "plain",
+       "optional": true,
+       "type": "bool"
+      }
+     },
+     "block_types": {
+      "features": {
+       "block": {
+        "attributes": {
+         "persist_id_on_create_before_polling_for_completion": {
+          "description": "Whether to set the resource ID into state before polling asynchronous operations for completion. Defaults to `false`.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "bool"
+         },
+         "skip_import_check_on_create_and_allow_overwriting_existing_resources": {
+          "description": "Whether to skip the import check and allow the provider to overwrite existing remote resources if present. Defaults to `false`.",
+          "description_kind": "plain",
+          "optional": true,
+          "type": "bool"
+         }
+        },
+        "block_types": {
+         "api_management": {
+          "block": {
+           "attributes": {
+            "purge_soft_delete_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "app_configuration": {
+          "block": {
+           "attributes": {
+            "purge_soft_delete_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "application_insights": {
+          "block": {
+           "attributes": {
+            "disable_generated_rule": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "cognitive_account": {
+          "block": {
+           "attributes": {
+            "purge_soft_delete_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "databricks_workspace": {
+          "block": {
+           "attributes": {
+            "force_delete": {
+             "description": "When enabled, the managed resource group that contains the Unity Catalog data will be forcibly deleted when the workspace is destroyed, regardless of contents.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "enhanced_validation": {
+          "block": {
+           "attributes": {
+            "locations": {
+             "description": "Should the AzureRM Provider validate location arguments against the list of supported Azure Locations? When enabled, invalid locations are caught at plan time; when disabled, they are caught at apply time.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "preflight_enabled": {
+             "description": "Should the AzureRM Provider call the Azure Preflight Validation API at plan time to check the request payload for each Preflight-supported resource is valid. Note: requires valid credentials and external Azure API access at plan-time.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "preflight_location_fallback": {
+             "description": "The Azure location to use as a fallback when Preflight Validation is enabled and a resource does not specify a location. This is typically used for resources that derive their location from a dependency that has not yet been created.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "string"
+            },
+            "resource_providers": {
+             "description": "Should the AzureRM Provider validate Resource Provider arguments against the list of supported Resource Providers? When enabled, invalid resource providers are caught at plan time; when disabled, they are caught at apply time.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "key_vault": {
+          "block": {
+           "attributes": {
+            "purge_soft_delete_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "purge_soft_deleted_certificates_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_certificate` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "purge_soft_deleted_hardware_security_module_keys_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_managed_hardware_security_module_key` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "purge_soft_deleted_hardware_security_modules_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_managed_hardware_security_module` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "purge_soft_deleted_keys_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_key` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "purge_soft_deleted_secrets_on_destroy": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_secret` resources will be permanently deleted (e.g purged), when destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted_certificates": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_certificate` resources will be restored, instead of creating new ones",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted_hardware_security_module_keys": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_managed_hardware_security_module_key` resources will be restored, instead of creating new ones",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted_key_vaults": {
+             "description": "When enabled soft-deleted `azurerm_key_vault` resources will be restored, instead of creating new ones",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted_keys": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_key` resources will be restored, instead of creating new ones",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "recover_soft_deleted_secrets": {
+             "description": "When enabled soft-deleted `azurerm_key_vault_secret` resources will be restored, instead of creating new ones",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "log_analytics_workspace": {
+          "block": {
+           "attributes": {
+            "permanently_delete_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "machine_learning": {
+          "block": {
+           "attributes": {
+            "purge_soft_deleted_workspace_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "managed_disk": {
+          "block": {
+           "attributes": {
+            "expand_without_downtime": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "netapp": {
+          "block": {
+           "attributes": {
+            "delete_backups_on_backup_vault_destroy": {
+             "description": "When enabled, backups will be deleted when the `azurerm_netapp_backup_vault` resource is destroyed",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "prevent_volume_destruction": {
+             "description": "When enabled, the volume will not be destroyed, safeguarding from severe data loss",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "postgresql_flexible_server": {
+          "block": {
+           "attributes": {
+            "restart_server_on_configuration_value_change": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "recovery_service": {
+          "block": {
+           "attributes": {
+            "purge_protected_items_from_vault_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "vm_backup_stop_protection_and_retain_data_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "vm_backup_suspend_protection_and_retain_data_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "recovery_services_vaults": {
+          "block": {
+           "attributes": {
+            "recover_soft_deleted_backup_protected_vm": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "resource_group": {
+          "block": {
+           "attributes": {
+            "prevent_deletion_if_contains_resources": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "servicebus": {
+          "block": {
+           "attributes": {
+            "auto_delete_subscription_default_rule": {
+             "description": "When enabled, the $Default rule is automatically deleted after creating a Service Bus subscription, preventing unfiltered message delivery.",
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "storage": {
+          "block": {
+           "attributes": {
+            "data_plane_available": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "subscription": {
+          "block": {
+           "attributes": {
+            "prevent_cancellation_on_destroy": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "template_deployment": {
+          "block": {
+           "attributes": {
+            "delete_nested_items_during_deletion": {
+             "description_kind": "plain",
+             "required": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "virtual_machine": {
+          "block": {
+           "attributes": {
+            "delete_os_disk_on_deletion": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "detach_implicit_data_disk_on_deletion": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "skip_shutdown_and_force_delete": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         },
+         "virtual_machine_scale_set": {
+          "block": {
+           "attributes": {
+            "force_delete": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "reimage_on_manual_upgrade": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "roll_instances_when_required": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            },
+            "scale_to_zero_before_deletion": {
+             "description_kind": "plain",
+             "optional": true,
+             "type": "bool"
+            }
+           },
+           "description_kind": "plain"
+          },
+          "nesting_mode": "list"
+         }
+        },
+        "description_kind": "plain"
+       },
+       "nesting_mode": "list"
+      }
+     },
+     "description_kind": "plain"
+    },
+    "version": 0
+   },
+   "resource_schemas": {
+    "azurerm_network_security_group": {
+     "block": {
+      "attributes": {
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "location": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "resource_group_name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "security_rule": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "access": "string",
+           "description": "string",
+           "destination_address_prefix": "string",
+           "destination_address_prefixes": [
+            "set",
+            "string"
+           ],
+           "destination_application_security_group_ids": [
+            "set",
+            "string"
+           ],
+           "destination_port_range": "string",
+           "destination_port_ranges": [
+            "set",
+            "string"
+           ],
+           "direction": "string",
+           "name": "string",
+           "priority": "number",
+           "protocol": "string",
+           "source_address_prefix": "string",
+           "source_address_prefixes": [
+            "set",
+            "string"
+           ],
+           "source_application_security_group_ids": [
+            "set",
+            "string"
+           ],
+           "source_port_range": "string",
+           "source_port_ranges": [
+            "set",
+            "string"
+           ]
+          }
+         ]
+        ]
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "azurerm_resource_group": {
+     "block": {
+      "attributes": {
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "location": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "managed_by": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "azurerm_storage_account": {
+     "block": {
+      "attributes": {
+       "access_tier": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "account_kind": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "account_replication_type": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "account_replication_type_migrating_to": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "account_replication_type_migration_in_progress": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "bool"
+       },
+       "account_tier": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "allow_nested_items_to_be_public": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "allowed_copy_scope": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "cross_tenant_replication_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "default_to_oauth_authentication": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "dns_endpoint_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "edge_zone": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "https_traffic_only_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "infrastructure_encryption_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "is_hns_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "large_file_share_enabled": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "local_user_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "location": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "min_tls_version": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "nfsv3_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "primary_access_key": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "primary_blob_connection_string": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "primary_blob_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_blob_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_blob_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_blob_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_blob_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_blob_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_connection_string": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "primary_dfs_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_dfs_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_dfs_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_dfs_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_dfs_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_dfs_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_file_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_location": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_queue_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_queue_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_queue_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_queue_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_table_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_table_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_table_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_table_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "primary_web_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "provisioned_billing_model_version": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "public_network_access": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "public_network_access_enabled": {
+        "computed": true,
+        "deprecated": true,
+        "deprecation_message": "`public_network_access_enabled` has been deprecated in favour of `public_network_access` and will be removed in v6.0 of the AzureRM provider",
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "queue_encryption_key_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "resource_group_name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "secondary_access_key": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "secondary_blob_connection_string": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "secondary_blob_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_blob_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_blob_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_blob_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_blob_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_blob_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_connection_string": {
+        "computed": true,
+        "description_kind": "plain",
+        "sensitive": true,
+        "type": "string"
+       },
+       "secondary_dfs_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dfs_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dfs_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dfs_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dfs_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_dfs_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_file_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_location": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_queue_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_queue_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_queue_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_queue_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_table_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_table_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_table_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_table_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_internet_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_internet_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_microsoft_endpoint": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "secondary_web_microsoft_host": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "sftp_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "shared_access_key_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "table_encryption_key_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "azure_files_authentication": {
+        "block": {
+         "attributes": {
+          "default_share_level_permission": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "directory_type": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "active_directory": {
+           "block": {
+            "attributes": {
+             "domain_guid": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             },
+             "domain_name": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             },
+             "domain_sid": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "forest_name": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "netbios_domain_name": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             },
+             "storage_sid": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "blob_properties": {
+        "block": {
+         "attributes": {
+          "change_feed_enabled": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "change_feed_retention_in_days": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "number"
+          },
+          "default_service_version": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "last_access_time_enabled": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "versioning_enabled": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          }
+         },
+         "block_types": {
+          "container_delete_retention_policy": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "cors_rule": {
+           "block": {
+            "attributes": {
+             "allowed_headers": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "allowed_methods": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "allowed_origins": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "exposed_headers": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "max_age_in_seconds": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 5,
+           "nesting_mode": "list"
+          },
+          "delete_retention_policy": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             },
+             "permanent_delete_enabled": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "restore_policy": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "custom_domain": {
+        "block": {
+         "attributes": {
+          "name": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "use_subdomain": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "customer_managed_key": {
+        "block": {
+         "attributes": {
+          "key_vault_key_id": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "user_assigned_identity_id": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "identity": {
+        "block": {
+         "attributes": {
+          "identity_ids": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "principal_id": {
+           "computed": true,
+           "description_kind": "plain",
+           "type": "string"
+          },
+          "tenant_id": {
+           "computed": true,
+           "description_kind": "plain",
+           "type": "string"
+          },
+          "type": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "immutability_policy": {
+        "block": {
+         "attributes": {
+          "allow_protected_append_writes": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "period_since_creation_in_days": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "number"
+          },
+          "state": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "network_rules": {
+        "block": {
+         "attributes": {
+          "bypass": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "default_action": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "ip_rules": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          },
+          "virtual_network_subnet_ids": {
+           "computed": true,
+           "description_kind": "plain",
+           "optional": true,
+           "type": [
+            "set",
+            "string"
+           ]
+          }
+         },
+         "block_types": {
+          "private_link_access": {
+           "block": {
+            "attributes": {
+             "endpoint_resource_id": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             },
+             "endpoint_tenant_id": {
+              "computed": true,
+              "description_kind": "plain",
+              "optional": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "routing": {
+        "block": {
+         "attributes": {
+          "choice": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "publish_internet_endpoints": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          },
+          "publish_microsoft_endpoints": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "bool"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "sas_policy": {
+        "block": {
+         "attributes": {
+          "expiration_action": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "expiration_period": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "share_properties": {
+        "block": {
+         "block_types": {
+          "cors_rule": {
+           "block": {
+            "attributes": {
+             "allowed_headers": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "allowed_methods": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "allowed_origins": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "exposed_headers": {
+              "description_kind": "plain",
+              "required": true,
+              "type": [
+               "list",
+               "string"
+              ]
+             },
+             "max_age_in_seconds": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 5,
+           "nesting_mode": "list"
+          },
+          "retention_policy": {
+           "block": {
+            "attributes": {
+             "days": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "number"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          },
+          "smb": {
+           "block": {
+            "attributes": {
+             "authentication_types": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "channel_encryption_type": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "kerberos_ticket_encryption_type": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "multichannel_enabled": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": "bool"
+             },
+             "versions": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 4
+    },
+    "azurerm_storage_container": {
+     "block": {
+      "attributes": {
+       "container_access_type": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "default_encryption_scope": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "encryption_scope_override_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "has_immutability_policy": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "bool"
+       },
+       "has_legal_hold": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "metadata": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "storage_account_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "url": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 2
+    },
+    "azurerm_subnet": {
+     "block": {
+      "attributes": {
+       "address_prefixes": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "list",
+         "string"
+        ]
+       },
+       "default_outbound_access_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "network_security_group_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "network_security_group_id_wo": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string",
+        "write_only": true
+       },
+       "network_security_group_id_wo_version": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "private_endpoint_network_policies": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "private_link_service_network_policies_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
+       "resource_group_name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "route_table_id": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "route_table_id_wo": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string",
+        "write_only": true
+       },
+       "route_table_id_wo_version": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "service_endpoint_policy_ids": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "sharing_scope": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "virtual_network_name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "delegation": {
+        "block": {
+         "attributes": {
+          "name": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "block_types": {
+          "service_delegation": {
+           "block": {
+            "attributes": {
+             "actions": {
+              "description_kind": "plain",
+              "optional": true,
+              "type": [
+               "set",
+               "string"
+              ]
+             },
+             "name": {
+              "description_kind": "plain",
+              "required": true,
+              "type": "string"
+             }
+            },
+            "description_kind": "plain"
+           },
+           "max_items": 1,
+           "min_items": 1,
+           "nesting_mode": "list"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "ip_address_pool": {
+        "block": {
+         "attributes": {
+          "allocated_ip_address_prefixes": {
+           "computed": true,
+           "description_kind": "plain",
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "id": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "number_of_ip_addresses": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "service_endpoint": {
+        "block": {
+         "attributes": {
+          "network_identifier": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "service": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "azurerm_subnet_network_security_group_association": {
+     "block": {
+      "attributes": {
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "network_security_group_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "subnet_id": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       }
+      },
+      "block_types": {
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    },
+    "azurerm_virtual_network": {
+     "block": {
+      "attributes": {
+       "address_space": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
+       "bgp_community": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "dns_servers": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "list",
+         "string"
+        ]
+       },
+       "edge_zone": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "flow_timeout_in_minutes": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "number"
+       },
+       "guid": {
+        "computed": true,
+        "description_kind": "plain",
+        "type": "string"
+       },
+       "id": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "location": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "private_endpoint_vnet_policies": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "string"
+       },
+       "resource_group_name": {
+        "description_kind": "plain",
+        "required": true,
+        "type": "string"
+       },
+       "subnet": {
+        "computed": true,
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         [
+          "object",
+          {
+           "address_prefixes": [
+            "list",
+            "string"
+           ],
+           "default_outbound_access_enabled": "bool",
+           "delegation": [
+            "list",
+            [
+             "object",
+             {
+              "name": "string",
+              "service_delegation": [
+               "list",
+               [
+                "object",
+                {
+                 "actions": [
+                  "set",
+                  "string"
+                 ],
+                 "name": "string"
+                }
+               ]
+              ]
+             }
+            ]
+           ],
+           "id": "string",
+           "name": "string",
+           "private_endpoint_network_policies": "string",
+           "private_link_service_network_policies_enabled": "bool",
+           "route_table_id": "string",
+           "security_group": "string",
+           "service_endpoint": [
+            "list",
+            [
+             "object",
+             {
+              "network_identifier": "string",
+              "service": "string"
+             }
+            ]
+           ],
+           "service_endpoint_policy_ids": [
+            "set",
+            "string"
+           ]
+          }
+         ]
+        ]
+       },
+       "tags": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "map",
+         "string"
+        ]
+       }
+      },
+      "block_types": {
+       "ddos_protection_plan": {
+        "block": {
+         "attributes": {
+          "enable": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "bool"
+          },
+          "id": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "encryption": {
+        "block": {
+         "attributes": {
+          "enforcement": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 1,
+        "nesting_mode": "list"
+       },
+       "ip_address_pool": {
+        "block": {
+         "attributes": {
+          "allocated_ip_address_prefixes": {
+           "computed": true,
+           "description_kind": "plain",
+           "type": [
+            "list",
+            "string"
+           ]
+          },
+          "id": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          },
+          "number_of_ip_addresses": {
+           "description_kind": "plain",
+           "required": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "max_items": 2,
+        "nesting_mode": "list"
+       },
+       "timeouts": {
+        "block": {
+         "attributes": {
+          "create": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "delete": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "read": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          },
+          "update": {
+           "description_kind": "plain",
+           "optional": true,
+           "type": "string"
+          }
+         },
+         "description_kind": "plain"
+        },
+        "nesting_mode": "single"
+       }
+      },
+      "description_kind": "plain"
+     },
+     "version": 0
+    }
+   }
+  }
+ }
+}
