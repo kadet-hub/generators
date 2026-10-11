@@ -1,0 +1,24 @@
+# Minimal: a single BackupStorageLocation (made the default) and a nightly Schedule
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/velero
+        output_path: manifests/
+
+  generators:
+    velero:
+      backup_storage_locations:
+        default:
+          provider: aws
+          bucket: velero-backups
+      schedules:
+        nightly:
+          schedule: "0 2 * * *"
+          template:
+            included_namespaces: ["*"]

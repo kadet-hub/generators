@@ -1,0 +1,106 @@
+# Complete: all five kinds, flat keys, objectStorage flattening, Schedule
+# template, spec passthrough, namespace override, the Schedule template default
+# and precedence (defaults < spec < flat keys)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/velero
+        output_path: manifests/
+
+  namespace: workloads
+  generators:
+    velero:
+      namespace: backup-system
+      backup_storage_locations:
+        primary:
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          provider: aws
+          bucket: velero-backups
+          prefix: cluster-a
+          ca_cert_ref:
+            name: s3-ca
+            key: ca.crt
+          config:
+            region: eu-central-1
+            s3ForcePathStyle: "true"
+            s3Url: https://s3.example.com
+          credential:
+            name: cloud-credentials
+            key: cloud
+          default: true
+          access_mode: ReadWrite
+          backup_sync_period: 2m
+          validation_frequency: 1m
+        archive:
+          provider: aws
+          bucket: velero-archive
+          ca_cert: Y2EtYnVuZGxl
+          access_mode: ReadOnly
+      volume_snapshot_locations:
+        ebs:
+          provider: aws
+          config:
+            region: eu-central-1
+          credential:
+            name: cloud-credentials
+            key: cloud
+      backups:
+        pre-upgrade:
+          included_namespaces: [apps, data]
+          excluded_namespaces: [kube-system]
+          included_resources: ["*"]
+          excluded_resources: [events]
+          label_selector:
+            matchLabels:
+              backup: "true"
+          storage_location: primary
+          volume_snapshot_locations: [ebs]
+          ttl: 168h0m0s
+          snapshot_volumes: true
+          default_volumes_to_fs_backup: false
+          snapshot_move_data: true
+          include_cluster_resources: true
+          spec:
+            csiSnapshotTimeout: 10m0s
+            ttl: 24h0m0s
+      schedules:
+        nightly:
+          schedule: "0 2 * * *"
+          paused: false
+          skip_immediately: true
+          use_owner_references_in_backup: false
+          template:
+            included_namespaces: ["*"]
+            storage_location: primary
+            ttl: 720h0m0s
+            spec:
+              itemOperationTimeout: 4h0m0s
+        weekly-full:
+          schedule: "CRON_TZ=Europe/Berlin 0 3 * * 0"
+        weekly-apps:
+          schedule: "0 4 * * 0"
+          spec:
+            template:
+              includedNamespaces: [apps]
+      restores:
+        from-backup:
+          backup_name: pre-upgrade
+          included_namespaces: [apps]
+          excluded_namespaces: [data]
+          namespace_mapping:
+            apps: apps-restored
+          restore_pvs: true
+          existing_resource_policy: update
+          preserve_node_ports: true
+        latest-nightly:
+          namespace: velero-dr
+          schedule_name: nightly
