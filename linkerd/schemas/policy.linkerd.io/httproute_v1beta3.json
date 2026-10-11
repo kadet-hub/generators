@@ -728,6 +728,23 @@
                 },
                 "maxItems": 8,
                 "type": "array"
+              },
+              "timeouts": {
+                "additionalProperties": false,
+                "description": "Timeouts defines the timeouts that can be configured for an HTTP request. \n Support: Core \n <gateway:experimental>",
+                "properties": {
+                  "backendRequest": {
+                    "description": "BackendRequest specifies a timeout for an individual request from the gateway to a backend service. Typically used in conjunction with automatic retries, if supported by an implementation. Default is the value of Request timeout. \n Support: Extended",
+                    "format": "duration",
+                    "type": "string"
+                  },
+                  "request": {
+                    "description": "Request specifies a timeout for responding to client HTTP requests, disabled by default. \n For example, the following rule will timeout if a client request is taking longer than 10 seconds to complete: \n ``` rules: - timeouts: request: 10s backendRefs: ... ``` \n Support: Core",
+                    "format": "duration",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               }
             },
             "type": "object"

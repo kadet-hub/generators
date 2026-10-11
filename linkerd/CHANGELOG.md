@@ -10,5 +10,5 @@ First release on kadet-hub, migrated from kapitan-generators.
   - MeshTLSAuthentication `identities` and `identity_refs: [<service account>]`.
   - NetworkAuthentication `networks: [<cidr>]`.
 - AuthorizationPolicy refs of kind `Server`, `MeshTLSAuthentication` or `NetworkAuthentication` without `group` get `group: policy.linkerd.io`, also in `spec`. Before, Linkerd read them as core group refs and rejected the policy.
-- Server is emitted as `policy.linkerd.io/v1beta3`; `v1beta1` is deprecated upstream. The inventory keys and shorthands are unchanged.
+- Server and HTTPRoute are emitted as `policy.linkerd.io/v1beta3`, the storage versions; Server `v1beta1` is deprecated upstream and HTTPRoute `v1beta3` only adds `timeouts`. The inventory keys and shorthands are unchanged.
 - Fixture targets set `parameters.kapitan.vars.target`, as the gate requires.

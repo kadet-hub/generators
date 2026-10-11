@@ -263,7 +263,7 @@ class LinkerdAuthorizationPolicy(k8s.Base):
 
 class LinkerdHttpRoute(k8s.Base):
     def new(self) -> None:
-        self.kwargs.apiVersion = "policy.linkerd.io/v1beta2"
+        self.kwargs.apiVersion = "policy.linkerd.io/v1beta3"
         self.kwargs.kind = "HTTPRoute"
 
         super().new()

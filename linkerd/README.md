@@ -9,12 +9,12 @@ Kapitan kadet generator for [Linkerd](https://linkerd.io/) policy resources. Bui
 - **AuthorizationPolicy** (`policy.linkerd.io/v1alpha1`): authentications required for a Server, HTTPRoute or namespace
 - **MeshTLSAuthentication** (`policy.linkerd.io/v1alpha1`): a set of mesh identities
 - **NetworkAuthentication** (`policy.linkerd.io/v1alpha1`): a set of client networks
-- **HTTPRoute** (`policy.linkerd.io/v1beta2`): HTTP route attached to a Server
+- **HTTPRoute** (`policy.linkerd.io/v1beta3`): HTTP route attached to a Server
 - **ServiceProfile** (`linkerd.io/v1alpha2`): per-route metrics, retries and timeouts of a Service
 
 The Linkerd install belongs in the `helm` input with the upstream `linkerd-crds` and `linkerd-control-plane` charts. Gateway API routes (`gateway.networking.k8s.io`) are not rendered.
 
-Server is emitted as `v1beta3`, the storage version; Linkerd 2.20 marks `v1beta1` deprecated ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/charts/linkerd-crds/templates/policy/server.yaml#L73-L77)). The Linkerd docs describe AuthorizationPolicy as the replacement for ServerAuthorization.
+Server and HTTPRoute are emitted as `v1beta3`, the storage versions; Linkerd 2.20 marks `v1beta1` deprecated ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/charts/linkerd-crds/templates/policy/server.yaml#L73-L77)). The Linkerd docs describe AuthorizationPolicy as the replacement for ServerAuthorization.
 
 ## Usage
 
