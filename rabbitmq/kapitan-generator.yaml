@@ -1,0 +1,14 @@
+name: rabbitmq
+description: Renders RabbitMQ Cluster Operator and Messaging Topology Operator resources, with their ConfigMaps and Secrets, from inventory parameters.
+tags: [kubernetes, operators, database]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas

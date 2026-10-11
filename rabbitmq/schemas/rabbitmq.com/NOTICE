@@ -1,0 +1,13 @@
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+rabbitmqcluster_v1beta1.json: Copyright 2020 VMware, Inc. All Rights Reserved.
+All other JSON Schema files in this directory: Copyright 2021-2022 VMware, Inc.
+
+The JSON Schema files in this directory are derived from the openAPIV3Schema
+of the upstream CRDs: rabbitmqcluster_v1beta1.json from
+https://github.com/rabbitmq/cluster-operator/tree/v2.23.0/config/crd/bases
+(tag v2.23.0), the other files from
+https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.3/config/crd/bases
+(tag v1.20.3). Modification: every node with properties gets
+additionalProperties: false, except preserve-unknown-fields nodes, maps and
+allOf/anyOf/oneOf/not branches.
