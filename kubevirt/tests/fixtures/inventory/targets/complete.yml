@@ -1,0 +1,129 @@
+# Complete: every kind, the main flat keys and shorthands, spec passthrough
+# with a flat key overriding it, and spec_strategy: replace
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubevirt
+        output_path: manifests/
+
+  namespace: default
+  generators:
+    kubevirt:
+      namespace: vms
+      virtual_machines:
+        complete-vm:
+          labels:
+            app.kubernetes.io/part-of: shop
+          annotations:
+            example.com/owner: platform
+          # Overrides spec.runStrategy below and logs a warning.
+          run_strategy: Always
+          instancetype: u1.medium
+          preference: ubuntu
+          disks:
+            - name: rootdisk
+              size: 20Gi
+              source:
+                registry:
+                  url: docker://quay.io/containerdisks/ubuntu:24.04
+            - name: data
+              size: 10Gi
+          cloudinit: |
+            #cloud-config
+            packages:
+              - qemu-guest-agent
+            runcmd:
+              - systemctl enable --now qemu-guest-agent
+          tolerations:
+            - key: example.com/virtualization
+              operator: Exists
+              effect: NoSchedule
+          spec:
+            runStrategy: Halted
+            template:
+              spec:
+                evictionStrategy: LiveMigrate
+        legacy-vm:
+          spec_strategy: replace
+          spec:
+            runStrategy: Manual
+            template:
+              spec:
+                domain:
+                  memory:
+                    guest: 512Mi
+                  devices:
+                    disks:
+                      - name: containerdisk
+                        disk:
+                          bus: virtio
+                volumes:
+                  - name: containerdisk
+                    containerDisk:
+                      image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+      virtual_machine_instances:
+        standalone-vmi:
+          memory: 256Mi
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+      virtual_machine_instance_migrations:
+        migrate-vm:
+          vmi_name: complete-vm
+      virtual_machine_instance_replica_sets:
+        vm-rs:
+          replicas: 2
+          selector:
+            matchLabels:
+              app: vm-rs
+          memory: 256Mi
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+          disks:
+            - name: scratch
+              blank: 5Gi
+      virtual_machine_pools:
+        web-pool:
+          replicas: 2
+          labels:
+            tier: web
+          run_strategy: Always
+          image: quay.io/containerdisks/ubuntu:24.04
+          cloudinit_secret_ref: web-userdata
+      virtual_machine_clones:
+        clone-vm:
+          source: complete-vm
+          target:
+            name: complete-vm-clone
+      virtual_machine_snapshots:
+        snapshot-vm:
+          source: complete-vm
+      virtual_machine_restores:
+        restore-vm:
+          target: complete-vm
+          snapshot_name: snapshot-vm
+      kubevirt_operators:
+        kubevirt:
+          spec:
+            workloadUpdateStrategy:
+              workloadUpdateMethods:
+                - LiveMigrate
+      data_volumes:
+        ubuntu-image:
+          size: 20Gi
+          content_type: kubevirt
+          source:
+            registry:
+              url: docker://quay.io/containerdisks/ubuntu:24.04
+      data_sources:
+        ubuntu:
+          pvc_name: ubuntu-image
+      object_transfers:
+        transfer-ubuntu-image:
+          source: ubuntu-image
+          target:
+            name: ubuntu-image
+            namespace: vms-staging
