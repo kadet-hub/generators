@@ -1,0 +1,69 @@
+# Complete: structured cni_config, conflist, namespace fallback chain,
+# resource_name shorthand, CNI config from disk, flat key over spec passthrough
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/multus
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    multus:
+      namespace: networks
+      networks:
+        bridge-network:
+          cni_config:
+            cniVersion: 1.0.0
+            type: bridge
+            bridge: br0
+            isGateway: true
+            ipMasq: true
+            ipam:
+              type: host-local
+              subnet: 192.168.100.0/24
+              routes:
+                - dst: 0.0.0.0/0
+          labels:
+            network: bridge
+        macvlan-dhcp:
+          namespace: kube-system
+          cni_config:
+            cniVersion: 0.3.1
+            type: macvlan
+            master: eth1
+            mode: bridge
+            ipam:
+              type: dhcp
+        sriov-net:
+          resource_name: intel.com/sriov_vf
+          annotations:
+            description: SR-IOV VF network
+          cni_config:
+            cniVersion: 1.0.0
+            plugins:
+              - type: sriov
+                vlan: 100
+                spoofchk: "on"
+                ipam:
+                  type: host-local
+                  ranges:
+                    - - subnet: 10.56.217.0/24
+              - type: tuning
+                sysctl:
+                  net.ipv6.conf.IFNAME.accept_ra: "0"
+        on-disk-net:
+          labels:
+            network: on-disk
+        override-net:
+          cni_config:
+            cniVersion: 1.0.0
+            type: bridge
+            bridge: br1
+          spec:
+            config: '{"cniVersion":"1.0.0","type":"macvlan","master":"eth0"}'
