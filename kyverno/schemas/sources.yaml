@@ -1,0 +1,9 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+kyverno.io:
+  software: Kyverno
+  version: 1.19.1
+  source: https://github.com/kyverno/kyverno/tree/v1.19.1/config/crds/kyverno
+  license: Apache-2.0

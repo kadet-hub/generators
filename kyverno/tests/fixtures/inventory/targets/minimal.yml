@@ -1,0 +1,27 @@
+# Minimal: one ClusterPolicy with the match_kinds shorthand, Kyverno's default Audit action
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kyverno
+        output_path: manifests/
+
+  generators:
+    kyverno:
+      cluster_policies:
+        require-labels:
+          rules:
+            - name: require-app-label
+              match_kinds:
+                - Pod
+              validate:
+                message: "The label 'app' is required"
+                pattern:
+                  metadata:
+                    labels:
+                      app: "?*"
