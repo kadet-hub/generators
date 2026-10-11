@@ -1,0 +1,121 @@
+# Complete: every kind, the shared object_storage_config with per-resource
+# overrides (string and dict), the retention shorthand, metadata,
+# per-resource namespace and spec passthrough
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/thanos
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    thanos:
+      namespace: monitoring
+      object_storage_config: thanos-object-storage
+      thanos_queries:
+        global:
+          labels:
+            team: observability
+          annotations:
+            example.com/owner: observability
+          replicas: 2
+          replica_labels: [prometheus_replica, replica, rule_replica]
+          custom_store_label_selector:
+            matchLabels:
+              operator.thanos.io/store-api: "true"
+          grpc_proxy_strategy: lazy
+          log_level: info
+          resource_requirements:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          query_frontend:
+            replicas: 2
+            compressResponses: true
+            logQueriesLongerThan: 10s
+            queryLabelSelector:
+              matchLabels:
+                operator.thanos.io/query-api: "true"
+          spec:
+            labels:
+              app.kubernetes.io/part-of: thanos
+      thanos_receives:
+        ingest:
+          termination_grace_period_seconds: 120
+          router_spec:
+            replicas: 3
+            replicationFactor: 1
+            externalLabels:
+              receive: "true"
+          ingester_spec:
+            defaultObjectStorageConfig:
+              name: thanos-object-storage
+              key: thanos.yaml
+            hashrings:
+              - name: default
+                replicas: 3
+                externalLabels:
+                  replica: $(POD_NAME)
+                storage:
+                  size: 10Gi
+                tenancyConfig:
+                  tenantMatcherType: exact
+                tsdbConfig:
+                  retention: 2h
+      thanos_rulers:
+        rules:
+          replicas: 1
+          alertmanager_url: http://alertmanager.monitoring.svc:9093
+          evaluation_interval: 30s
+          rule_config_selector:
+            matchLabels:
+              operator.thanos.io/prometheus-rule: "true"
+          query_label_selector:
+            matchLabels:
+              operator.thanos.io/query-api: "true"
+          ruler_mode:
+            type: Stateful
+            stateful:
+              retention: 2h
+              externalLabels:
+                rule_replica: $(NAME)
+              objectStorageConfig:
+                name: thanos-object-storage
+                key: thanos.yaml
+          storage:
+            size: 1Gi
+      thanos_stores:
+        gateway:
+          namespace: storage
+          replicas: 1
+          object_storage_config: thanos-object-storage
+          sharding_strategy:
+            type: block
+            shards: 2
+          ignore_deletion_marks_delay: 24h
+          storage:
+            size: 10Gi
+      thanos_compacts:
+        compactor:
+          object_storage_config:
+            name: compact-object-storage
+            key: objstore.yaml
+          retention: 1y
+          retention_config:
+            raw: 30d
+            fiveMinutes: 90d
+          compact_config:
+            compactConcurrency: 2
+          sharding_config:
+            - shardName: tenant-a
+              externalLabelSharding:
+                - label: tenant_id
+                  value: a
+          storage:
+            size: 10Gi
