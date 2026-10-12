@@ -61,6 +61,7 @@ def widget_pages(new_versions=("v1alpha1",)):
 OLD = "https://github.com/example/widgets/tree/v1.0.0/crds"
 NEW = "https://github.com/example/widgets/tree/v1.1.0/crds"
 GO = "https://github.com/example/gadgets/blob/v2.0.0/pkg/crds_generated.go"
+IRONCORE = "https://github.com/ironcore-dev/ironcore/blob/v0.8.0/gen/v3/apis__compute.ironcore.dev__v1alpha1_openapi.json"
 WIDGET = {
     "additionalProperties": False,
     "properties": {
@@ -152,6 +153,7 @@ class Sources(unittest.TestCase):
         cases = {
             "https://github.com/argoproj/argo-cd/tree/v3.5.4/manifests/crds": ("tag", "argoproj/argo-cd", "v3.5.4"),
             "https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml": ("tag", "projectcalico/calico", "v3.33.0"),
+            IRONCORE: ("tag", "ironcore-dev/ironcore", "v0.8.0"),
             "https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict": ("kubernetes", "kubernetes/kubernetes", "8df8a883b68a24a104b4a9e43c1288090ae60b3b"),
             "https://registry.terraform.io/providers/hashicorp/aws/6.68.0": ("terraform", "hashicorp/aws", "6.68.0"),
             f"https://github.com/thanos-community/thanos-operator/tree/{sha}/config/crd/bases": ("commit", "thanos-community/thanos-operator", sha),
@@ -170,6 +172,7 @@ class Sources(unittest.TestCase):
             "https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict": "kubernetes-json-schema",
             "https://github.com/argoproj/argo-cd/tree/v3.5.4/manifests/crds": None,
             "https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml": None,
+            IRONCORE: None,
         }
         for url, expected in cases.items():
             self.assertEqual(upstream.not_regenerable(upstream.classify(url)[0], url), expected, url)
@@ -274,6 +277,82 @@ class Gate(Repo):
         del self.web.pages[f"{GH}repos/example/widgets/contents/crds?ref=v1.1.0"]
         with self.assertRaises(OSError):
             upstream.gate(self.group, [OLD], [NEW])
+
+
+def openapi(replicas="integer", kind="Gizmo"):
+    """OpenAPI v3 document of an aggregated API server with one kind; components unsorted, one self-referencing, one unused."""
+    ref = "#/components/schemas/"
+    return {"openapi": "3.0.0", "components": {"schemas": {
+        "meta.ObjectMeta": {"type": "object", "properties": {"name": {"type": "string"}}},
+        "io.example.v1alpha1.Gizmo": {
+            "type": "object",
+            "properties": {
+                "apiVersion": {"type": "string"},
+                "kind": {"type": "string"},
+                "metadata": {"default": {}, "allOf": [{"$ref": ref + "meta.ObjectMeta"}]},
+                "spec": {"default": {}, "allOf": [{"$ref": ref + "io.example.v1alpha1.GizmoSpec"}]},
+            },
+            "x-kubernetes-group-version-kind": [{"group": "gizmos.example.io", "kind": kind, "version": "v1alpha1"}],
+        },
+        "io.example.v1alpha1.GizmoSpec": {"type": "object", "properties": {
+            "replicas": {"type": replicas},
+            "size": {"$ref": ref + "Quantity"},
+            "parts": {"type": "array", "items": {"$ref": ref + "io.example.v1alpha1.GizmoSpec"}},
+        }},
+        "Quantity": {"type": "string"},
+        "meta.Unused": {"type": "object", "properties": {"x": {"type": "string"}}},
+    }}}
+
+
+OAPI = "gen/v3/apis__gizmos.example.io__v1alpha1_openapi.json"
+OAPI_OLD = f"https://github.com/example/gizmos/blob/v1.0.0/{OAPI}"
+OAPI_NEW = f"https://github.com/example/gizmos/blob/v1.1.0/{OAPI}"
+GIZMO = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "apiVersion": {"type": "string"},
+        "kind": {"type": "string"},
+        "metadata": {"default": {}, "allOf": [{"$ref": "#/definitions/meta.ObjectMeta"}]},
+        "spec": {"default": {}, "allOf": [{"$ref": "#/definitions/io.example.v1alpha1.GizmoSpec"}]},
+    },
+    "x-kubernetes-group-version-kind": [{"group": "gizmos.example.io", "kind": "Gizmo", "version": "v1alpha1"}],
+    "additionalProperties": False,
+    "definitions": {
+        "Quantity": {"type": "string"},
+        "io.example.v1alpha1.GizmoSpec": {"type": "object", "properties": {
+            "replicas": {"type": "integer"},
+            "size": {"$ref": "#/definitions/Quantity"},
+            "parts": {"type": "array", "items": {"$ref": "#/definitions/io.example.v1alpha1.GizmoSpec"}},
+        }, "additionalProperties": False},
+        "meta.ObjectMeta": {"type": "object", "properties": {"name": {"type": "string"}}, "additionalProperties": False},
+    },
+}
+
+
+class OpenAPI(Repo):
+    """gizmos.example.io, a group served by an aggregated API server, from its OpenAPI v3 document."""
+
+    def setUp(self):
+        super().setUp()
+        self.group = self.root / "gen" / "schemas" / "gizmos.example.io"
+        self.group.mkdir()
+        (self.group / "gizmo_v1alpha1.json").write_text(json.dumps(GIZMO, indent=2) + "\n")
+        self.web.pages[f"{RAW}example/gizmos/v1.0.0/{OAPI}"] = openapi()
+        self.web.pages[f"{RAW}example/gizmos/v1.1.0/{OAPI}"] = openapi(replicas="number")
+
+    def test_reproduces_then_regenerates_at_the_new_tag(self):
+        files, cause = upstream.gate(self.group, [OAPI_OLD], [OAPI_NEW])
+        self.assertIsNone(cause)
+        self.assertEqual(json.loads(files["gizmo_v1alpha1.json"])["definitions"]["io.example.v1alpha1.GizmoSpec"]["properties"]["replicas"], {"type": "number"})
+
+    def test_missing_kind_at_the_new_tag_is_an_issue_cause(self):
+        self.web.pages[f"{RAW}example/gizmos/v1.1.0/{OAPI}"] = openapi(kind="Widget")
+        self.assertEqual(upstream.gate(self.group, [OAPI_OLD], [OAPI_NEW]), (None, "missing at the new release: gizmo_v1alpha1.json"))
+
+    def test_json_without_components_does_not_reproduce(self):
+        self.web.pages[f"{RAW}example/gizmos/v1.0.0/{OAPI}"] = {"$schema": "http://json-schema.org/draft-07/schema#", "type": "object"}
+        self.assertEqual(upstream.gate(self.group, [OAPI_OLD], [OAPI_NEW]), (None, "does not reproduce: no CRD for gizmo_v1alpha1.json"))
 
 
 class Outdated(Repo):

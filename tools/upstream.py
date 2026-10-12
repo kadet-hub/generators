@@ -10,6 +10,7 @@ open or update, without writing anything, ./check included.
 
 import argparse
 import base64
+import copy
 import json
 import re
 import subprocess
@@ -25,6 +26,7 @@ REPO = API + "repos/{owner}/{repo}/"  # gh fills in the repository of ROOT
 GITHUB = re.compile(r"https://github\.com/([^/]+/[^/]+)/(tree|blob)/([^/]+)/(.+)")
 TERRAFORM = re.compile(r"https://registry\.terraform\.io/providers/([^/]+/[^/]+)/([^/]+)")
 ANNOTATIONS = ("$id", "$schema", "title", "description")
+COMPONENTS = "#/components/schemas/"
 
 
 class Loader(getattr(yaml, "CSafeLoader", yaml.SafeLoader)):
@@ -109,13 +111,43 @@ def crd_schemas(url):
     return schemas
 
 
+def inline(node, components, definitions):
+    """Point the component references in node to definitions, copying each referenced component there once."""
+    if isinstance(node, list):
+        for sub in node:
+            inline(sub, components, definitions)
+    elif isinstance(node, dict):
+        if str(node.get("$ref")).startswith(COMPONENTS):
+            name = node["$ref"].removeprefix(COMPONENTS)
+            node["$ref"] = "#/definitions/" + name
+            if name not in definitions:
+                definitions[name] = copy.deepcopy(components[name])
+                inline(definitions[name], components, definitions)
+        for sub in node.values():
+            inline(sub, components, definitions)
+
+
+def openapi_schemas(url):
+    """{<kind>_<version>.json: schema} of the kinds in the OpenAPI v3 document at a GitHub source, referenced components under definitions."""
+    repo, _, ref, path = GITHUB.fullmatch(url).groups()
+    components = json.loads(get(f"https://raw.githubusercontent.com/{repo}/{ref}/{path}")).get("components", {}).get("schemas", {})
+    schemas = {}
+    for component in components.values():
+        for gvk in component.get("x-kubernetes-group-version-kind", []):
+            schema, definitions = copy.deepcopy(component), {}
+            inline(schema, components, definitions)
+            schema["definitions"] = dict(sorted(definitions.items()))
+            schemas[f"{gvk['kind'].lower()}_{gvk['version']}.json"] = schema
+    return schemas
+
+
 def close(schema):
     """additionalProperties: false on every node with properties, like kubeconform strict mode."""
     if not isinstance(schema, dict):
         return
     if "properties" in schema and "additionalProperties" not in schema and not schema.get("x-kubernetes-preserve-unknown-fields"):
         schema["additionalProperties"] = False
-    for sub in schema.get("properties", {}).values():
+    for sub in [*schema.get("properties", {}).values(), *schema.get("definitions", {}).values()]:
         close(sub)
     close(schema.get("items"))
     close(schema.get("additionalProperties"))
@@ -146,10 +178,10 @@ def render(schema, committed):
 
 
 def regenerate(urls, committed):
-    """({file: content}, [missing files]) for a group's committed files {name: content} from the CRDs at urls."""
+    """({file: content}, [missing files]) for a group's committed files {name: content} from the CRDs or OpenAPI documents at urls."""
     schemas = {}
     for url in urls:
-        schemas.update(crd_schemas(url))
+        schemas.update((openapi_schemas if url.endswith(".json") else crd_schemas)(url))
     return {n: render(schemas[n], text) for n, text in committed.items() if n in schemas}, [n for n in committed if n not in schemas]
 
 
