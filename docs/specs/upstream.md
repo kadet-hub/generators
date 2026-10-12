@@ -2,7 +2,7 @@
 
 Status: Draft
 Code: `tools/upstream.py`, `.github/workflows/upstream.yml`
-Verified against: main @ tbd
+Verified against: main @ 313f1ca
 
 ## Problem and decision
 
