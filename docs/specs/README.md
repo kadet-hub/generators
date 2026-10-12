@@ -11,4 +11,5 @@ request, as its first commit.
 
 | Spec | Area |
 |---|---|
+| [check.md](check.md) | Gate check (`CHK-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
