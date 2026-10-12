@@ -1,0 +1,14 @@
+name: kubernetes
+description: Renders Kubernetes workloads with their Services, ConfigMaps, Secrets, RBAC, autoscaling, NetworkPolicies and volumes from one component block, plus Ingress, Gateway API and cluster policy resources.
+tags: [kubernetes]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: [admission-webhook]
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas

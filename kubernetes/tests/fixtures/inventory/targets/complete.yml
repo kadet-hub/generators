@@ -1,0 +1,511 @@
+# Complete: component shorthands for every workload type with their derived
+# Services, ConfigMaps, Secrets, RBAC, scaling, NetworkPolicies and volumes;
+# Ingress with a GKE ManagedCertificate; Gateway API with the services
+# shorthand; standalone resources, cluster policy sections and manifests.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubernetes
+        output_path: manifests/
+
+  namespace: shop
+
+  generators:
+    manifest:
+      # Merged into every component; component keys win.
+      default_config:
+        recommended_labels: true
+        security_profile: restricted
+        globals:
+          config_maps:
+            labels:
+              app.kubernetes.io/part-of: shop
+      resource_defaults:
+        deployment:
+          revision_history_limit: 5
+
+    kubernetes:
+      namespace: shop
+      configs:
+        feature-flags:
+          data:
+            flags.yaml:
+              value: |
+                checkout_v2: true
+      secrets:
+        payment-provider:
+          string_data:
+            api_key:
+              value: not-a-real-api-key
+      service_accounts:
+        ci-deployer:
+          service_account:
+            annotations:
+              example.com/owner: platform
+      persistent_volumes:
+        backup-nfs:
+          capacity:
+            storage: 100Gi
+          access_modes: [ReadWriteMany]
+          storage_class_name: nfs
+          mount_options: [nfsvers=4.1]
+          spec:
+            nfs:
+              server: 192.0.2.20
+              path: /exports/backup
+      persistent_volume_claims:
+        backup:
+          storage: 100Gi
+          storage_class: nfs
+          # access_modes overrides spec.accessModes and logs a warning
+          access_modes: [ReadWriteMany]
+          spec:
+            accessModes: [ReadWriteOnce]
+            volumeName: backup-nfs
+      pod_monitors:
+        # Not rendered: logs a warning naming the prometheus-operator generator
+        web:
+          endpoints:
+            - port: metrics
+      storage_classes:
+        fast:
+          default: true
+          provisioner: ebs.csi.aws.com
+          parameters:
+            type: gp3
+          reclaim_policy: Delete
+          volume_binding_mode: WaitForFirstConsumer
+          allow_volume_expansion: true
+      ingress_classes:
+        nginx:
+          controller: k8s.io/ingress-nginx
+      runtime_classes:
+        gvisor:
+          handler: runsc
+      priority_classes:
+        shop-critical:
+          value: 100000
+          description: Checkout path workloads
+      limit_ranges:
+        defaults:
+          limits:
+            - type: Container
+              defaultRequest:
+                cpu: 50m
+                memory: 64Mi
+      resource_quotas:
+        compute:
+          hard:
+            requests.cpu: "8"
+            limits.memory: 16Gi
+      manifests:
+        shop:
+          api_version: v1
+          kind: Namespace
+          labels:
+            pod-security.kubernetes.io/enforce: restricted
+
+      gateway_classes:
+        istio:
+          controller_name: istio.io/gateway-controller
+      gateways:
+        public:
+          namespace: gateway
+          gateway_class: istio
+          services:
+            # HTTPS listener, HTTP->HTTPS redirect and HTTPRoute in namespace shop
+            web:
+              hostname: shop.example.com
+              namespace: shop
+              tls_secret: shop-example-com-tls
+              cluster_issuer: letsencrypt
+              backend:
+                name: web
+                port: 80
+            # GRPCRoute, no redirect
+            orders-api:
+              hostname: orders.example.com
+              namespace: shop
+              tls_secret: orders-example-com-tls
+              type: grpc
+              backend:
+                name: orders-api
+                port: 9090
+          listeners:
+            postgres:
+              port_number: 5432
+              protocol: TCP
+            mq:
+              hostname: mq.example.com
+              port_number: 5671
+              protocol: TLS
+              tls_mode: Passthrough
+          routes:
+            postgres:
+              type: tcp
+              listener: postgres
+              namespace: shop
+              rules:
+                db:
+                  name: db-primary
+                  port: 5432
+            # Route in the Gateway's namespace: listener stays Same, the
+            # backend in shop needs the ReferenceGrant below
+            mq:
+              type: tls
+              listener: mq
+              namespace: gateway
+              hostnames: [mq.example.com]
+              rules:
+                mq:
+                  name: mq
+                  namespace: shop
+                  port: 5671
+      reference_grants:
+        gateway-mq-route:
+          target_namespace: shop
+          from_namespace: gateway
+          from_kind: TLSRoute
+          to_kind: Service
+          to_names: [mq]
+      backend_tls_policies:
+        orders-api:
+          namespace: shop
+          target_refs:
+            - name: orders-api
+          hostname: orders-api.shop.svc.cluster.local
+          ca_cert_refs:
+            - name: shop-internal-ca
+
+  ingresses:
+    web:
+      namespace: shop
+      ingress_class: gce
+      managed_certificate: www.example.com
+      hosts:
+        - name: www.example.com
+          paths:
+            - path: /
+              path_type: Prefix
+              backend_name: web
+              port_name: http
+
+  components:
+    web:
+      image: registry.example.com/shop/web:1.4.2
+      replicas: 2
+      prefer_pods_in_different_zones: true
+      read_only_root_filesystem: true
+      priority_class_name: shop-critical
+      ports:
+        http:
+          container_port: 8080
+          service_port: 80
+        metrics:
+          container_port: 9100
+      healthcheck:
+        readiness:
+          type: http
+          port: http
+          path: /ready
+        liveness:
+          type: http
+          port: http
+          path: /healthz
+          period_seconds: 20
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+      env:
+        LOG_LEVEL: info
+        CHECKOUT_URL:
+          configMapKeyRef:
+            key: checkout_url
+        SESSION_KEY:
+          secretKeyRef:
+            key: session_key
+      config_maps:
+        config:
+          mount: /etc/web
+          data:
+            checkout_url:
+              value: https://shop.example.com/checkout
+      secrets:
+        secrets:
+          string_data:
+            session_key:
+              value: not-a-real-session-key
+      volumes:
+        tmp:
+          emptyDir: {}
+      volume_mounts:
+        tmp:
+          mount_path: /tmp
+      service:
+        type: ClusterIP
+        expose_ports: [http]
+      service_account:
+        create: true
+        enabled: true
+      # Needs the API: opts back in to the token
+      automount_service_account_token: true
+      role:
+        rules:
+          - apiGroups: [""]
+            resources: [configmaps]
+            resourceNames: [web]
+            verbs: [get, watch]
+      hpa:
+        min_replicas: 2
+        max_replicas: 6
+        metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 70
+      pdb_min_available: 1
+      vpa: "Off"
+      network_policies:
+        allow-gateway:
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: gateway
+              ports:
+                - port: 8080
+      # Not rendered: logs a warning naming the prometheus-operator generator
+      service_monitors:
+        endpoints:
+          - port: metrics
+
+    orders-api:
+      image: registry.example.com/shop/orders-api:2.0.1
+      ports:
+        grpc:
+          container_port: 9090
+          service_port: 9090
+      healthcheck:
+        readiness:
+          type: grpc
+          port: 9090
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+      service:
+        type: ClusterIP
+
+    db:
+      type: statefulset
+      image: postgres:17.6
+      workload_security_context:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      ports:
+        postgres:
+          container_port: 5432
+          service_port: 5432
+      healthcheck:
+        readiness:
+          type: command
+          command: [pg_isready, -U, postgres]
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          memory: 1Gi
+      env:
+        PGDATA: /var/lib/postgresql/data/pgdata
+        POSTGRES_PASSWORD:
+          secretKeyRef:
+            name: db-credentials
+            key: password
+      volume_mounts:
+        data:
+          mount_path: /var/lib/postgresql/data
+        run:
+          mount_path: /var/run/postgresql
+      volumes:
+        run:
+          emptyDir: {}
+      volume_claims:
+        data:
+          spec:
+            accessModes: [ReadWriteOnce]
+            storageClassName: fast
+            resources:
+              requests:
+                storage: 20Gi
+      service:
+        headless: true
+      additional_services:
+        db-primary:
+          type: ClusterIP
+      auto_pdb: true
+
+    mq:
+      image: rabbitmq:4.1.4
+      workload_security_context:
+        runAsUser: 999
+        fsGroup: 999
+      ports:
+        amqps:
+          container_port: 5671
+          service_port: 5671
+      healthcheck:
+        readiness:
+          type: tcp
+          port: 5671
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 512Mi
+      service:
+        type: ClusterIP
+      persistent_volume_claims:
+        mq-data:
+          storage: 5Gi
+          storage_class: fast
+
+    nightly-report:
+      type: job
+      schedule: "0 3 * * *"
+      concurrency_policy: Forbid
+      image: registry.example.com/shop/report:1.4.2
+      args: [--since, 24h]
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    migrate:
+      type: job
+      image: registry.example.com/shop/web:1.4.2
+      command: [/app/migrate]
+      ttl_seconds_after_finished: 3600
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    image-prepuller:
+      type: daemonset
+      image: registry.k8s.io/pause:3.10
+      init_containers:
+        pull-web:
+          image: registry.example.com/shop/web:1.4.2
+          command: [/bin/true]
+          resources:
+            requests:
+              cpu: 1m
+              memory: 8Mi
+            limits:
+              memory: 16Mi
+        pull-report:
+          image: registry.example.com/shop/report:1.4.2
+          command: [/bin/true]
+          resources:
+            requests:
+              cpu: 1m
+              memory: 8Mi
+            limits:
+              memory: 16Mi
+      resources:
+        requests:
+          cpu: 1m
+          memory: 8Mi
+        limits:
+          memory: 16Mi
+
+    policy-webhook:
+      image: registry.example.com/platform/policy-webhook:0.9.0
+      ports:
+        https:
+          container_port: 9443
+          service_port: 443
+      healthcheck:
+        readiness:
+          type: http
+          scheme: HTTPS
+          port: https
+          path: /readyz
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+      service:
+        type: ClusterIP
+      service_account:
+        create: true
+        enabled: true
+      automount_service_account_token: true
+      # Serving certificate from a cert-manager Certificate named policy-webhook-tls
+      volumes:
+        tls:
+          secret:
+            secretName: policy-webhook-tls
+      volume_mounts:
+        tls:
+          mount_path: /tls
+          read_only: true
+      webhook_annotations:
+        cert-manager.io/inject-ca-from: shop/policy-webhook-tls
+      cluster_role:
+        rules:
+          - apiGroups: [""]
+            resources: [namespaces]
+            verbs: [get, list, watch]
+      validating_webhooks:
+        - name: validate.policy.example.com
+          admissionReviewVersions: [v1]
+          sideEffects: None
+          failurePolicy: Fail
+          clientConfig:
+            service:
+              name: policy-webhook
+              namespace: shop
+              path: /validate
+          rules:
+            - apiGroups: [apps]
+              apiVersions: [v1]
+              operations: [CREATE, UPDATE]
+              resources: [deployments]
+      webhooks:
+        - name: default.policy.example.com
+          admissionReviewVersions: [v1]
+          sideEffects: None
+          failurePolicy: Ignore
+          clientConfig:
+            service:
+              name: policy-webhook
+              namespace: shop
+              path: /mutate
+          rules:
+            - apiGroups: [apps]
+              apiVersions: [v1]
+              operations: [CREATE]
+              resources: [deployments]

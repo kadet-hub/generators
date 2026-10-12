@@ -1,0 +1,77 @@
+# QA-7: Kubernetes built-in groups are the kubernetes-json-schema
+# standalone-strict files of this Kubernetes release, unchanged. CRD groups
+# are the openAPIV3Schema of the upstream CRDs at these releases (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# cloud.google.com BackendConfig has no published CRD file and ships no schema.
+core:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+admissionregistration.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+apps:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+autoscaling:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+batch:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+networking.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+node.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+policy:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+rbac.authorization.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+scheduling.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+storage.k8s.io:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+gateway.networking.k8s.io:
+  software: Gateway API
+  version: 1.6.3
+  source: https://github.com/kubernetes-sigs/gateway-api/tree/v1.6.3/config/crd/standard
+  license: Apache-2.0
+autoscaling.k8s.io:
+  software: Vertical Pod Autoscaler
+  version: 1.8.0
+  source: https://github.com/kubernetes/autoscaler/blob/vertical-pod-autoscaler-1.8.0/vertical-pod-autoscaler/deploy/vpa-v1-crd-gen.yaml
+  license: Apache-2.0
+networking.gke.io:
+  software: GKE Managed Certificates
+  version: 1.2.12
+  source: https://github.com/GoogleCloudPlatform/gke-managed-certs/blob/v1.2.12/deploy/managedcertificates-crd.yaml
+  license: Apache-2.0

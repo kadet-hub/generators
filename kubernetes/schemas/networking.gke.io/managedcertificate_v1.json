@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "spec": {
+      "additionalProperties": false,
+      "properties": {
+        "domains": {
+          "items": {
+            "maxLength": 63,
+            "pattern": "^(([a-z0-9]+|[a-z0-9][-a-z0-9]*[a-z0-9])\\.)+[a-z][-a-z0-9]*[a-z0-9]$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "status": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateName": {
+          "type": "string"
+        },
+        "certificateStatus": {
+          "type": "string"
+        },
+        "domainStatus": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "domain": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "domain",
+              "status"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "expireTime": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}
