@@ -32,7 +32,7 @@ and CHANGELOG entry before merging.
 
   | Source | Newer release |
   |---|---|
-  | GitHub `tree` or `blob` URL at a release tag | the repository's highest release that is neither pre-release nor draft |
+  | GitHub `tree` or `blob` URL at a release tag, of CRD YAML or of an OpenAPI v3 JSON document | the repository's highest release that is neither pre-release nor draft |
   | kubernetes-json-schema at a commit | the highest Kubernetes release (`kubernetes/kubernetes`) |
   | Terraform Registry provider URL | the provider's highest version in the Terraform Registry |
   | GitHub URL at a commit (`version: main@<sha>`) | the repository's first release, if one exists by now |
@@ -77,6 +77,18 @@ and CHANGELOG entry before merging.
   no versions; a kind or version missing at the new tag is an issue.
   CustomResourceDefinition documents without `spec.versions`, such as the
   conversion and CA-injection patches next to KServe's CRDs, are skipped.
+
+  A source ending in `.json` is read as an OpenAPI v3 document instead. An
+  aggregated API server such as IronCore's serves its kinds without CRDs
+  and publishes one such document per API group version
+  (`gen/v3/apis__<group>__<version>_openapi.json`). For each
+  `<kind>_<version>.json` regeneration takes the component schema whose
+  `x-kubernetes-group-version-kind` names that kind and version, copies
+  every component it references, directly or through other components,
+  under `definitions` sorted by name with `$ref` rewritten from
+  `#/components/schemas/` to `#/definitions/`, and closes the schema and
+  each definition as above. A JSON document without components, such as
+  k3d's JSON Schema source, yields no schema and does not reproduce.
 
   Each file keeps the committed file's top-level `$id`, `$schema`, `title`
   and `description`, where present, and its layout: the same indent, or
