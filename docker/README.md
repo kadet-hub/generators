@@ -2,9 +2,9 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/docker/) page.
 
-Kapitan kadet generator for Dockerfiles. Each entry under `dockerfiles` renders one `Dockerfile`, single-stage or multi-stage. From a short image description it derives the package install command for the base image's distribution (`apk`, `apt-get` with cleanup, `dnf`, or `pip`), creates a non-root user with the matching userland (busybox `adduser` on Alpine, shadow `useradd` elsewhere) and writes the instructions in a fixed order that builds.
+Kapitan kadet generator for Dockerfiles. Each entry under `dockerfiles` renders one `Dockerfile`, single-stage or multi-stage. From a short image description it derives the package install command for the base image's distribution (`apk add --no-cache`, `apt-get` with [cache mounts](https://docs.docker.com/build/cache/optimize/#use-cache-mounts) for `/var/cache/apt` and `/var/lib/apt/lists`, so neither ends up in the image, `dnf` with `dnf clean all`, or `pip --no-cache-dir`), creates a non-root user with the matching userland (busybox `adduser` on Alpine, shadow `useradd` elsewhere) and writes the instructions in a fixed order that builds.
 
-Built for BuildKit's Dockerfile frontend 1.20 or later, per the [Dockerfile reference at BuildKit v0.34.0](https://github.com/moby/buildkit/blob/v0.34.0/frontend/dockerfile/docs/reference.md): `RUN --mount` and `COPY --chmod` need Dockerfile 1.2, `RUN --network` 1.3, `RUN --security` 1.20, and `RUN --security=insecure` also needs the `security.insecure` entitlement on the builder and the build. BuildKit is the default builder on Linux since [Docker Engine 23.0.0](https://docs.docker.com/engine/release-notes/23.0/#2300).
+Built for BuildKit's Dockerfile frontend 1.20 or later, per the [Dockerfile reference at BuildKit v0.34.0](https://github.com/moby/buildkit/blob/v0.34.0/frontend/dockerfile/docs/reference.md): `RUN --mount` (also used for apt installs) and `COPY --chmod` need Dockerfile 1.2, `RUN --network` 1.3, `RUN --security` 1.20, and `RUN --security=insecure` also needs the `security.insecure` entitlement on the builder and the build. BuildKit is the default builder on Linux since [Docker Engine 23.0.0](https://docs.docker.com/engine/release-notes/23.0/#2300).
 
 ## Usage
 

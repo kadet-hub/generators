@@ -27,7 +27,7 @@ Example inventory:
               cmd: ["python", "main.py"]
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import json
 from typing import Any
@@ -368,11 +368,17 @@ class DockerfileBuilder:
                 f"RUN apk add --no-cache {package_list_string}"
             )
         elif package_manager == "apt":
-            self.dockerfile_lines.append("RUN apt-get update && \\")
+            # Cache mounts keep apt's lists and archives out of the image
+            # https://docs.docker.com/build/cache/optimize/#use-cache-mounts
             self.dockerfile_lines.append(
-                f"    apt-get install -y --no-install-recommends {package_list_string} && \\"
+                "RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \\"
             )
-            self.dockerfile_lines.append("    rm -rf /var/lib/apt/lists/*")
+            self.dockerfile_lines.append(
+                "    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \\"
+            )
+            self.dockerfile_lines.append(
+                f"    apt-get update && apt-get install -y --no-install-recommends {package_list_string}"
+            )
         elif package_manager == "dnf":
             self.dockerfile_lines.append(
                 f"RUN dnf install -y {package_list_string} && dnf clean all"
