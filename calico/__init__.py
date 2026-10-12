@@ -4,6 +4,7 @@ Generates resources for the Tigera operator that manages Calico CNI:
 - Installation: Core networking and network policy configuration (must be named "default")
 - APIServer: Enables the Calico API server for advanced policy management
 - ImageSet: Pins Calico images by digest for security/compliance
+- projectcalico.org/v3 policy, network set, IP pool and BGP resources (resources.py)
 
 Tigera operator installs and manages Calico (or Calico Enterprise / TigeraSecureEnterprise)
 on Kubernetes clusters.
@@ -14,7 +15,7 @@ See: https://docs.tigera.io/calico/3.33/reference/installation/api
      https://github.com/tigera/operator/tree/v1.44.0
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 import logging
 from typing import Any
@@ -708,6 +709,11 @@ def main(input_params: dict | None = None) -> BaseObj:
         # The operator degrades Whisker without a Goldmane CR
         # (pkg/controller/whisker/controller.go at v1.44.0).
         logger.warning("calico 'whisker' is set without 'goldmane'; Whisker needs Goldmane")
+
+    # projectcalico.org/v3 resources; imported here because resources.py uses this module's helpers
+    from . import resources
+
+    resources.render(obj, calico_config)
 
     return obj
 

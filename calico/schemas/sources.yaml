@@ -10,3 +10,8 @@ operator.tigera.io:
   version: 1.44.0
   source: https://github.com/tigera/operator/tree/v1.44.0/pkg/imports/crds/operator
   license: Apache-2.0
+projectcalico.org:
+  software: Calico
+  version: 3.33.0
+  source: https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml
+  license: Apache-2.0
