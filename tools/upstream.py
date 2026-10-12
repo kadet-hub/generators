@@ -103,7 +103,7 @@ def crd_schemas(url):
     for f in sorted(files):
         for doc in yaml.load_all(get(f"https://raw.githubusercontent.com/{repo}/{ref}/{f}"), Loader=Loader):
             if isinstance(doc, dict) and doc.get("kind") == "CustomResourceDefinition":
-                for v in doc["spec"]["versions"]:
+                for v in doc.get("spec", {}).get("versions", []):  # patches carry no versions
                     if "openAPIV3Schema" in v.get("schema", {}):
                         schemas[f"{doc['spec']['names']['kind'].lower()}_{v['name']}.json"] = v["schema"]["openAPIV3Schema"]
     return schemas

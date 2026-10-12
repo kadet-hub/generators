@@ -257,6 +257,15 @@ class Gate(Repo):
         self.assertIsNone(files)
         self.assertEqual(cause, "missing at the new release: widget_v1alpha1.json")
 
+    def test_crd_patch_without_versions_is_skipped(self):
+        patch = yaml.safe_dump({"apiVersion": "apiextensions.k8s.io/v1", "kind": "CustomResourceDefinition",
+                                "spec": {"conversion": {"strategy": "Webhook"}}})
+        for ref in ("v1.0.0", "v1.1.0"):
+            self.web.pages[f"{RAW}example/widgets/{ref}/crds/widgets.yaml"] += "---\n" + patch
+        files, cause = upstream.gate(self.group, [OLD], [NEW])
+        self.assertIsNone(cause)
+        self.assertEqual(list(files), ["widget_v1alpha1.json"])
+
     def test_no_crd_at_the_current_ref_does_not_reproduce(self):
         self.web.pages[f"{RAW}example/widgets/v1.0.0/crds/widgets.yaml"] = crd("Gadget", ("v1alpha1",))
         self.assertEqual(upstream.gate(self.group, [OLD], [NEW]), (None, "does not reproduce: no CRD for widget_v1alpha1.json"))
