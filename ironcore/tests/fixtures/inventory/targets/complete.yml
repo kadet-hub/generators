@@ -1,0 +1,171 @@
+# Complete: all eight kinds in one namespace. MachineClass, MachinePool,
+# VolumeClass, VolumePool, the IPAM Prefix "node-prefix-v4" and the Secrets
+# for ignition and disk encryption are operator-managed and not emitted here.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/ironcore
+        output_path: manifests/
+
+  generators:
+    ironcore:
+      namespace: production
+
+      networks:
+        main-net:
+          labels:
+            env: production
+          peerings:
+            - name: to-backup
+              networkRef: backup-net
+              prefixes:
+                - name: backup-range
+                  prefix: 10.100.0.0/16
+        backup-net:
+          peerings:
+            - name: to-main
+              networkRef:
+                name: main-net
+                namespace: production
+              prefixes:
+                - name: main-range
+                  prefix: 10.0.0.0/16
+
+      network_interfaces:
+        worker-01-primary:
+          network_ref: main-net
+          ips:
+            - 10.0.1.10
+            - "2001:db8::10"
+          virtual_ip:
+            virtualIPRef: worker-01-vip
+          labels:
+            role: worker
+        worker-01-backup:
+          network_ref: backup-net
+          ips:
+            - ephemeral:
+                prefixTemplate:
+                  spec:
+                    ipFamily: IPv4
+                    parentRef:
+                      name: node-prefix-v4
+          labels:
+            role: worker
+
+      virtual_ips:
+        worker-01-vip:
+          ip_family: IPv4
+          labels:
+            usage: worker-01
+
+      volumes:
+        worker-01-root:
+          volume_class_ref: fast
+          volume_pool_ref: pool-a
+          resources:
+            storage: 100Gi
+          data_source:
+            osImage: registry.example.com/os-images/ubuntu:24.04
+        worker-01-data:
+          volume_class_ref:
+            name: standard
+          resources:
+            storage: 500Gi
+          encryption: disk-encryption-key
+
+      machines:
+        worker-01:
+          machine_class_ref: x1-xlarge
+          machine_pool_ref: pool-a
+          power: Off
+          network_interfaces:
+            - name: primary
+              networkInterfaceRef: worker-01-primary
+            - name: backup
+              networkInterfaceRef: worker-01-backup
+          volumes:
+            - name: root
+              device: oda
+              volumeRef: worker-01-root
+            - name: data
+              device: odb
+              volumeRef: worker-01-data
+            - name: scratch
+              emptyDisk:
+                sizeLimit: 10Gi
+          ignition_ref:
+            name: worker-01-ignition
+            key: ignition.json
+          labels:
+            role: worker
+
+      load_balancers:
+        frontend:
+          type: Public
+          ip_families:
+            - IPv4
+          network_ref: main-net
+          network_interface_selector:
+            matchLabels:
+              role: worker
+          ports:
+            - port: 80
+              protocol: TCP
+            - port: 443
+              protocol: TCP
+        internal-api:
+          type: Internal
+          network_ref: main-net
+          ips:
+            - 10.0.0.100
+          network_interface_selector:
+            matchLabels:
+              role: worker
+          ports:
+            - port: 8080
+              protocol: TCP
+              endPort: 8090
+
+      nat_gateways:
+        main-nat:
+          ip_family: IPv4
+          network_ref: main-net
+          # flat key wins over spec and logs a warning
+          ports_per_network_interface: 1024
+          spec:
+            portsPerNetworkInterface: 512
+
+      network_policies:
+        worker-ingress:
+          network_ref: main-net
+          network_interface_selector:
+            matchLabels:
+              role: worker
+          ingress:
+            - ports:
+                - port: 80
+                  protocol: TCP
+                - port: 443
+                  protocol: TCP
+              from:
+                - ipBlock:
+                    cidr: 10.0.0.0/16
+          egress:
+            - ports:
+                - port: 53
+                  protocol: UDP
+        worker-default-deny:
+          network_ref: main-net
+          network_interface_selector:
+            matchLabels:
+              role: worker
+          policy_types:
+            - Ingress
+            - Egress

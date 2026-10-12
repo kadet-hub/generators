@@ -10,6 +10,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |
 | [external-secrets](external-secrets/) ([catalog](https://kadet-hub.org/generators/external-secrets/)) | External Secrets Operator SecretStores, ClusterSecretStores and ExternalSecrets |
 | [grafana](grafana/) ([catalog](https://kadet-hub.org/generators/grafana/)) | Grafana Operator instances, dashboards, folders, datasources, alert rules, contact points, notification policies and more, with instance selector defaults |
+| [ironcore](ironcore/) ([catalog](https://kadet-hub.org/generators/ironcore/)) | IronCore Machines, Volumes, Networks, NetworkInterfaces, VirtualIPs, LoadBalancers, NAT gateways and NetworkPolicies, with ipFamilies derived from IPs and no public exposure by default |
 | [k3d](k3d/) ([catalog](https://kadet-hub.org/generators/k3d/)) | k3d cluster configs (k3d.io/v1alpha5 Simple) with port, volume, env and registry shorthands |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
 | [keycloak](keycloak/) ([catalog](https://kadet-hub.org/generators/keycloak/)) | Keycloak Operator Keycloak instances, realm imports and OIDC and SAML clients, with database credential and CR reference defaults |
