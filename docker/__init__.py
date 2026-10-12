@@ -27,7 +27,7 @@ Example inventory:
               cmd: ["python", "main.py"]
 """
 
-__version__ = "1.4.3"
+__version__ = "1.0.0"
 
 import json
 from typing import Any
