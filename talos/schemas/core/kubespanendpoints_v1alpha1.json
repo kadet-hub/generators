@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.KubespanEndpointsConfigV1Alpha1",
+  "$defs": {
+    "network.KubespanEndpointsConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeSpanEndpoints"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "extraAnnouncedEndpoints": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "extraAnnouncedEndpoints",
+          "description": "A list of extra Wireguard endpoints to announce from this machine.\n\nTalos automatically adds endpoints based on machine addresses, public IP, etc.\nThis field allows to add extra endpoints which are managed outside of Talos, e.g. NAT mapping.\n",
+          "markdownDescription": "A list of extra Wireguard endpoints to announce from this machine.\n\nTalos automatically adds endpoints based on machine addresses, public IP, etc.\nThis field allows to add extra endpoints which are managed outside of Talos, e.g. NAT mapping.",
+          "x-intellij-html-description": "<p>A list of extra Wireguard endpoints to announce from this machine.</p>\n\n<p>Talos automatically adds endpoints based on machine addresses, public IP, etc.\nThis field allows to add extra endpoints which are managed outside of Talos, e.g. NAT mapping.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeSpanEndpointsConfig is a config document to configure KubeSpan endpoints."
+    }
+  }
+}

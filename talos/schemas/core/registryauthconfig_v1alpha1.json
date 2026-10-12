@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.RegistryAuthConfigV1Alpha1",
+  "$defs": {
+    "cri.RegistryAuthConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "RegistryAuthConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Registry endpoint to apply the authentication configuration to.\n\nRegistry endpoint is the hostname part of the endpoint URL,\ne.g. \u2018my-mirror.local:5000\u2019 for \u2018https://my-mirror.local:5000/v2/\u2019.\n\nThe authentication configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.\n",
+          "markdownDescription": "Registry endpoint to apply the authentication configuration to.\n\nRegistry endpoint is the hostname part of the endpoint URL,\ne.g. 'my-mirror.local:5000' for 'https://my-mirror.local:5000/v2/'.\n\nThe authentication configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.",
+          "x-intellij-html-description": "<p>Registry endpoint to apply the authentication configuration to.</p>\n\n<p>Registry endpoint is the hostname part of the endpoint URL,\ne.g. &lsquo;my-mirror.local:5000&rsquo; for &lsquo;<a href=\"https://my-mirror.local:5000/v2/'\" target=\"_blank\">https://my-mirror.local:5000/v2/&rsquo;</a>.</p>\n\n<p>The authentication configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.</p>\n"
+        },
+        "username": {
+          "type": "string",
+          "title": "username",
+          "description": "Username/password authentication.\n",
+          "markdownDescription": "Username/password authentication.",
+          "x-intellij-html-description": "<p>Username/password authentication.</p>\n"
+        },
+        "password": {
+          "type": "string",
+          "title": "password",
+          "description": "Username/password authentication.\n",
+          "markdownDescription": "Username/password authentication.",
+          "x-intellij-html-description": "<p>Username/password authentication.</p>\n"
+        },
+        "auth": {
+          "type": "string",
+          "title": "auth",
+          "description": "Raw authentication string.\n",
+          "markdownDescription": "Raw authentication string.",
+          "x-intellij-html-description": "<p>Raw authentication string.</p>\n"
+        },
+        "identityToken": {
+          "type": "string",
+          "title": "identityToken",
+          "description": "Identity token authentication.\n",
+          "markdownDescription": "Identity token authentication.",
+          "x-intellij-html-description": "<p>Identity token authentication.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "RegistryAuthConfig configures authentication for a registry endpoint."
+    }
+  }
+}

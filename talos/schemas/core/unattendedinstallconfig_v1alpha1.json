@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.UnattendedInstallConfigV1Alpha1",
+  "$defs": {
+    "runtime.DiskSelectorSpec": {
+      "properties": {
+        "match": {
+          "type": "string",
+          "title": "match",
+          "description": "CEL expression matching a disk.\n",
+          "markdownDescription": "CEL expression matching a disk.",
+          "x-intellij-html-description": "<p>CEL expression matching a disk.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "DiskSelectorSpec matches disks with CEL."
+    },
+    "runtime.InstallerSpec": {
+      "properties": {
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "Allows for supplying the image used to perform the installation.\nImage reference for each Talos release can be found on\nGitHub releases page.\n\nIf not set, it will run installer based on the current Talos version\nand current schematic (this requires booting asset built by Image\nFactory).\n",
+          "markdownDescription": "Allows for supplying the image used to perform the installation.\nImage reference for each Talos release can be found on\n[GitHub releases page](https://github.com/siderolabs/talos/releases).\n\nIf not set, it will run installer based on the current Talos version\nand current schematic (this requires booting asset built by Image\nFactory).",
+          "x-intellij-html-description": "<p>Allows for supplying the image used to perform the installation.\nImage reference for each Talos release can be found on\n<a href=\"https://github.com/siderolabs/talos/releases\" target=\"_blank\">GitHub releases page</a>.</p>\n\n<p>If not set, it will run installer based on the current Talos version\nand current schematic (this requires booting asset built by Image\nFactory).</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "InstallerSpec describes the installer to perform the installation."
+    },
+    "runtime.ProvisioningSpec": {
+      "properties": {
+        "diskSelector": {
+          "$ref": "#/$defs/runtime.DiskSelectorSpec",
+          "title": "diskSelector",
+          "description": "Matches disks to initialize as physical volumes.\n",
+          "markdownDescription": "Matches disks to initialize as physical volumes.",
+          "x-intellij-html-description": "<p>Matches disks to initialize as physical volumes.</p>\n"
+        },
+        "wipe": {
+          "type": "boolean",
+          "title": "wipe",
+          "description": "Indicates if the installation disk should be wiped at installation time.\nDefaults to true.\n",
+          "markdownDescription": "Indicates if the installation disk should be wiped at installation time.\nDefaults to `true`.",
+          "x-intellij-html-description": "<p>Indicates if the installation disk should be wiped at installation time.\nDefaults to <code>true</code>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ProvisioningSpec describes how the Physical Volumes are provisioned."
+    },
+    "runtime.UnattendedInstallConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "UnattendedInstallConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "reboot": {
+          "type": "boolean",
+          "title": "reboot",
+          "description": "Reboot is a flag to indicate if the system should reboot after installation.\nIf not set, Talos will reboot only if the installer.image is set.\n",
+          "markdownDescription": "Reboot is a flag to indicate if the system should reboot after installation.\nIf not set, Talos will reboot only if the installer.image is set.",
+          "x-intellij-html-description": "<p>Reboot is a flag to indicate if the system should reboot after installation.\nIf not set, Talos will reboot only if the installer.image is set.</p>\n"
+        },
+        "installer": {
+          "$ref": "#/$defs/runtime.InstallerSpec",
+          "title": "installer",
+          "description": "The installer describes the source of the installation.\n",
+          "markdownDescription": "The installer describes the source of the installation.",
+          "x-intellij-html-description": "<p>The installer describes the source of the installation.</p>\n"
+        },
+        "provisioning": {
+          "$ref": "#/$defs/runtime.ProvisioningSpec",
+          "title": "provisioning",
+          "description": "The provisioning describes how the installation disk should be provisioned.\n",
+          "markdownDescription": "The provisioning describes how the installation disk should be provisioned.",
+          "x-intellij-html-description": "<p>The provisioning describes how the installation disk should be provisioned.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "UnattendedInstallConfig is an UnattendedInstallConfig config document."
+    }
+  }
+}

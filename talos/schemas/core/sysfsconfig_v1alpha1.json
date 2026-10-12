@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.SysfsConfigV1Alpha1",
+  "$defs": {
+    "runtime.SysfsConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "SysfsConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "params": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "params",
+          "description": "Used to configure the machine\u2019s sysfs (kernel attributes under /sys).\nValues from this document are merged with the deprecated v1alpha1 machine.sysfs values (if set),\nwith this document taking precedence on key conflicts.\n",
+          "markdownDescription": "Used to configure the machine's sysfs (kernel attributes under `/sys`).\nValues from this document are merged with the deprecated v1alpha1 machine.sysfs values (if set),\nwith this document taking precedence on key conflicts.",
+          "x-intellij-html-description": "<p>Used to configure the machine&rsquo;s sysfs (kernel attributes under <code>/sys</code>).\nValues from this document are merged with the deprecated v1alpha1 machine.sysfs values (if set),\nwith this document taking precedence on key conflicts.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "SysfsConfig configures Linux kernel sysfs values."
+    }
+  }
+}

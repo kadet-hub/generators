@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.EnvironmentV1Alpha1",
+  "$defs": {
+    "runtime.EnvironmentV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "EnvironmentConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "variables": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "variables",
+          "description": "This field allows for the addition of environment variables.\nAll environment variables are set on PID 1 in addition to every service.\nPropagation of environment variables to services is done only at initial service start time.\nTo modify environment variables for services, the node must be restarted.\nMultiple values for the same environment variable (in multiple documents) will replace previous values, with the last one taking precedence.\nFully removing an environment variable can only be achieved by removing it from the document and restarting the machine.\nEnvironment variable names are validated, and should:\n  - start with an uppercase letter, lowercase letter, or an underscore () character, and\n  - contain only uppercase and lowercase letters, underscore () characters, and numbers.\n",
+          "markdownDescription": "This field allows for the addition of environment variables.\nAll environment variables are set on PID 1 in addition to every service.\nPropagation of environment variables to services is done only at initial service start time.\nTo modify environment variables for services, the node must be restarted.\nMultiple values for the same environment variable (in multiple documents) will replace previous values, with the last one taking precedence.\nFully removing an environment variable can only be achieved by removing it from the document and restarting the machine.\nEnvironment variable names are validated, and should:\n  - start with an uppercase letter, lowercase letter, or an underscore (_) character, and\n  - contain only uppercase and lowercase letters, underscore (_) characters, and numbers.",
+          "x-intellij-html-description": "<p>This field allows for the addition of environment variables.\nAll environment variables are set on PID 1 in addition to every service.\nPropagation of environment variables to services is done only at initial service start time.\nTo modify environment variables for services, the node must be restarted.\nMultiple values for the same environment variable (in multiple documents) will replace previous values, with the last one taking precedence.\nFully removing an environment variable can only be achieved by removing it from the document and restarting the machine.\nEnvironment variable names are validated, and should:\n  - start with an uppercase letter, lowercase letter, or an underscore (<em>) character, and\n  - contain only uppercase and lowercase letters, underscore (</em>) characters, and numbers.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "EnvironmentConfig is an environment config document."
+    }
+  }
+}

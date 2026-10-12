@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeTalosAPIAccessConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeTalosAPIAccessConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeTalosAPIAccessConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "allowedRoles": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "allowedRoles",
+          "description": "The list of Talos API roles which can be granted for access from Kubernetes pods.\n\nEmpty list means that no roles can be granted, so access is blocked.\n",
+          "markdownDescription": "The list of Talos API roles which can be granted for access from Kubernetes pods.\n\nEmpty list means that no roles can be granted, so access is blocked.",
+          "x-intellij-html-description": "<p>The list of Talos API roles which can be granted for access from Kubernetes pods.</p>\n\n<p>Empty list means that no roles can be granted, so access is blocked.</p>\n"
+        },
+        "allowedKubernetesNamespaces": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "allowedKubernetesNamespaces",
+          "description": "The list of Kubernetes namespaces Talos API access is available from.\n",
+          "markdownDescription": "The list of Kubernetes namespaces Talos API access is available from.",
+          "x-intellij-html-description": "<p>The list of Kubernetes namespaces Talos API access is available from.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeTalosAPIAccessConfig configures access to Talos API from Kubernetes pods via service accounts."
+    }
+  }
+}

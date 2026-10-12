@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeAuthorizerConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeAuthorizerConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeAuthorizerConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the authorizer, should be be DNS1123 labels like myauthorizername or subdomains like myauthorizer.example.domain.\n",
+          "markdownDescription": "Name of the authorizer, should be be DNS1123 labels like myauthorizername or subdomains like myauthorizer.example.domain.",
+          "x-intellij-html-description": "<p>Name of the authorizer, should be be DNS1123 labels like myauthorizername or subdomains like myauthorizer.example.domain.</p>\n"
+        },
+        "type": {
+          "enum": [
+            "Node",
+            "RBAC",
+            "Webhook"
+          ],
+          "title": "type",
+          "description": "Type is the name of the authorizer.\n",
+          "markdownDescription": "Type is the name of the authorizer.",
+          "x-intellij-html-description": "<p>Type is the name of the authorizer.</p>\n"
+        },
+        "webhook": {
+          "type": "object",
+          "title": "webhook",
+          "description": "Webhook is the configuration for the webhook authorizer.\n\nThis field is required if the AuthorizerType is Webhook, should not be set for other authorizer types.\nThe value is the literal Kubernetes webhook authorizer configuration.\n",
+          "markdownDescription": "Webhook is the configuration for the webhook authorizer.\n\nThis field is required if the AuthorizerType is Webhook, should not be set for other authorizer types.\nThe value is the literal Kubernetes webhook authorizer configuration.",
+          "x-intellij-html-description": "<p>Webhook is the configuration for the webhook authorizer.</p>\n\n<p>This field is required if the AuthorizerType is Webhook, should not be set for other authorizer types.\nThe value is the literal Kubernetes webhook authorizer configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeAuthorizerConfig configures kube-apiserver authorization by configuring a specific authorization plugin."
+    }
+  }
+}

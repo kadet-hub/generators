@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeInlineManifestConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeInlineManifestConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeInlineManifestConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of manifest.\n",
+          "markdownDescription": "Name of manifest.",
+          "x-intellij-html-description": "<p>Name of manifest.</p>\n"
+        },
+        "manifest": {
+          "type": "string",
+          "title": "manifest",
+          "description": "Kubernetes manifest definition, it is supplied as a raw string.\nIt might contain a set of YAML documents separated by ---.\nThe format matches what can be supplied as kubectl apply -f &lt;file&gt;.\n",
+          "markdownDescription": "Kubernetes manifest definition, it is supplied as a raw string.\nIt might contain a set of YAML documents separated by `---`.\nThe format matches what can be supplied as `kubectl apply -f <file>`.",
+          "x-intellij-html-description": "<p>Kubernetes manifest definition, it is supplied as a raw string.\nIt might contain a set of YAML documents separated by <code>---</code>.\nThe format matches what can be supplied as <code>kubectl apply -f &lt;file&gt;</code>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "manifest",
+        "name"
+      ],
+      "description": "KubeInlineManifestConfig configures a Kubernetes manifest to be applied to the cluster."
+    }
+  }
+}

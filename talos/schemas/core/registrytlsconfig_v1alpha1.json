@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.RegistryTLSConfigV1Alpha1",
+  "$defs": {
+    "cri.RegistryTLSConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "RegistryTLSConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Registry endpoint to apply the TLS configuration to.\n\nRegistry endpoint is the hostname part of the endpoint URL,\ne.g. \u2018my-mirror.local:5000\u2019 for \u2018https://my-mirror.local:5000/v2/\u2019.\n\nThe TLS configuration makes sense only for HTTPS endpoints.\nThe TLS configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.\n",
+          "markdownDescription": "Registry endpoint to apply the TLS configuration to.\n\nRegistry endpoint is the hostname part of the endpoint URL,\ne.g. 'my-mirror.local:5000' for 'https://my-mirror.local:5000/v2/'.\n\nThe TLS configuration makes sense only for HTTPS endpoints.\nThe TLS configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.",
+          "x-intellij-html-description": "<p>Registry endpoint to apply the TLS configuration to.</p>\n\n<p>Registry endpoint is the hostname part of the endpoint URL,\ne.g. &lsquo;my-mirror.local:5000&rsquo; for &lsquo;<a href=\"https://my-mirror.local:5000/v2/'\" target=\"_blank\">https://my-mirror.local:5000/v2/&rsquo;</a>.</p>\n\n<p>The TLS configuration makes sense only for HTTPS endpoints.\nThe TLS configuration will apply to all image pulls for this\nregistry endpoint, by Talos or any Kubernetes workloads.</p>\n"
+        },
+        "clientIdentity": {
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "clientIdentity",
+          "description": "Enable mutual TLS authentication with the registry.\nClient certificate and key should be PEM-encoded.\n",
+          "markdownDescription": "Enable mutual TLS authentication with the registry.\nClient certificate and key should be PEM-encoded.",
+          "x-intellij-html-description": "<p>Enable mutual TLS authentication with the registry.\nClient certificate and key should be PEM-encoded.</p>\n"
+        },
+        "ca": {
+          "type": "string",
+          "title": "ca",
+          "description": "CA registry certificate to add the list of trusted certificates.\nCertificate should be PEM-encoded.\n",
+          "markdownDescription": "CA registry certificate to add the list of trusted certificates.\nCertificate should be PEM-encoded.",
+          "x-intellij-html-description": "<p>CA registry certificate to add the list of trusted certificates.\nCertificate should be PEM-encoded.</p>\n"
+        },
+        "insecureSkipVerify": {
+          "type": "boolean",
+          "title": "insecureSkipVerify",
+          "description": "Skip TLS server certificate verification (not recommended).\n",
+          "markdownDescription": "Skip TLS server certificate verification (not recommended).",
+          "x-intellij-html-description": "<p>Skip TLS server certificate verification (not recommended).</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "RegistryTLSConfig configures TLS for a registry endpoint."
+    }
+  }
+}

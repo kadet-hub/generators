@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/siderolink.ConfigV1Alpha1",
+  "$defs": {
+    "siderolink.ConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "SideroLinkConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "apiUrl": {
+          "type": "string",
+          "pattern": "^(https|grpc)://",
+          "title": "apiUrl",
+          "description": "SideroLink API URL to connect to.\n",
+          "markdownDescription": "SideroLink API URL to connect to.",
+          "x-intellij-html-description": "<p>SideroLink API URL to connect to.</p>\n"
+        },
+        "uniqueToken": {
+          "type": "string",
+          "title": "uniqueToken",
+          "description": "SideroLink unique token to use for the connection (optional).\n\nThis value is overridden with META key UniqueMachineToken.\n",
+          "markdownDescription": "SideroLink unique token to use for the connection (optional).\n\nThis value is overridden with META key UniqueMachineToken.",
+          "x-intellij-html-description": "<p>SideroLink unique token to use for the connection (optional).</p>\n\n<p>This value is overridden with META key UniqueMachineToken.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "SideroLinkConfig is a SideroLink connection machine configuration document."
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.CRICustomizationConfigV1Alpha1",
+  "$defs": {
+    "cri.CRICustomizationConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "CRICustomizationConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the CRI customization.\n\nCustomizations are merged with physical CRI configuration parts in\nlexicographical order by name. The legacy\n/etc/cri/conf.d/20-customization.part machine file is included under\nthe reserved name customization.\n\nApplying, updating, or removing a customization restarts CRI automatically.\n",
+          "markdownDescription": "Name of the CRI customization.\n\nCustomizations are merged with physical CRI configuration parts in\nlexicographical order by name. The legacy\n`/etc/cri/conf.d/20-customization.part` machine file is included under\nthe reserved name `customization`.\n\nApplying, updating, or removing a customization restarts CRI automatically.",
+          "x-intellij-html-description": "<p>Name of the CRI customization.</p>\n\n<p>Customizations are merged with physical CRI configuration parts in\nlexicographical order by name. The legacy\n<code>/etc/cri/conf.d/20-customization.part</code> machine file is included under\nthe reserved name <code>customization</code>.</p>\n\n<p>Applying, updating, or removing a customization restarts CRI automatically.</p>\n"
+        },
+        "content": {
+          "type": "string",
+          "title": "content",
+          "description": "CRI containerd configuration fragment in TOML format.\n",
+          "markdownDescription": "CRI containerd configuration fragment in TOML format.",
+          "x-intellij-html-description": "<p>CRI containerd configuration fragment in TOML format.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "CRICustomizationConfig configures the CRI containerd instance."
+    }
+  }
+}

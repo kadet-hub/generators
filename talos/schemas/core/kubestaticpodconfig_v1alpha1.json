@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeStaticPodConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeStaticPodConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeStaticPodConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the static pod.\n",
+          "markdownDescription": "Name of the static pod.",
+          "x-intellij-html-description": "<p>Name of the static pod.</p>\n"
+        },
+        "pod": {
+          "type": "object",
+          "title": "pod",
+          "description": "Static pods can be used to run components which should be started before the Kubernetes control plane is up.\nTalos doesn\u2019t validate the pod definition.\nUpdates to this field can be applied without a reboot.\n\nSee https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/.\n",
+          "markdownDescription": "Static pods can be used to run components which should be started before the Kubernetes control plane is up.\nTalos doesn't validate the pod definition.\nUpdates to this field can be applied without a reboot.\n\nSee https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/.",
+          "x-intellij-html-description": "<p>Static pods can be used to run components which should be started before the Kubernetes control plane is up.\nTalos doesn&rsquo;t validate the pod definition.\nUpdates to this field can be applied without a reboot.</p>\n\n<p>See <a href=\"https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/\" target=\"_blank\">https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/</a>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name",
+        "pod"
+      ],
+      "description": "KubeStaticPodConfig configures a pod definition to be run as a static pod by the kubelet."
+    }
+  }
+}

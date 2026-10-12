@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/storage.LVMLogicalVolumeConfigV1Alpha1",
+  "$defs": {
+    "storage.LVMLogicalVolumeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "LVMLogicalVolumeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Logical volume name.\n\nMust be 1-63 chars: ASCII letters, digits, hyphens, underscores.\n",
+          "markdownDescription": "Logical volume name.\n\nMust be 1-63 chars: ASCII letters, digits, hyphens, underscores.",
+          "x-intellij-html-description": "<p>Logical volume name.</p>\n\n<p>Must be 1-63 chars: ASCII letters, digits, hyphens, underscores.</p>\n"
+        },
+        "type": {
+          "type": "string",
+          "title": "type",
+          "description": "Logical volume layout.\n",
+          "markdownDescription": "Logical volume layout.",
+          "x-intellij-html-description": "<p>Logical volume layout.</p>\n"
+        },
+        "mirrors": {
+          "type": "integer",
+          "title": "mirrors",
+          "description": "Number of mirror copies for raid1 / raid10 layouts.\n\nDefaults to 1 (a two-way mirror) when unset. Not valid for linear\nor raid0.\n",
+          "markdownDescription": "Number of mirror copies for `raid1` / `raid10` layouts.\n\nDefaults to 1 (a two-way mirror) when unset. Not valid for `linear`\nor `raid0`.",
+          "x-intellij-html-description": "<p>Number of mirror copies for <code>raid1</code> / <code>raid10</code> layouts.</p>\n\n<p>Defaults to 1 (a two-way mirror) when unset. Not valid for <code>linear</code>\nor <code>raid0</code>.</p>\n"
+        },
+        "stripes": {
+          "type": "integer",
+          "title": "stripes",
+          "description": "Number of stripes for raid0 / raid10 layouts.\n\nDefaults to all available physical volumes when unset. Must be at\nleast 2. Not valid for linear or raid1.\n",
+          "markdownDescription": "Number of stripes for `raid0` / `raid10` layouts.\n\nDefaults to all available physical volumes when unset. Must be at\nleast 2. Not valid for `linear` or `raid1`.",
+          "x-intellij-html-description": "<p>Number of stripes for <code>raid0</code> / <code>raid10</code> layouts.</p>\n\n<p>Defaults to all available physical volumes when unset. Must be at\nleast 2. Not valid for <code>linear</code> or <code>raid1</code>.</p>\n"
+        },
+        "provisioning": {
+          "$ref": "#/$defs/storage.LVMLogicalVolumeProvisioningSpec",
+          "title": "provisioning",
+          "description": "Describes how the logical volume is provisioned.\n",
+          "markdownDescription": "Describes how the logical volume is provisioned.",
+          "x-intellij-html-description": "<p>Describes how the logical volume is provisioned.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "LVMLogicalVolumeConfig is an LVM logical volume config document.\\nDefines a logical volume provisioned inside a volume group.\\n"
+    },
+    "storage.LVMLogicalVolumeProvisioningSpec": {
+      "properties": {
+        "volumeGroup": {
+          "type": "string",
+          "title": "volumeGroup",
+          "description": "Name of the volume group that backs the logical volume.\n",
+          "markdownDescription": "Name of the volume group that backs the logical volume.",
+          "x-intellij-html-description": "<p>Name of the volume group that backs the logical volume.</p>\n"
+        },
+        "minSize": {
+          "type": "string",
+          "title": "minSize",
+          "description": "The minimum size of the volume.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.\n",
+          "markdownDescription": "The minimum size of the volume.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.",
+          "x-intellij-html-description": "<p>The minimum size of the volume.</p>\n\n<p>Size is specified in bytes, but can be expressed in human readable format, e.g. 100MB.</p>\n"
+        },
+        "maxSize": {
+          "type": "string",
+          "title": "maxSize",
+          "description": "The maximum size of the volume.\n\nSize is specified in bytes or in percents of the volume group.\nIt can be expressed in human readable format, e.g. 100MB or 80%.\n",
+          "markdownDescription": "The maximum size of the volume.\n\nSize is specified in bytes or in percents of the volume group.\nIt can be expressed in human readable format, e.g. 100MB or 80%.",
+          "x-intellij-html-description": "<p>The maximum size of the volume.</p>\n\n<p>Size is specified in bytes or in percents of the volume group.\nIt can be expressed in human readable format, e.g. 100MB or 80%.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "LVMLogicalVolumeProvisioningSpec describes how an LV is provisioned."
+    }
+  }
+}

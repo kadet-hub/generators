@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.ResolverConfigV1Alpha1",
+  "$defs": {
+    "network.HostDNSConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Enable host DNS caching resolver.\n\nWhen enabled, a local DNS caching resolver is deployed on the host to improve DNS resolution performance and reliability.\nUpstream DNS servers for the host resolver are configured using the nameservers field in this config document.\n",
+          "markdownDescription": "Enable host DNS caching resolver.\n\nWhen enabled, a local DNS caching resolver is deployed on the host to improve DNS resolution performance and reliability.\nUpstream DNS servers for the host resolver are configured using the `nameservers` field in this config document.",
+          "x-intellij-html-description": "<p>Enable host DNS caching resolver.</p>\n\n<p>When enabled, a local DNS caching resolver is deployed on the host to improve DNS resolution performance and reliability.\nUpstream DNS servers for the host resolver are configured using the <code>nameservers</code> field in this config document.</p>\n"
+        },
+        "forwardKubeDNSToHost": {
+          "type": "boolean",
+          "title": "forwardKubeDNSToHost",
+          "description": "Use the host DNS resolver as upstream for Kubernetes CoreDNS pods.\n\nWhen enabled, CoreDNS pods use host DNS server as the upstream DNS (instead of\nusing configured upstream DNS resolvers directly).\n",
+          "markdownDescription": "Use the host DNS resolver as upstream for Kubernetes CoreDNS pods.\n\nWhen enabled, CoreDNS pods use host DNS server as the upstream DNS (instead of\nusing configured upstream DNS resolvers directly).",
+          "x-intellij-html-description": "<p>Use the host DNS resolver as upstream for Kubernetes CoreDNS pods.</p>\n\n<p>When enabled, CoreDNS pods use host DNS server as the upstream DNS (instead of\nusing configured upstream DNS resolvers directly).</p>\n"
+        },
+        "resolveMemberNames": {
+          "type": "boolean",
+          "title": "resolveMemberNames",
+          "description": "Resolve member hostnames using the host DNS resolver.\n\nWhen enabled, cluster member hostnames and node names are resolved using the host DNS resolver.\nThis requires service discovery to be enabled.\n",
+          "markdownDescription": "Resolve member hostnames using the host DNS resolver.\n\nWhen enabled, cluster member hostnames and node names are resolved using the host DNS resolver.\nThis requires service discovery to be enabled.",
+          "x-intellij-html-description": "<p>Resolve member hostnames using the host DNS resolver.</p>\n\n<p>When enabled, cluster member hostnames and node names are resolved using the host DNS resolver.\nThis requires service discovery to be enabled.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "HostDNSConfig represents host DNS configuration."
+    },
+    "network.NameserverConfig": {
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+$",
+          "title": "address",
+          "description": "The IP address of the nameserver.\n",
+          "markdownDescription": "The IP address of the nameserver.",
+          "x-intellij-html-description": "<p>The IP address of the nameserver.</p>\n"
+        },
+        "protocol": {
+          "enum": [
+            "Do53",
+            "DoT",
+            "DoH"
+          ],
+          "title": "protocol",
+          "description": "A DNS protocol to use.\n\nThe default protocol is plain DNS (Do53) (DNS over TCP/UDP). Set this to\nDoT to use DNS over TLS (RFC 7858) on TCP port 853, or DoH to use DNS\nover HTTPS (RFC 8484) on TCP port 443 with the /dns-query URL path. Both\nDoT and DoH deliver encrypted queries to this nameserver.\n\nNote: encrypted DNS protocols require a correct system clock to validate\ncertificates. If NTP is configured with hostnames that need to be resolved\nthrough DoT/DoH, the boot may stall: NTP needs DNS, and TLS needs valid\ntime. Either rely on the hardware clock, configure NTP servers by IP, or\nkeep at least one plain-DNS fallback nameserver.\n",
+          "markdownDescription": "A DNS protocol to use.\n\nThe default protocol is plain DNS (`Do53`) (DNS over TCP/UDP). Set this to\n`DoT` to use DNS over TLS (RFC 7858) on TCP port 853, or `DoH` to use DNS\nover HTTPS (RFC 8484) on TCP port 443 with the `/dns-query` URL path. Both\n`DoT` and `DoH` deliver encrypted queries to this nameserver.\n\nNote: encrypted DNS protocols require a correct system clock to validate\ncertificates. If NTP is configured with hostnames that need to be resolved\nthrough DoT/DoH, the boot may stall: NTP needs DNS, and TLS needs valid\ntime. Either rely on the hardware clock, configure NTP servers by IP, or\nkeep at least one plain-DNS fallback nameserver.",
+          "x-intellij-html-description": "<p>A DNS protocol to use.</p>\n\n<p>The default protocol is plain DNS (<code>Do53</code>) (DNS over TCP/UDP). Set this to\n<code>DoT</code> to use DNS over TLS (RFC 7858) on TCP port 853, or <code>DoH</code> to use DNS\nover HTTPS (RFC 8484) on TCP port 443 with the <code>/dns-query</code> URL path. Both\n<code>DoT</code> and <code>DoH</code> deliver encrypted queries to this nameserver.</p>\n\n<p>Note: encrypted DNS protocols require a correct system clock to validate\ncertificates. If NTP is configured with hostnames that need to be resolved\nthrough DoT/DoH, the boot may stall: NTP needs DNS, and TLS needs valid\ntime. Either rely on the hardware clock, configure NTP servers by IP, or\nkeep at least one plain-DNS fallback nameserver.</p>\n"
+        },
+        "tlsServerName": {
+          "type": "string",
+          "title": "tlsServerName",
+          "description": "TLS server name to validate the nameserver certificate against.\n\nThis field should be set if the protocol is set to DoT or DoH.\nThe value is used both as the SNI sent during the TLS handshake and as the\nname verified against the server certificate. For DoH, it is also used as\nthe host portion of the request URL (https://&lt;tlsServerName&gt;/dns-query)\nwhile the connection itself is established to the configured address.\n",
+          "markdownDescription": "TLS server name to validate the nameserver certificate against.\n\nThis field should be set if the protocol is set to `DoT` or `DoH`.\nThe value is used both as the SNI sent during the TLS handshake and as the\nname verified against the server certificate. For `DoH`, it is also used as\nthe host portion of the request URL (`https://<tlsServerName>/dns-query`)\nwhile the connection itself is established to the configured `address`.",
+          "x-intellij-html-description": "<p>TLS server name to validate the nameserver certificate against.</p>\n\n<p>This field should be set if the protocol is set to <code>DoT</code> or <code>DoH</code>.\nThe value is used both as the SNI sent during the TLS handshake and as the\nname verified against the server certificate. For <code>DoH</code>, it is also used as\nthe host portion of the request URL (<code>https://&lt;tlsServerName&gt;/dns-query</code>)\nwhile the connection itself is established to the configured <code>address</code>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "NameserverConfig represents a single nameserver configuration."
+    },
+    "network.ResolverConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "ResolverConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "nameservers": {
+          "items": {
+            "$ref": "#/$defs/network.NameserverConfig"
+          },
+          "type": "array",
+          "title": "nameservers",
+          "description": "A list of nameservers (DNS servers) to use for resolving domain names.\n\nNameservers are used to resolve domain names on the host, and they are also\npropagated to Kubernetes DNS (CoreDNS) for use by pods running on the cluster.\n\nThis overrides any nameservers obtained via DHCP or platform configuration.\nDefault configuration is to use 1.1.1.1 and 8.8.8.8 as nameservers.\n",
+          "markdownDescription": "A list of nameservers (DNS servers) to use for resolving domain names.\n\nNameservers are used to resolve domain names on the host, and they are also\npropagated to Kubernetes DNS (CoreDNS) for use by pods running on the cluster.\n\nThis overrides any nameservers obtained via DHCP or platform configuration.\nDefault configuration is to use 1.1.1.1 and 8.8.8.8 as nameservers.",
+          "x-intellij-html-description": "<p>A list of nameservers (DNS servers) to use for resolving domain names.</p>\n\n<p>Nameservers are used to resolve domain names on the host, and they are also\npropagated to Kubernetes DNS (CoreDNS) for use by pods running on the cluster.</p>\n\n<p>This overrides any nameservers obtained via DHCP or platform configuration.\nDefault configuration is to use 1.1.1.1 and 8.8.8.8 as nameservers.</p>\n"
+        },
+        "searchDomains": {
+          "$ref": "#/$defs/network.SearchDomainsConfig",
+          "title": "searchDomains",
+          "description": "Configuration for search domains (in /etc/resolv.conf).\n\nThe default is to derive search domains from the hostname FQDN.\n",
+          "markdownDescription": "Configuration for search domains (in /etc/resolv.conf).\n\nThe default is to derive search domains from the hostname FQDN.",
+          "x-intellij-html-description": "<p>Configuration for search domains (in /etc/resolv.conf).</p>\n\n<p>The default is to derive search domains from the hostname FQDN.</p>\n"
+        },
+        "hostDNS": {
+          "$ref": "#/$defs/network.HostDNSConfig",
+          "title": "hostDNS",
+          "description": "Configuration for host DNS resolver.\n\nThis configures a local DNS caching resolver on the host to improve DNS resolution performance and reliability.\n",
+          "markdownDescription": "Configuration for host DNS resolver.\n\nThis configures a local DNS caching resolver on the host to improve DNS resolution performance and reliability.",
+          "x-intellij-html-description": "<p>Configuration for host DNS resolver.</p>\n\n<p>This configures a local DNS caching resolver on the host to improve DNS resolution performance and reliability.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "ResolverConfig is a config document to configure DNS resolving."
+    },
+    "network.SearchDomainsConfig": {
+      "properties": {
+        "domains": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "domains",
+          "description": "A list of search domains to be used for DNS resolution.\n\nSearch domains are appended to unqualified domain names during DNS resolution.\nFor example, if \u201cexample.com\u201d is a search domain and a user tries to resolve\n\u201chost\u201d, the system will attempt to resolve \u201chost.example.com\u201d.\n\nIf set, this overrides any search domains obtained via DHCP or platform configuration.\nAn empty list (domains: []) clears search domains obtained from DHCP or platform,\nwhile leaving this field unset inherits them.\nThe default configuration derives the search domain from the hostname FQDN.\n",
+          "markdownDescription": "A list of search domains to be used for DNS resolution.\n\nSearch domains are appended to unqualified domain names during DNS resolution.\nFor example, if \"example.com\" is a search domain and a user tries to resolve\n\"host\", the system will attempt to resolve \"host.example.com\".\n\nIf set, this overrides any search domains obtained via DHCP or platform configuration.\nAn empty list (`domains: []`) clears search domains obtained from DHCP or platform,\nwhile leaving this field unset inherits them.\nThe default configuration derives the search domain from the hostname FQDN.",
+          "x-intellij-html-description": "<p>A list of search domains to be used for DNS resolution.</p>\n\n<p>Search domains are appended to unqualified domain names during DNS resolution.\nFor example, if &ldquo;example.com&rdquo; is a search domain and a user tries to resolve\n&ldquo;host&rdquo;, the system will attempt to resolve &ldquo;host.example.com&rdquo;.</p>\n\n<p>If set, this overrides any search domains obtained via DHCP or platform configuration.\nAn empty list (<code>domains: []</code>) clears search domains obtained from DHCP or platform,\nwhile leaving this field unset inherits them.\nThe default configuration derives the search domain from the hostname FQDN.</p>\n"
+        },
+        "disableDefault": {
+          "type": "boolean",
+          "title": "disableDefault",
+          "description": "Disable default search domain configuration from hostname FQDN.\n\nWhen set to true, the system will not derive search domains from the hostname FQDN.\nThis allows for a custom configuration of search domains without any defaults.\n",
+          "markdownDescription": "Disable default search domain configuration from hostname FQDN.\n\nWhen set to true, the system will not derive search domains from the hostname FQDN.\nThis allows for a custom configuration of search domains without any defaults.",
+          "x-intellij-html-description": "<p>Disable default search domain configuration from hostname FQDN.</p>\n\n<p>When set to true, the system will not derive search domains from the hostname FQDN.\nThis allows for a custom configuration of search domains without any defaults.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "SearchDomainsConfig represents search domains configuration."
+    }
+  }
+}

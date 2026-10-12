@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.EtcFileConfigV1Alpha1",
+  "$defs": {
+    "runtime.EtcFileConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "EtcFileConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Path of the file relative to /etc.\n",
+          "markdownDescription": "Path of the file relative to `/etc`.",
+          "x-intellij-html-description": "<p>Path of the file relative to <code>/etc</code>.</p>\n"
+        },
+        "mode": {
+          "type": "integer",
+          "title": "mode",
+          "description": "The file\u2019s permissions in octal.\n",
+          "markdownDescription": "The file's permissions in octal.",
+          "x-intellij-html-description": "<p>The file&rsquo;s permissions in octal.</p>\n"
+        },
+        "contents": {
+          "type": "string",
+          "title": "contents",
+          "description": "The contents of the file.\n",
+          "markdownDescription": "The contents of the file.",
+          "x-intellij-html-description": "<p>The contents of the file.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "EtcFileConfig configures a user-managed file under /etc."
+    }
+  }
+}

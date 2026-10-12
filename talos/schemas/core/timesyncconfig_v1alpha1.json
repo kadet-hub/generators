@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.TimeSyncConfigV1Alpha1",
+  "$defs": {
+    "network.NTPConfig": {
+      "properties": {
+        "servers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "servers",
+          "description": "Specifies time (NTP) servers to use for setting the system time.\nDefaults to time.cloudflare.com when configuration is not provided.\n",
+          "markdownDescription": "Specifies time (NTP) servers to use for setting the system time.\nDefaults to `time.cloudflare.com` when configuration is not provided.",
+          "x-intellij-html-description": "<p>Specifies time (NTP) servers to use for setting the system time.\nDefaults to <code>time.cloudflare.com</code> when configuration is not provided.</p>\n"
+        },
+        "useNTS": {
+          "type": "boolean",
+          "title": "useNTS",
+          "description": "Enables NTS (Network Time Security) for NTP queries.\nNTS provides authenticated and encrypted time synchronization using TLS.\nWhen enabled, all NTP capable servers must be specified as hostnames (not IP addresses).\nDefaults to true when configuration is not provided, using the system default server (time.cloudflare.com).\n",
+          "markdownDescription": "Enables NTS (Network Time Security) for NTP queries.\nNTS provides authenticated and encrypted time synchronization using TLS.\nWhen enabled, all NTP capable servers must be specified as hostnames (not IP addresses).\nDefaults to `true` when configuration is not provided, using the system default server (`time.cloudflare.com`).",
+          "x-intellij-html-description": "<p>Enables NTS (Network Time Security) for NTP queries.\nNTS provides authenticated and encrypted time synchronization using TLS.\nWhen enabled, all NTP capable servers must be specified as hostnames (not IP addresses).\nDefaults to <code>true</code> when configuration is not provided, using the system default server (<code>time.cloudflare.com</code>).</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "NTPConfig represents a NTP server configuration."
+    },
+    "network.PTPConfig": {
+      "properties": {
+        "devices": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "devices",
+          "description": "description: |\n    A list of PTP devices to sync with (e.g. provided by the hypervisor).\n\nA PTP device is typically represented as a character device file in the /dev directory,\n\n\nsuch as /dev/ptp0 or /dev/ptp_kvm. These devices are used to synchronize the system time\n    with an external time source that supports the Precision Time Protocol.\n",
+          "markdownDescription": "description: |\n    A list of PTP devices to sync with (e.g. provided by the hypervisor).\n\n    A PTP device is typically represented as a character device file in the /dev directory,\n   such as /dev/ptp0 or /dev/ptp_kvm. These devices are used to synchronize the system time\n    with an external time source that supports the Precision Time Protocol.",
+          "x-intellij-html-description": "<p>description: |\n    A list of PTP devices to sync with (e.g. provided by the hypervisor).</p>\n\n<pre><code>A PTP device is typically represented as a character device file in the /dev directory,\n</code></pre>\n\n<p>such as /dev/ptp0 or /dev/ptp_kvm. These devices are used to synchronize the system time\n    with an external time source that supports the Precision Time Protocol.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "PTPConfig represents a PTP (Precision Time Protocol) configuration."
+    },
+    "network.TimeSyncConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "TimeSyncConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Indicates if the time synchronization is enabled for the machine.\nDefaults to true.\n",
+          "markdownDescription": "Indicates if the time synchronization is enabled for the machine.\nDefaults to `true`.",
+          "x-intellij-html-description": "<p>Indicates if the time synchronization is enabled for the machine.\nDefaults to <code>true</code>.</p>\n"
+        },
+        "bootTimeout": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "bootTimeout",
+          "description": "Specifies the timeout when the node time is considered to be in sync unlocking the boot sequence.\nNTP sync will be still running in the background.\nDefaults to \u201cinfinity\u201d (waiting forever for time sync)\n",
+          "markdownDescription": "Specifies the timeout when the node time is considered to be in sync unlocking the boot sequence.\nNTP sync will be still running in the background.\nDefaults to \"infinity\" (waiting forever for time sync)",
+          "x-intellij-html-description": "<p>Specifies the timeout when the node time is considered to be in sync unlocking the boot sequence.\nNTP sync will be still running in the background.\nDefaults to &ldquo;infinity&rdquo; (waiting forever for time sync)</p>\n"
+        },
+        "ntp": {
+          "$ref": "#/$defs/network.NTPConfig",
+          "title": "ntp",
+          "description": "Specifies NTP configuration to sync the time over network.\nMutually exclusive with PTP configuration.\n",
+          "markdownDescription": "Specifies NTP configuration to sync the time over network.\nMutually exclusive with PTP configuration.",
+          "x-intellij-html-description": "<p>Specifies NTP configuration to sync the time over network.\nMutually exclusive with PTP configuration.</p>\n"
+        },
+        "ptp": {
+          "$ref": "#/$defs/network.PTPConfig",
+          "title": "ptp",
+          "description": "Specific PTP (Precision Time Protocol) configuration to sync the time over PTP devices.\nMutually exclusive with NTP configuration.\n",
+          "markdownDescription": "Specific PTP (Precision Time Protocol) configuration to sync the time over PTP devices.\nMutually exclusive with NTP configuration.",
+          "x-intellij-html-description": "<p>Specific PTP (Precision Time Protocol) configuration to sync the time over PTP devices.\nMutually exclusive with NTP configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "TimeSyncConfig is a config document to configure time synchronization (NTP)."
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeCoreDNSConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeCoreDNSConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeCoreDNSConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "By default, CoreDNS deployment is enabled.\nSet to false to disable the CoreDNS deployment.\n",
+          "markdownDescription": "By default, CoreDNS deployment is enabled.\nSet to false to disable the CoreDNS deployment.",
+          "x-intellij-html-description": "<p>By default, CoreDNS deployment is enabled.\nSet to false to disable the CoreDNS deployment.</p>\n"
+        },
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "The container image used to run the CoreDNS.\n\nIf the value is not set, the default image will be used.\n",
+          "markdownDescription": "The container image used to run the CoreDNS.\n\nIf the value is not set, the default image will be used.",
+          "x-intellij-html-description": "<p>The container image used to run the CoreDNS.</p>\n\n<p>If the value is not set, the default image will be used.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeCoreDNSConfig configures CoreDNS deployment."
+    }
+  }
+}

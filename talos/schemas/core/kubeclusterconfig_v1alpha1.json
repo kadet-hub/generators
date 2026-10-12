@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeClusterConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeClusterConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeClusterConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "clusterName": {
+          "type": "string",
+          "title": "clusterName",
+          "description": "The cluster name.\nIt is used mostly for informational purposes, and gets included into kubeconfig.\n",
+          "markdownDescription": "The cluster name.\nIt is used mostly for informational purposes, and gets included into kubeconfig.",
+          "x-intellij-html-description": "<p>The cluster name.\nIt is used mostly for informational purposes, and gets included into kubeconfig.</p>\n"
+        },
+        "endpoint": {
+          "type": "string",
+          "pattern": "^https://",
+          "title": "endpoint",
+          "description": "The Kubernetes API endpoint.\nFor a single-node cluster, this can be the same as the node\u2019s IP address.\nFor a multi-node cluster, this should be the load balancer\u2019s IP address or DNS name,\nor any other address (VIP, BGP, etc.) that can be used to reach the Kubernetes API server from the nodes.\n",
+          "markdownDescription": "The Kubernetes API endpoint.\nFor a single-node cluster, this can be the same as the node's IP address.\nFor a multi-node cluster, this should be the load balancer's IP address or DNS name,\nor any other address (VIP, BGP, etc.) that can be used to reach the Kubernetes API server from the nodes.",
+          "x-intellij-html-description": "<p>The Kubernetes API endpoint.\nFor a single-node cluster, this can be the same as the node&rsquo;s IP address.\nFor a multi-node cluster, this should be the load balancer&rsquo;s IP address or DNS name,\nor any other address (VIP, BGP, etc.) that can be used to reach the Kubernetes API server from the nodes.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "clusterName",
+        "endpoint",
+        "kind"
+      ],
+      "description": "KubeClusterConfig configures Kubernetes cluster base settings."
+    }
+  }
+}
