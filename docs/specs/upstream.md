@@ -85,7 +85,7 @@ and CHANGELOG entry before merging.
   upstream order, with the top level in the committed file's order.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39
+  - Since: #39, #40
 
 ## Pull requests and issues
 
