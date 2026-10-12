@@ -51,7 +51,7 @@ and CHANGELOG entry before merging.
   rows is reported as unchecked in the workflow log.
 
   - Test: `tools/test_upstream.py`
-  - Since: this change
+  - Since: #39
 
 ## Regeneration
 
@@ -83,7 +83,7 @@ and CHANGELOG entry before merging.
   upstream order, with the top level in the committed file's order.
 
   - Test: `tools/test_upstream.py`
-  - Since: this change
+  - Since: #39
 
 ## Pull requests and issues
 
@@ -100,7 +100,7 @@ and CHANGELOG entry before merging.
   pushed to it.
 
   - Test: `tools/test_upstream.py`; manual: dispatch the workflow
-  - Since: this change
+  - Since: #39
 
 - UPD-4: For the groups of a generator whose newer release cannot be
   proposed in a pull request, the workflow MUST open one issue, or update
@@ -115,7 +115,7 @@ and CHANGELOG entry before merging.
   group and, for a failing check, its tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: this change
+  - Since: #39
 
 ## Credentials
 
@@ -132,7 +132,7 @@ and CHANGELOG entry before merging.
   is deprecated in favour of `client-id`.
 
   - Test: manual: dispatch the workflow and confirm the pull request runs `check`
-  - Since: this change
+  - Since: #39
 
 ## Open questions
 
