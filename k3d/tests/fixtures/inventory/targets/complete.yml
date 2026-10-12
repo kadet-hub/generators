@@ -1,0 +1,108 @@
+# Complete: HA cluster with a pull-through registry cache, plus a second cluster
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/k3d
+        output_path: k3d/
+
+  generators:
+    k3d:
+      clusters:
+        ha:
+          servers: 3
+          agents: 2
+          image: rancher/k3s:v1.32.5-k3s1
+          network: k3d-ha
+          subnet: 172.28.0.0/16
+          kubeAPI:
+            host: k3d-ha.localhost
+            hostIP: 127.0.0.1
+            hostPort: 6443
+          ports:
+            - port: "8080:80"
+              nodeFilters: ["loadbalancer"]
+            - value: "8443:443"
+              nodeFilters: ["loadbalancer"]
+            - "9000:9000"
+          volumes:
+            - volume: /srv/k3d-ha:/data
+              nodeFilters: ["all"]
+          env:
+            - envVar: HTTP_PROXY=http://proxy.example.com:3128
+              nodeFilters: ["all"]
+            - envVar: NO_PROXY=localhost,127.0.0.1,10.42.0.0/16,10.43.0.0/16,registry.localhost
+              nodeFilters: ["all"]
+          files:
+            - description: Namespace applied by the k3s deploy controller
+              source: |
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: apps
+              destination: k3s-manifests-custom/apps-namespace.yaml
+              nodeFilters: ["server:0"]
+          registries:
+            create:
+              name: registry.localhost
+              host: 127.0.0.1
+              hostPort: "5000"
+              proxy:
+                remoteURL: https://registry-1.docker.io
+              volumes:
+                - /srv/k3d-registry:/var/lib/registry
+            config: |
+              mirrors:
+                "docker.io":
+                  endpoint:
+                    - "http://registry.localhost:5000"
+          hostAliases:
+            - ip: 192.168.1.100
+              hostnames:
+                - git.example.com
+          options:
+            k3d:
+              wait: true
+              timeout: 5m
+              disableLoadbalancer: false
+              disableImageVolume: false
+              disableRollback: false
+              loadbalancer:
+                configOverrides:
+                  - settings.workerConnections=2048
+            k3s:
+              extraArgs:
+                - arg: --disable=traefik
+                  nodeFilters: ["server:*"]
+                - arg: --tls-san=k3d-ha.example.com
+                  nodeFilters: ["server:*"]
+              nodeLabels:
+                - label: node-role.kubernetes.io/worker=true
+                  nodeFilters: ["agent:*"]
+            kubeconfig:
+              updateDefaultKubeconfig: true
+              switchCurrentContext: false
+            runtime:
+              serversMemory: 4g
+              agentsMemory: 2g
+              hostPidMode: false
+              labels:
+                - label: team=platform
+                  nodeFilters: ["all"]
+              ulimits:
+                - name: nofile
+                  soft: 65536
+                  hard: 65536
+        ci:
+          servers: 1
+          agents: 1
+          options:
+            k3d:
+              disableLoadbalancer: true
+            kubeconfig:
+              updateDefaultKubeconfig: false
