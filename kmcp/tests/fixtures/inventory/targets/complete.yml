@@ -1,0 +1,81 @@
+# Complete: stdio and HTTP servers, all flat keys, spec passthrough and a
+# flat key overriding spec (logs a warning)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kmcp
+        output_path: manifests/
+
+  namespace: mcp
+  generators:
+    kmcp:
+      namespace: mcp
+      mcpservers:
+        git:
+          labels:
+            app.kubernetes.io/part-of: mcp-tools
+          transport_type: stdio
+          deployment:
+            image: ghcr.io/astral-sh/uv:debian
+            image_pull_policy: IfNotPresent
+            cmd: uvx
+            args:
+              - mcp-server-git
+              - "--repository"
+              - /workspace
+            volume_mounts:
+              - name: workspace
+                mountPath: /workspace
+            volumes:
+              - name: workspace
+                emptyDir: {}
+            init_container:
+              image: ghcr.io/agentgateway/agentgateway:0.9.0-musl
+              image_pull_policy: IfNotPresent
+          stdio_transport: {}
+
+        search:
+          namespace: mcp-apps
+          labels:
+            app.kubernetes.io/part-of: mcp-tools
+          annotations:
+            description: Document search MCP server over Streamable HTTP
+          transport_type: http
+          deployment:
+            image: registry.example.com/mcp/search:1.2.0
+            image_pull_policy: Always
+            port: 8080
+            cmd: python
+            args:
+              - "-m"
+              - search_mcp
+              - "--port"
+              - "8080"
+            env:
+              LOG_LEVEL: info
+            secret_refs:
+              - search-api-credentials
+            configmap_refs:
+              - search-config
+            service_account:
+              annotations:
+                eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/mcp-search
+          http_transport:
+            target_path: /mcp
+          spec:
+            timeout: 60s
+            deployment:
+              image: registry.example.com/mcp/search:1.1.0
+              replicas: 2
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi
