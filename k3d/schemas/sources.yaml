@@ -1,0 +1,9 @@
+# QA-7: the SimpleConfig JSON Schema that k3d publishes at this release (MIT,
+# Copyright (c) 2019-2023 Thorsten Klein), closed like kubeconform strict mode:
+# upstream leaves options.runtime, registries and hostAliases items open, here
+# they get additionalProperties: false. Unknown fields in the output therefore fail.
+k3d.io:
+  software: k3d
+  version: 5.9.0
+  source: https://github.com/k3d-io/k3d/blob/v5.9.0/pkg/config/v1alpha5/schema.json
+  license: MIT
