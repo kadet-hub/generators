@@ -41,8 +41,9 @@ changelog and fixture project under `tests/fixtures`. Releases are tagged
 [Using marketplace generators](https://github.com/kadet-hub/registry/blob/main/docs/consumers.md);
 the registry itself is [kadet-hub/registry](https://github.com/kadet-hub/registry).
 
-`./check <generator>` runs the gate's ruff rules and sandbox compile locally (needs docker);
-the `check` workflow runs it for every generator a pull request changes.
+`./check <generator>` runs the gate's static scan and sandbox compile locally (Linux x86-64
+with docker, uv and yq; [spec](docs/specs/check.md)); the `check` workflow runs it for every
+generator a pull request changes.
 
 ## Upstream updates
 
