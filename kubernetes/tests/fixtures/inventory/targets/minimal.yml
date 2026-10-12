@@ -1,0 +1,35 @@
+# Minimal: one component shorthand -> Deployment and Service
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubernetes
+        output_path: manifests/
+
+  namespace: demo
+
+  components:
+    echo-server:
+      image: jmalloc/echo-server:v0.3.7
+      ports:
+        http:
+          container_port: 8080
+          service_port: 80
+      healthcheck:
+        readiness:
+          type: http
+          port: http
+          path: /
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 64Mi
+      service:
+        type: ClusterIP
