@@ -42,12 +42,13 @@ the `check` workflow runs it for every generator a pull request changes.
 
 The `upstream` workflow runs `tools/upstream.py` every Monday at 03:00 UTC and on
 dispatch. It compares each `schemas/sources.yaml` entry with the latest upstream
-release and opens or updates a pull request on `upstream/<generator>` where the
-schemas regenerate and `./check` passes, otherwise an issue
-`[upstream] <generator>: <software> <version>` ([spec](docs/specs/upstream.md)).
+release, opens or updates a pull request on `upstream/<generator>` for the groups
+whose schemas regenerate and pass `./check`, and an issue
+`[upstream] <generator>: <software> <version>` for the rest
+([spec](docs/specs/upstream.md)).
 `GH_TOKEN=$(gh auth token) uv run --with pyyaml python3 tools/upstream.py --dry-run`
 prints what it would open without writing anything.
 
 The workflow needs a kadet-hub GitHub App installed on this repository with read
-and write access to contents, pull requests and issues. Its App ID and private
-key are the repository secrets `APP_ID` and `APP_PRIVATE_KEY`.
+and write access to contents, pull requests and issues. Its client ID and private
+key are the repository secrets `APP_CLIENT_ID` and `APP_PRIVATE_KEY`.

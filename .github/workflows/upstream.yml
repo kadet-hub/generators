@@ -19,7 +19,7 @@ jobs:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app
         with:
-          app-id: ${{ secrets.APP_ID }}
+          client-id: ${{ secrets.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
@@ -36,7 +36,6 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
-          uv run --with pyyaml==6.0.3 python3 -m unittest discover -s tools
           gh auth setup-git
           id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
           git config --global user.name "${APP_SLUG}[bot]"
