@@ -1,0 +1,295 @@
+# Complete: one model serving setup with every kind the generator renders.
+# Runtimes, InferenceServices, the graph and the TrainedModel reference each
+# other by name; the local model cache uses the node group and the storage
+# container defined here.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kserve
+        output_path: manifests/
+
+  generators:
+    kserve:
+      namespace: ml-serving
+
+      serving_runtimes:
+        sklearn-runtime:
+          # first container without a name becomes kserve-container
+          containers:
+            - image: kserve/sklearnserver:v0.21.0
+              args:
+                - --model_name={{.Name}}
+                - --model_dir=/mnt/models
+                - --http_port=8080
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+          supported_model_formats:
+            - name: sklearn
+              version: "1"
+              autoSelect: true
+          protocol_versions:
+            - v1
+            - v2
+          image_pull_secrets:
+            - registry-credentials
+
+      cluster_serving_runtimes:
+        triton-runtime:
+          labels:
+            runtime: triton
+          containers:
+            - name: kserve-container
+              image: nvcr.io/nvidia/tritonserver:25.01-py3
+              args:
+                - tritonserver
+                - --model-store=/mnt/models
+                - --model-control-mode=explicit
+                - --grpc-port=9000
+                - --http-port=8080
+          supported_model_formats:
+            - name: onnx
+              version: "1"
+            - name: triton
+              version: "2"
+            - name: tensorrt
+              version: "8"
+          protocol_versions:
+            - v2
+            - grpc-v2
+          multi_model: true
+
+      inference_services:
+        sklearn-iris:
+          labels:
+            app: iris
+          # flat min_replicas overrides spec.predictor.minReplicas (logs a warning)
+          spec:
+            predictor:
+              minReplicas: 0
+          predictor:
+            min_replicas: 1
+            max_replicas: 3
+            scale_metric: concurrency
+            scale_target: 10
+            image_pull_secrets:
+              - registry-credentials
+            model:
+              model_format: sklearn
+              runtime: sklearn-runtime
+              protocol_version: v2
+              storage_uri: s3://models/sklearn/iris/v1
+        sklearn-iris-v2:
+          labels:
+            app: iris
+          predictor:
+            min_replicas: 1
+            model:
+              model_format:
+                name: sklearn
+                version: "1"
+              runtime: sklearn-runtime
+              protocol_version: v2
+              storage_uri: s3://models/sklearn/iris/v2
+          transformer:
+            canary_traffic_percent: 20
+            containers:
+              - name: kserve-container
+                image: registry.example.com/iris-transformer:1.0.0
+                args:
+                  - --predictor_protocol=v2
+        mlflow-wine:
+          predictor:
+            model:
+              # served by the kserve-mlserver ClusterServingRuntime of the KServe install
+              model_format: mlflow
+              protocol_version: v2
+              storage_uri: s3://models/mlflow/wine
+        triton-mms:
+          predictor:
+            model:
+              model_format: triton
+              runtime: triton-runtime
+              storage_uri: s3://models/triton/mms
+              resources:
+                requests:
+                  cpu: "1"
+                  memory: 4Gi
+                limits:
+                  cpu: "2"
+                  memory: 8Gi
+                  nvidia.com/gpu: "1"
+        qwen-chat:
+          annotations:
+            serving.kserve.io/autoscalerClass: hpa
+          predictor:
+            min_replicas: 1
+            max_replicas: 2
+            node_selector:
+              nvidia.com/gpu.product: NVIDIA-A100-SXM4-80GB
+            model:
+              model_format: huggingface
+              # matches local_model_caches.qwen-2-5-7b.source_model_uri
+              storage_uri: s3://models/Qwen/Qwen2.5-7B-Instruct
+              args:
+                - --max_model_len=4096
+              resources:
+                requests:
+                  cpu: "4"
+                  memory: 16Gi
+                  nvidia.com/gpu: "1"
+                limits:
+                  cpu: "8"
+                  memory: 32Gi
+                  nvidia.com/gpu: "1"
+
+      inference_graphs:
+        iris-split:
+          nodes:
+            root:
+              router_type: Splitter
+              steps:
+                - service_name: sklearn-iris
+                  weight: 80
+                - service_name: sklearn-iris-v2
+                  weight: 20
+          min_replicas: 1
+          max_replicas: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+        iris-chain:
+          nodes:
+            root:
+              router_type: Sequence
+              steps:
+                - name: classify
+                  service_name: sklearn-iris
+                  dependency: Hard
+                - name: compare
+                  service_name: sklearn-iris-v2
+                  data: $response
+                  map_predictions_to_instances: true
+
+      trained_models:
+        cifar10:
+          inference_service: triton-mms
+          model:
+            # free string in the CRD; the runtime decides what it serves
+            framework: tensorrt
+            storage_uri: s3://models/triton/cifar10
+            memory: 1Gi
+
+      cluster_storage_containers:
+        s3-model-downloader:
+          container:
+            name: storage-initializer
+            image: kserve/storage-initializer:v0.21.0
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                cpu: "1"
+                memory: 1Gi
+          supported_uri_formats:
+            - prefix: s3://
+          workload_type: localModelDownloadJob
+        gcs-downloader:
+          disabled: true
+          container:
+            name: storage-initializer
+            image: kserve/storage-initializer:v0.21.0
+          supported_uri_formats:
+            - prefix: gs://
+
+      local_model_node_groups:
+        gpu-a100:
+          storage_limit: 500Gi
+          # PVC spec is derived: accessModes, storageClassName and storage
+          persistent_volume_spec:
+            accessModes:
+              - ReadWriteOnce
+            capacity:
+              storage: 100Gi
+            storageClassName: local-nvme
+            volumeMode: Filesystem
+            local:
+              path: /mnt/models
+            nodeAffinity:
+              required:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: nvidia.com/gpu.product
+                        operator: In
+                        values:
+                          - NVIDIA-A100-SXM4-80GB
+
+        cpu-nvme:
+          storage_limit: 200Gi
+          # PV without storageClassName: the PVC gets storageClassName ""
+          persistent_volume_spec:
+            accessModes:
+              - ReadWriteOnce
+            capacity:
+              storage: 50Gi
+            volumeMode: Filesystem
+            local:
+              path: /mnt/models
+            nodeAffinity:
+              required:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-role.kubernetes.io/model-cache
+                        operator: Exists
+
+      local_model_caches:
+        qwen-2-5-7b:
+          source_model_uri: s3://models/Qwen/Qwen2.5-7B-Instruct
+          model_size: 15Gi
+          node_groups:
+            - gpu-a100
+
+      llm_inference_service_configs:
+        vllm-gpu:
+          template:
+            nodeSelector:
+              nvidia.com/gpu.product: NVIDIA-A100-SXM4-80GB
+            containers:
+              - name: main
+                resources:
+                  limits:
+                    nvidia.com/gpu: "1"
+
+      llm_inference_services:
+        llama-chat:
+          base_refs:
+            - vllm-gpu
+          model:
+            uri: hf://meta-llama/Llama-3.1-8B-Instruct
+            name: meta-llama/Llama-3.1-8B-Instruct
+            # v1alpha1 fields, dropped with a warning
+            criticality: Standard
+            lora:
+              adapters:
+                - name: sql-adapter
+                  uri: hf://example-org/llama-3.1-8b-sql-lora
+                  criticality: Sheddable
+          replicas: 2
+          parallelism:
+            tensor: 1
+          router:
+            route: {}
+            scheduler: {}

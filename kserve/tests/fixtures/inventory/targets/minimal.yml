@@ -1,0 +1,22 @@
+# Minimal: one InferenceService with the model_format shorthand
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kserve
+        output_path: manifests/
+
+  namespace: ml-serving
+  generators:
+    kserve:
+      inference_services:
+        sklearn-iris:
+          predictor:
+            model:
+              model_format: sklearn
+              storage_uri: s3://models/sklearn/iris

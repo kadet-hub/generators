@@ -1,0 +1,90 @@
+{
+  "properties": {
+    "apiVersion": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "spec": {
+      "properties": {
+        "localModels": {
+          "items": {
+            "properties": {
+              "modelName": {
+                "type": "string"
+              },
+              "namespace": {
+                "type": "string"
+              },
+              "nodeGroup": {
+                "type": "string"
+              },
+              "serviceAccountName": {
+                "type": "string"
+              },
+              "sourceModelUri": {
+                "type": "string"
+              },
+              "storage": {
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "modelName",
+              "sourceModelUri"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "localModels"
+      ],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "status": {
+      "properties": {
+        "modelStatus": {
+          "additionalProperties": {
+            "enum": [
+              "",
+              "ModelDownloadPending",
+              "ModelDownloading",
+              "ModelDownloaded",
+              "ModelDownloadError"
+            ],
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://serving.kserve.io/v1alpha1/localmodelnode.json",
+  "title": "LocalModelNode",
+  "description": "KServe LocalModelNode for tracking local model storage on nodes",
+  "additionalProperties": false
+}

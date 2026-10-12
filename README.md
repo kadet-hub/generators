@@ -15,6 +15,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [keycloak](keycloak/) ([catalog](https://kadet-hub.org/generators/keycloak/)) | Keycloak Operator Keycloak instances, realm imports and OIDC and SAML clients, with database credential and CR reference defaults |
 | [kind](kind/) ([catalog](https://kadet-hub.org/generators/kind/)) | kind cluster configs (kind.x-k8s.io/v1alpha4), with kindest/node images pinned by digest from `kubernetes_version` |
 | [kmcp](kmcp/) ([catalog](https://kadet-hub.org/generators/kmcp/)) | kmcp MCPServers (kagent.dev/v1alpha1) with the transport and target-port defaults the controller requires, and secret refs for env |
+| [kserve](kserve/) ([catalog](https://kadet-hub.org/generators/kserve/)) | KServe InferenceServices, serving runtimes, inference graphs, trained models, storage containers, local model caches and LLMInferenceServices, with model-format and runtime container defaults |
 | [kubevirt](kubevirt/) ([catalog](https://kadet-hub.org/generators/kubevirt/)) | KubeVirt VirtualMachines, pools, snapshots, clones and the KubeVirt CR, and CDI DataVolumes and DataSources |
 | [kyverno](kyverno/) ([catalog](https://kadet-hub.org/generators/kyverno/)) | Kyverno ClusterPolicies, Policies, PolicyExceptions and cleanup policies with a match_kinds shorthand |
 | [linkerd](linkerd/) ([catalog](https://kadet-hub.org/generators/linkerd/)) | Linkerd Servers, AuthorizationPolicies, mTLS and network authentications, HTTPRoutes and ServiceProfiles with refs and group defaults |
