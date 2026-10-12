@@ -51,7 +51,7 @@ and CHANGELOG entry before merging.
   rows is reported as unchecked in the workflow log.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39
+  - Since: #39, #43
 
 ## Regeneration
 
@@ -97,7 +97,7 @@ and CHANGELOG entry before merging.
   upstream order, with the top level in the committed file's order.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40
+  - Since: #39, #40, #43
 
 ## Pull requests and issues
 
