@@ -1,0 +1,23 @@
+# Minimal: one stdio MCP server started with npx; transportType defaults to stdio
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kmcp
+        output_path: manifests/
+
+  namespace: mcp
+  generators:
+    kmcp:
+      mcpservers:
+        everything:
+          deployment:
+            cmd: npx
+            args:
+              - "-y"
+              - "@modelcontextprotocol/server-everything"
