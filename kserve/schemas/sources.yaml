@@ -1,0 +1,10 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# The three largest files are written without indentation to stay below 1 MiB.
+serving.kserve.io:
+  software: KServe
+  version: 0.21.0
+  source: https://github.com/kserve/kserve/tree/v0.21.0/config/crd/full
+  license: Apache-2.0
