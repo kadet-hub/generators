@@ -1,0 +1,13 @@
+name: kind
+description: Renders kind (Kubernetes IN Docker) cluster configuration files from inventory parameters, with digest-pinned node images by Kubernetes version.
+tags: [kubernetes, clusters]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: [host-path]
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures

@@ -1,0 +1,18 @@
+# Minimal: one single-node cluster on a Kubernetes version of this kind release
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kind
+        output_path: kind/
+
+  generators:
+    kind:
+      clusters:
+        dev:
+          kubernetes_version: "1.36"

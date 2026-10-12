@@ -1,0 +1,89 @@
+# Complete: every flat key, kubernetes_version at cluster and node level, and
+# the spec passthrough with a flat key overriding it
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kind
+        output_path: kind/
+
+  generators:
+    kind:
+      clusters:
+        dev:
+          kubernetes_version: "1.37"
+          feature_gates:
+            InPlacePodVerticalScaling: true
+          runtime_config:
+            api/beta: "true"
+          # Upstream fields without a flat key; networking.podSubnet is
+          # overridden by the flat pod_subnet below (logs a warning)
+          spec:
+            kubeadmConfigPatches:
+              - |
+                kind: KubeletConfiguration
+                maxPods: 150
+            networking:
+              podSubnet: 10.200.0.0/16
+              dnsSearch: []
+          networking:
+            ip_family: ipv4
+            api_server_address: 127.0.0.1
+            api_server_port: 6443
+            pod_subnet: 10.244.0.0/16
+            service_subnet: 10.96.0.0/16
+            disable_default_cni: false
+            kube_proxy_mode: nftables
+          containerd_config_patches:
+            - |
+              [plugins."io.containerd.grpc.v1.cri".registry]
+                config_path = "/etc/containerd/certs.d"
+          nodes:
+            - role: control-plane
+              extra_port_mappings:
+                - container_port: 30080
+                  host_port: 8080
+                  listen_address: 127.0.0.1
+                  protocol: TCP
+              kubeadm_config_patches:
+                - |
+                  kind: KubeletConfiguration
+                  serializeImagePulls: false
+            - role: worker
+              labels:
+                tier: frontend
+              extra_mounts:
+                - host_path: /srv/kind/data
+                  container_path: /data
+                  read_only: true
+                  selinux_relabel: false
+                  propagation: HostToContainer
+            - role: worker
+              kubernetes_version: "1.36"
+              labels:
+                tier: backend
+              kubeadm_config_patches_json6902:
+                - group: kubeadm.k8s.io
+                  version: v1beta4
+                  kind: JoinConfiguration
+                  patch: |
+                    - op: add
+                      path: /nodeRegistration/taints
+                      value: [{key: dedicated, value: backend, effect: NoSchedule}]
+        ha:
+          kubernetes_version: v1.35.8
+          networking:
+            disable_default_cni: true
+            pod_subnet: 192.168.0.0/16
+          nodes:
+            - role: control-plane
+            - role: control-plane
+            - role: control-plane
+            - role: worker
+            - role: worker
+            - role: worker
