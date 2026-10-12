@@ -24,6 +24,7 @@ API = "https://api.github.com/"
 REPO = API + "repos/{owner}/{repo}/"  # gh fills in the repository of ROOT
 GITHUB = re.compile(r"https://github\.com/([^/]+/[^/]+)/(tree|blob)/([^/]+)/(.+)")
 TERRAFORM = re.compile(r"https://registry\.terraform\.io/providers/([^/]+/[^/]+)/([^/]+)")
+ANNOTATIONS = ("$id", "$schema", "title", "description")
 
 
 class Loader(getattr(yaml, "CSafeLoader", yaml.SafeLoader)):
@@ -71,6 +72,8 @@ def latest(row, repo, ref):
     else:
         releases = json.loads(get(f"{API}repos/{repo}/releases?per_page=100"))
         tags = [r["tag_name"] for r in releases if not r["draft"] and not r["prerelease"]]
+        if not releases:
+            tags = [t["name"] for t in json.loads(get(f"{API}repos/{repo}/tags?per_page=100"))]
     tags = [t for t in tags if semver(t, tag_prefix(row, ref))]
     return max(tags, key=lambda t: semver(t, tag_prefix(row, ref))) if tags else None
 
@@ -118,33 +121,48 @@ def close(schema):
     close(schema.get("additionalProperties"))
 
 
-def render(schema):
-    """The committed JSON Schema file for one openAPIV3Schema."""
+def ordered(node):
+    """Whether every object in a JSON value has its keys sorted."""
+    if isinstance(node, dict):
+        return list(node) == sorted(node) and all(ordered(v) for v in node.values())
+    return all(ordered(v) for v in node) if isinstance(node, list) else True
+
+
+def render(schema, committed):
+    """The JSON Schema file for one openAPIV3Schema, with the top-level annotations and layout of the committed file."""
+    old = json.loads(committed)
     props = schema.setdefault("properties", {})
     for key, sub in (("apiVersion", {"type": "string"}), ("kind", {"type": "string"}), ("metadata", {"type": "object"})):
         props.setdefault(key, sub)
     close(schema)
-    return json.dumps(schema, indent=2, sort_keys=True) + "\n"
+    schema.update((k, old[k]) for k in ANNOTATIONS if k in old)
+    sort = ordered(old)
+    if not sort:
+        schema = {k: schema[k] for k in dict.fromkeys([*old, *schema]) if k in schema}
+    lines = committed.splitlines()
+    if len(lines) == 1:
+        return json.dumps(schema, separators=(",", ":"), sort_keys=sort) + "\n"
+    return json.dumps(schema, indent=len(lines[1]) - len(lines[1].lstrip(" ")), sort_keys=sort) + "\n"
 
 
-def regenerate(urls, names):
-    """({file: content}, [missing files]) for a group's existing files from the CRDs at urls."""
+def regenerate(urls, committed):
+    """({file: content}, [missing files]) for a group's committed files {name: content} from the CRDs at urls."""
     schemas = {}
     for url in urls:
         schemas.update(crd_schemas(url))
-    return {n: render(schemas[n]) for n in names if n in schemas}, [n for n in names if n not in schemas]
+    return {n: render(schemas[n], text) for n, text in committed.items() if n in schemas}, [n for n in committed if n not in schemas]
 
 
 def gate(directory, old_urls, new_urls):
     """UPD-2: (files at the new release, None) if the group reproduces, else (None, cause)."""
-    names = sorted(p.name for p in directory.glob("*.json"))
-    if not names:
+    committed = {p.name: p.read_text() for p in sorted(directory.glob("*.json"))}
+    if not committed:
         return None, f"no schema files in {directory.name}"
-    files, missing = regenerate(old_urls, names)
-    differ = missing + [n for n, text in files.items() if (directory / n).read_text() != text]
+    files, missing = regenerate(old_urls, committed)
+    differ = [f"no CRD for {n}" for n in missing] + [f"{n} differs" for n, text in files.items() if committed[n] != text]
     if differ:
         return None, "does not reproduce: " + ", ".join(differ)
-    files, missing = regenerate(new_urls, names)
+    files, missing = regenerate(new_urls, committed)
     if missing:
         return None, "missing at the new release: " + ", ".join(missing)
     return files, None
@@ -164,7 +182,7 @@ def outdated(gen):
             if not c:
                 print(f"{gen} {group}: unchecked source {url}")
             elif not tag:
-                print(f"{gen} {group}: {version}, {c[1]} has no release")
+                print(f"{gen} {group}: {version}, {c[1]} has no release or tag")
             else:
                 print(f"{gen} {group}: current {version}, latest {tag}")
             if tag and ((cur := semver(version)) is None or semver(tag, tag_prefix(c[0], c[2])) > cur):
@@ -239,46 +257,48 @@ def run(*cmd):
     return subprocess.run(cmd, cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip()
 
 
-def act(gen, updates, prs, issues, dry_run):
-    """UPD-3 or UPD-4 for one generator."""
+def propose(gen, updates, pr, dry_run):
+    """UPD-3 for the groups that regenerate; the tail of a failing ./check, their cause then, else None."""
     branch = f"upstream/{gen}"
-    tail = None
-    if not any(u["cause"] for u in updates):
-        sources = (ROOT / gen / "schemas" / "sources.yaml").read_text()
-        for u in updates:
-            sources = bump_sources(sources, u)
-        title, pr = pr_title(gen, updates), prs.get(branch)
-        if pr and base64.b64decode(json.loads(get(f"{REPO}contents/{gen}/schemas/sources.yaml?ref={branch}"))["content"]).decode() == sources:
-            print(f"{gen}: pull request #{pr['number']} already proposes these versions")
-            return
-        change = f"pull request #{pr['number']}" if pr else "a pull request"
-        if dry_run:
-            print(f"{gen}: would {'update' if pr else 'open'} {change} from {branch} if ./check passes: {title}")
-            print(body(updates, None, True))
-            return
-        for u in updates:
-            for name, text in u["files"].items():
-                (ROOT / gen / "schemas" / u["group"] / name).write_text(text)
-        (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
-        readme = ROOT / gen / "README.md"
-        readme.write_text(bump_readme(readme.read_text(), updates))
-        check = subprocess.run(["./check", gen], cwd=ROOT, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        print(check.stdout)
-        tail = "\n".join(check.stdout.splitlines()[-30:])
-        if check.returncode == 0:
-            run("git", "checkout", "-B", branch)
-            run("git", "add", "--", gen)
-            run("git", "commit", "-m", title)
-            run("git", "push", "--force", "origin", branch)
-            text = body(updates, tail, True)
-            if pr:
-                run("gh", "pr", "edit", str(pr["number"]), "--title", title, "--body", text)
-            else:
-                run("gh", "pr", "create", "--base", "main", "--head", branch, "--title", title, "--body", text)
-            print(f"{gen}: {'updated' if pr else 'opened'} {change}: {title}")
-            return
+    sources = (ROOT / gen / "schemas" / "sources.yaml").read_text()
+    for u in updates:
+        sources = bump_sources(sources, u)
+    title, change = pr_title(gen, updates), f"pull request #{pr['number']}" if pr else "a pull request"
+    if pr and base64.b64decode(json.loads(get(f"{REPO}contents/{gen}/schemas/sources.yaml?ref={branch}"))["content"]).decode() == sources:
+        print(f"{gen}: {change} already proposes these versions")
+        return None
+    if dry_run:
+        print(f"{gen}: would {'update' if pr else 'open'} {change} from {branch} if ./check passes: {title}")
+        print(body(updates, None, True))
+        return None
+    for u in updates:
+        for name, text in u["files"].items():
+            (ROOT / gen / "schemas" / u["group"] / name).write_text(text)
+    (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
+    readme = ROOT / gen / "README.md"
+    readme.write_text(bump_readme(readme.read_text(), updates))
+    check = subprocess.run(["./check", gen], cwd=ROOT, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    print(check.stdout)
+    tail = "\n".join(check.stdout.splitlines()[-30:])
+    if check.returncode:
         for u in updates:
             u["cause"] = "`./check` fails"
+        return tail
+    run("git", "checkout", "-B", branch)
+    run("git", "add", "--", gen)
+    run("git", "commit", "-m", title)
+    run("git", "push", "--force", "origin", branch)
+    text = body(updates, tail, True)
+    if pr:
+        run("gh", "pr", "edit", str(pr["number"]), "--title", title, "--body", text)
+    else:
+        run("gh", "pr", "create", "--base", "main", "--head", branch, "--title", title, "--body", text)
+    print(f"{gen}: {'updated' if pr else 'opened'} {change}: {title}")
+    return None
+
+
+def report(gen, updates, tail, issues, dry_run):
+    """UPD-4 for the groups that cannot be proposed."""
     title, text = issue_title(gen, updates), body(updates, tail, False)
     issue = next((i for i in issues if i["title"].startswith(f"[upstream] {gen}: ")), None)
     change = f"issue #{issue['number']}" if issue else "an issue"
@@ -293,6 +313,15 @@ def act(gen, updates, prs, issues, dry_run):
     else:
         run("gh", "issue", "create", "--title", title, "--body", text)
         print(f"{gen}: opened an issue: {title}")
+
+
+def act(gen, updates, prs, issues, dry_run):
+    """A pull request for the groups that regenerate, an issue for the rest (UPD-3, UPD-4)."""
+    tail = None
+    if ready := [u for u in updates if not u["cause"]]:
+        tail = propose(gen, ready, prs.get(f"upstream/{gen}"), dry_run)
+    if rest := [u for u in updates if u["cause"]]:
+        report(gen, rest, tail, issues, dry_run)
 
 
 def main():

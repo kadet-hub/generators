@@ -60,6 +60,17 @@ def widget_pages(new_versions=("v1alpha1",)):
 
 OLD = "https://github.com/example/widgets/tree/v1.0.0/crds"
 NEW = "https://github.com/example/widgets/tree/v1.1.0/crds"
+GO = "https://github.com/example/gadgets/blob/v2.0.0/pkg/crds_generated.go"
+WIDGET = {
+    "additionalProperties": False,
+    "properties": {
+        "apiVersion": {"type": "string"},
+        "kind": {"type": "string"},
+        "metadata": {"type": "object"},
+        "spec": {"additionalProperties": False, "properties": {"replicas": {"type": "integer"}}, "type": "object"},
+    },
+    "type": "object",
+}
 
 
 class Repo(unittest.TestCase):
@@ -75,9 +86,7 @@ class Repo(unittest.TestCase):
         self.sources.write_text(f"# comment\nexample.io:\n  software: Widgets\n  version: 1.0.0\n  source: {OLD}\n  license: Apache-2.0\n")
         (self.root / "gen" / "README.md").write_text("Built for Widgets 1.0.0.\n")
         self.web = Web(widget_pages())
-        with mock.patch.object(upstream, "get", self.web):
-            committed, _ = upstream.regenerate([OLD], ["widget_v1alpha1.json"])
-        (self.group / "widget_v1alpha1.json").write_text(committed["widget_v1alpha1.json"])
+        (self.group / "widget_v1alpha1.json").write_text(json.dumps(WIDGET, indent=2) + "\n")
         for patch in (mock.patch.object(upstream, "ROOT", self.root), mock.patch.object(upstream, "get", self.web)):
             patch.start()
             self.addCleanup(patch.stop)
@@ -111,12 +120,25 @@ class Versions(unittest.TestCase):
 
     def test_latest_of_a_commit_is_any_release(self):
         sha = "1b6edfbba0e54af83870b158ee1124e499455b43"
-        web = Web({f"{GH}repos/o/r/releases?per_page=100": []})
+        web = Web({f"{GH}repos/o/r/releases?per_page=100": [], f"{GH}repos/o/r/tags?per_page=100": []})
         with mock.patch.object(upstream, "get", web):
             self.assertIsNone(upstream.latest("commit", "o/r", sha))
         web.pages[f"{GH}repos/o/r/releases?per_page=100"] = releases("v0.1.0")
         with mock.patch.object(upstream, "get", web):
             self.assertEqual(upstream.latest("commit", "o/r", sha), "v0.1.0")
+
+    def test_latest_falls_back_to_tags_without_releases(self):
+        web = Web({
+            f"{GH}repos/o/r/releases?per_page=100": [],
+            f"{GH}repos/o/r/tags?per_page=100": [{"name": n} for n in ("nightly", "26.10.0-rc1", "26.9.0", "26.8.0", "v27.0.0")],
+        })
+        with mock.patch.object(upstream, "get", web):
+            self.assertEqual(upstream.latest("tag", "o/r", "26.8.0"), "26.9.0")
+
+    def test_latest_ignores_tags_when_there_are_releases(self):
+        web = Web({f"{GH}repos/o/r/releases?per_page=100": releases("v2.0.0-rc.1", prerelease={"v2.0.0-rc.1"})})
+        with mock.patch.object(upstream, "get", web):
+            self.assertIsNone(upstream.latest("tag", "o/r", "v1.0.0"))
 
     def test_latest_terraform_provider(self):
         web = Web({"https://registry.terraform.io/v1/providers/hashicorp/aws": {"version": "6.69.0", "versions": ["6.68.0", "6.69.0", "7.0.0-beta1"]}})
@@ -167,7 +189,7 @@ class Render(unittest.TestCase):
                 }},
             },
         }
-        out = json.loads(upstream.render(schema))
+        out = json.loads(upstream.render(schema, '{\n  "type": "object"\n}\n'))
         spec = out["properties"]["spec"]
         self.assertFalse(out["additionalProperties"])
         self.assertEqual(out["properties"]["metadata"], {"type": "object"})
@@ -182,9 +204,38 @@ class Render(unittest.TestCase):
         self.assertFalse(spec["properties"]["either"]["additionalProperties"])
         self.assertNotIn("additionalProperties", spec["properties"]["either"]["anyOf"][0])
 
-    def test_render_is_indented_and_sorted_with_a_final_newline(self):
-        expected = {"additionalProperties": False, "properties": {"apiVersion": {"type": "string"}, "kind": {"type": "string"}, "metadata": {"type": "object"}}, "type": "object"}
-        self.assertEqual(upstream.render({"type": "object"}), json.dumps(expected, indent=2) + "\n")
+    def upstream_schema(self):
+        return {"description": "Upstream text.", "properties": {"spec": {"type": "object", "properties": {"b": {"type": "string"}, "a": {"type": "string"}}}}, "type": "object"}
+
+    def closed(self, top):
+        spec = {"type": "object", "properties": {"b": {"type": "string"}, "a": {"type": "string"}}, "additionalProperties": False}
+        props = {"spec": spec, "apiVersion": {"type": "string"}, "kind": {"type": "string"}, "metadata": {"type": "object"}}
+        values = {"description": "Hand-written.", "properties": props, "type": "object", "additionalProperties": False, "$id": "https://example.io/v1/widget.json", "$schema": "http://json-schema.org/draft-07/schema#", "title": "Widget"}
+        return {k: values[k] for k in top}
+
+    def test_keeps_annotations_and_sorted_layout(self):
+        for indent in (2, 4):
+            committed = json.dumps(self.closed(["description", "properties", "type", "additionalProperties", "$id", "$schema", "title"]), indent=indent, sort_keys=True) + "\n"
+            self.assertEqual(upstream.render(self.upstream_schema(), committed), committed)
+
+    def test_keeps_a_compact_layout(self):
+        committed = json.dumps(self.closed(["$id", "description", "properties", "type", "additionalProperties"]), separators=(",", ":"), sort_keys=True) + "\n"
+        self.assertEqual(upstream.render(self.upstream_schema(), committed), committed)
+
+    def test_unsorted_keeps_upstream_order_below_and_the_committed_order_on_top(self):
+        for top in (
+            ["description", "properties", "type", "$schema", "$id", "title", "additionalProperties"],
+            ["description", "type", "properties", "additionalProperties", "$schema", "$id", "title"],
+            ["description", "properties", "type", "additionalProperties"],
+        ):
+            committed = json.dumps(self.closed(top), indent=2) + "\n"
+            self.assertEqual(upstream.render(self.upstream_schema(), committed), committed, top)
+
+    def test_does_not_add_annotations_the_committed_file_lacks(self):
+        committed = json.dumps(self.closed(["additionalProperties", "properties", "type"]), indent=2, sort_keys=True) + "\n"
+        out = json.loads(upstream.render({"properties": {"spec": self.upstream_schema()["properties"]["spec"]}, "type": "object"}, committed))
+        self.assertNotIn("$id", out)
+        self.assertNotIn("description", out)
 
 
 class Gate(Repo):
@@ -195,16 +246,20 @@ class Gate(Repo):
 
     def test_differs_is_an_issue_cause(self):
         path = self.group / "widget_v1alpha1.json"
-        path.write_text(path.read_text().replace("{\n", '{\n  "$id": "x",\n', 1))
+        path.write_text(path.read_text().replace('"integer"', '"string"'))
         files, cause = upstream.gate(self.group, [OLD], [NEW])
         self.assertIsNone(files)
-        self.assertEqual(cause, "does not reproduce: widget_v1alpha1.json")
+        self.assertEqual(cause, "does not reproduce: widget_v1alpha1.json differs")
 
     def test_missing_kind_or_version_at_the_new_tag_is_an_issue_cause(self):
         self.web.pages.update(widget_pages(new_versions=("v1beta1",)))
         files, cause = upstream.gate(self.group, [OLD], [NEW])
         self.assertIsNone(files)
         self.assertEqual(cause, "missing at the new release: widget_v1alpha1.json")
+
+    def test_no_crd_at_the_current_ref_does_not_reproduce(self):
+        self.web.pages[f"{RAW}example/widgets/v1.0.0/crds/widgets.yaml"] = crd("Gadget", ("v1alpha1",))
+        self.assertEqual(upstream.gate(self.group, [OLD], [NEW]), (None, "does not reproduce: no CRD for widget_v1alpha1.json"))
 
     def test_unreadable_source_at_the_new_tag_raises(self):
         del self.web.pages[f"{GH}repos/example/widgets/contents/crds?ref=v1.1.0"]
@@ -271,6 +326,46 @@ class Edits(unittest.TestCase):
         text = "Built for Calico 3.33.0 (Tigera operator 1.44.0), not 11.44.0 or 1.44.01.\nTigera operator 1.44.0 elsewhere.\n"
         update = dict(UPDATE, old=[("u", "1.44.0")], new=[("u", "1.45.0")])
         self.assertEqual(upstream.bump_readme(text, [update]), "Built for Calico 3.33.0 (Tigera operator 1.45.0), not 11.44.0 or 1.44.01.\nTigera operator 1.44.0 elsewhere.\n")
+
+
+class Mixed(Repo):
+    """gen with example.io, which regenerates, and other.io, whose source is Go code."""
+
+    def setUp(self):
+        super().setUp()
+        self.sources.write_text(self.sources.read_text() + f"other.io:\n  software: Gadgets\n  version: 2.0.0\n  source: {GO}\n")
+        self.web.pages[f"{GH}repos/example/gadgets/releases?per_page=100"] = releases("v2.1.0")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.updates = upstream.outdated("gen")
+
+    def act(self, check=None):
+        calls = []
+        checker = mock.patch.object(subprocess, "run", return_value=check) if check else mock.patch.object(subprocess, "run", refuse)
+        with mock.patch.object(upstream, "run", lambda *cmd: calls.append(cmd)), checker, contextlib.redirect_stdout(io.StringIO()) as log:
+            upstream.act("gen", self.updates, {}, [], check is None)
+        return calls, log.getvalue()
+
+    def test_dry_run_proposes_a_pull_request_and_an_issue(self):
+        calls, log = self.act()
+        self.assertEqual(calls, [])
+        self.assertIn("gen: would open a pull request from upstream/gen if ./check passes: feat(gen): update schemas to Widgets 1.1.0", log)
+        self.assertIn("gen: would open an issue: [upstream] gen: Gadgets 2.1.0", log)
+
+    def test_passing_check_opens_both_and_bumps_only_the_regenerated_group(self):
+        calls, _ = self.act(subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n"))
+        self.assertEqual([c[:3] for c in calls[-2:]], [("gh", "pr", "create"), ("gh", "issue", "create")])
+        self.assertEqual(calls[-1][4], "[upstream] gen: Gadgets 2.1.0")
+        self.assertNotIn("Widgets", calls[-1][6])
+        self.assertIn(f"  version: 1.1.0\n  source: {NEW}\n", self.sources.read_text())
+        self.assertIn(f"  version: 2.0.0\n  source: {GO}\n", self.sources.read_text())
+
+    def test_failing_check_puts_every_group_in_the_issue(self):
+        calls, _ = self.act(subprocess.CompletedProcess(["./check", "gen"], 1, stdout="E501 line too long\n"))
+        (call,) = calls
+        self.assertEqual(call[:5], ("gh", "issue", "create", "--title", "[upstream] gen: Widgets 1.1.0, Gadgets 2.1.0"))
+        self.assertIn("| `example.io` | Widgets | 1.0.0 | 1.1.0 | `./check` fails |", call[6])
+        self.assertIn("| `other.io` | Gadgets | 2.0.0 | 2.1.0 | not regenerable: Go code |", call[6])
+        self.assertIn("E501 line too long", call[6])
 
 
 def refuse(*cmd, **_):
