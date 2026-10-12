@@ -75,6 +75,8 @@ and CHANGELOG entry before merging.
   false` on every node with `properties`, except preserve-unknown-fields
   nodes and `allOf`/`anyOf`/`oneOf`/`not` branches). It adds no kinds and
   no versions; a kind or version missing at the new tag is an issue.
+  CustomResourceDefinition documents without `spec.versions`, such as the
+  conversion and CA-injection patches next to KServe's CRDs, are skipped.
 
   Each file keeps the committed file's top-level `$id`, `$schema`, `title`
   and `description`, where present, and its layout: the same indent, or
@@ -83,7 +85,7 @@ and CHANGELOG entry before merging.
   upstream order, with the top level in the committed file's order.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39
+  - Since: #39, #40
 
 ## Pull requests and issues
 
