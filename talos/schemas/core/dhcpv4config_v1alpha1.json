@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.DHCPv4ConfigV1Alpha1",
+  "$defs": {
+    "network.DHCPv4ConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "DHCPv4Config"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the link (interface).\n",
+          "markdownDescription": "Name of the link (interface).",
+          "x-intellij-html-description": "<p>Name of the link (interface).</p>\n"
+        },
+        "routeMetric": {
+          "type": "integer",
+          "title": "routeMetric",
+          "description": "An optional metric for the routes received from the DHCP server.\n\nLower values indicate higher priority.\nDefault value is 1024.\n",
+          "markdownDescription": "An optional metric for the routes received from the DHCP server.\n\nLower values indicate higher priority.\nDefault value is 1024.",
+          "x-intellij-html-description": "<p>An optional metric for the routes received from the DHCP server.</p>\n\n<p>Lower values indicate higher priority.\nDefault value is 1024.</p>\n"
+        },
+        "ignoreHostname": {
+          "type": "boolean",
+          "title": "ignoreHostname",
+          "description": "Ignore hostname received from the DHCP server.\n",
+          "markdownDescription": "Ignore hostname received from the DHCP server.",
+          "x-intellij-html-description": "<p>Ignore hostname received from the DHCP server.</p>\n"
+        },
+        "ignoreRoutes": {
+          "type": "boolean",
+          "title": "ignoreRoutes",
+          "description": "Ignore routes received from the DHCP server (the default gateway and classless static routes).\n\nThe connected route for the leased address is still configured.\n",
+          "markdownDescription": "Ignore routes received from the DHCP server (the default gateway and classless static routes).\n\nThe connected route for the leased address is still configured.",
+          "x-intellij-html-description": "<p>Ignore routes received from the DHCP server (the default gateway and classless static routes).</p>\n\n<p>The connected route for the leased address is still configured.</p>\n"
+        },
+        "clientIdentifier": {
+          "enum": [
+            "none",
+            "mac",
+            "duid"
+          ],
+          "title": "clientIdentifier",
+          "description": "Client identifier to use when communicating with DHCP servers.\n\nDefaults to \u2018mac\u2019 if not set.\n",
+          "markdownDescription": "Client identifier to use when communicating with DHCP servers.\n\nDefaults to 'mac' if not set.",
+          "x-intellij-html-description": "<p>Client identifier to use when communicating with DHCP servers.</p>\n\n<p>Defaults to &lsquo;mac&rsquo; if not set.</p>\n"
+        },
+        "duidRaw": {
+          "type": "string",
+          "pattern": "^([0-9a-fA-F]{2}(:[0-9a-fA-F]{2})+)$",
+          "title": "duidRaw",
+          "description": "Raw value of the DUID to use as client identifier.\n\nThis field is only used if \u2018clientIdentifier\u2019 is set to \u2018duid\u2019.\n",
+          "markdownDescription": "Raw value of the DUID to use as client identifier.\n\nThis field is only used if 'clientIdentifier' is set to 'duid'.",
+          "x-intellij-html-description": "<p>Raw value of the DUID to use as client identifier.</p>\n\n<p>This field is only used if &lsquo;clientIdentifier&rsquo; is set to &lsquo;duid&rsquo;.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "DHCPv4Config is a config document to configure DHCPv4 on a network link."
+    }
+  }
+}

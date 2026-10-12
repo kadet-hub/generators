@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/storage.LVMVolumeGroupConfigV1Alpha1",
+  "$defs": {
+    "storage.LVMVolumeGroupConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "LVMVolumeGroupConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Volume group name.\n\nMust be 1-63 chars: ASCII letters, digits, hyphens, underscores.\n",
+          "markdownDescription": "Volume group name.\n\nMust be 1-63 chars: ASCII letters, digits, hyphens, underscores.",
+          "x-intellij-html-description": "<p>Volume group name.</p>\n\n<p>Must be 1-63 chars: ASCII letters, digits, hyphens, underscores.</p>\n"
+        },
+        "provisioning": {
+          "$ref": "#/$defs/storage.ProvisioningSpec",
+          "title": "provisioning",
+          "description": "The provisioning describes how the Physical Volumes are provisioned.\n",
+          "markdownDescription": "The provisioning describes how the Physical Volumes are provisioned.",
+          "x-intellij-html-description": "<p>The provisioning describes how the Physical Volumes are provisioned.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "LVMVolumeGroupConfig is an LVM volume group config document.\\nDefines volume group and selector for backing disks.\\n"
+    },
+    "storage.LVMVolumeSelectorSpec": {
+      "properties": {
+        "match": {
+          "type": "string",
+          "title": "match",
+          "description": "CEL expression matching a disk or partition to use as a physical volume.\n\nThe expression is evaluated against each discovered volume with the\nvolume variable (the discovered volume) and, for whole disks, the\ndisk variable. Partitions (e.g. raw volumes) can be matched by their\npartition label via volume.partition_label.\n\nA volume declared in the machine config also matches on volume_id,\nthe volume name prefixed by its kind (u- user, r- raw, s- swap),\nas in volume_id == &#34;r-lvmdata&#34;. A device Talos does not manage as a\nvolume has an empty volume_id.\n\nUse volume_id for a whole-disk volume, which carries no partition\nlabel to match on. Use it for an encrypted volume too: Talos creates\nthe physical volume on the opened device, never on the ciphertext.\n\nTalos matches a declared volume only after the volume manager has\nprepared it. Provisioning therefore waits for an encrypted volume to\nbe unlocked rather than write to the still-locked device.\n",
+          "markdownDescription": "CEL expression matching a disk or partition to use as a physical volume.\n\nThe expression is evaluated against each discovered volume with the\n`volume` variable (the discovered volume) and, for whole disks, the\n`disk` variable. Partitions (e.g. raw volumes) can be matched by their\npartition label via `volume.partition_label`.\n\nA volume declared in the machine config also matches on `volume_id`,\nthe volume name prefixed by its kind (`u-` user, `r-` raw, `s-` swap),\nas in `volume_id == \"r-lvmdata\"`. A device Talos does not manage as a\nvolume has an empty `volume_id`.\n\nUse `volume_id` for a whole-disk volume, which carries no partition\nlabel to match on. Use it for an encrypted volume too: Talos creates\nthe physical volume on the opened device, never on the ciphertext.\n\nTalos matches a declared volume only after the volume manager has\nprepared it. Provisioning therefore waits for an encrypted volume to\nbe unlocked rather than write to the still-locked device.",
+          "x-intellij-html-description": "<p>CEL expression matching a disk or partition to use as a physical volume.</p>\n\n<p>The expression is evaluated against each discovered volume with the\n<code>volume</code> variable (the discovered volume) and, for whole disks, the\n<code>disk</code> variable. Partitions (e.g. raw volumes) can be matched by their\npartition label via <code>volume.partition_label</code>.</p>\n\n<p>A volume declared in the machine config also matches on <code>volume_id</code>,\nthe volume name prefixed by its kind (<code>u-</code> user, <code>r-</code> raw, <code>s-</code> swap),\nas in <code>volume_id == &quot;r-lvmdata&quot;</code>. A device Talos does not manage as a\nvolume has an empty <code>volume_id</code>.</p>\n\n<p>Use <code>volume_id</code> for a whole-disk volume, which carries no partition\nlabel to match on. Use it for an encrypted volume too: Talos creates\nthe physical volume on the opened device, never on the ciphertext.</p>\n\n<p>Talos matches a declared volume only after the volume manager has\nprepared it. Provisioning therefore waits for an encrypted volume to\nbe unlocked rather than write to the still-locked device.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "LVMVolumeSelectorSpec matches disks with CEL."
+    },
+    "storage.ProvisioningSpec": {
+      "properties": {
+        "volumeSelector": {
+          "$ref": "#/$defs/storage.LVMVolumeSelectorSpec",
+          "title": "volumeSelector",
+          "description": "Matches disks to initialize as physical volumes.\n",
+          "markdownDescription": "Matches disks to initialize as physical volumes.",
+          "x-intellij-html-description": "<p>Matches disks to initialize as physical volumes.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ProvisioningSpec describes how the Physical Volumes are provisioned."
+    }
+  }
+}

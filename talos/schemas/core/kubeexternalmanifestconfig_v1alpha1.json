@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeExternalManifestConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeExternalManifestConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeExternalManifestConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of manifest.\n",
+          "markdownDescription": "Name of manifest.",
+          "x-intellij-html-description": "<p>Name of manifest.</p>\n"
+        },
+        "headers": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "headers",
+          "description": "Optional HTTP headers to use when downloading the manifest.\n",
+          "markdownDescription": "Optional HTTP headers to use when downloading the manifest.",
+          "x-intellij-html-description": "<p>Optional HTTP headers to use when downloading the manifest.</p>\n"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^(http|https)://",
+          "title": "url",
+          "description": "Kubernetes manifest definition, via the URL to download it from.\nPlease note that Talos does not watch URL contents, and might download\nthe manifest only once, during the boot.\n",
+          "markdownDescription": "Kubernetes manifest definition, via the URL to download it from.\nPlease note that Talos does not watch URL contents, and might download\nthe manifest only once, during the boot.",
+          "x-intellij-html-description": "<p>Kubernetes manifest definition, via the URL to download it from.\nPlease note that Talos does not watch URL contents, and might download\nthe manifest only once, during the boot.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name",
+        "url"
+      ],
+      "description": "KubeExternalManifestConfig configures a Kubernetes manifest which is downloaded from a URL."
+    }
+  }
+}

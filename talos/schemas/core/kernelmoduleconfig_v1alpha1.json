@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.KernelModuleConfigV1Alpha1",
+  "$defs": {
+    "runtime.KernelModuleConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KernelModuleConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Module name.\n",
+          "markdownDescription": "Module name.",
+          "x-intellij-html-description": "<p>Module name.</p>\n"
+        },
+        "parameters": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "parameters",
+          "description": "Module parameters, changes applied after reboot.\n",
+          "markdownDescription": "Module parameters, changes applied after reboot.",
+          "x-intellij-html-description": "<p>Module parameters, changes applied after reboot.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "KernelModuleConfig is a config document to configure a Linux kernel module to load."
+    }
+  }
+}

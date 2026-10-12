@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/hardware.PCIDriverRebindConfigV1Alpha1",
+  "$defs": {
+    "hardware.PCIDriverRebindConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "PCIDriverRebindConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "PCI device id\n",
+          "markdownDescription": "PCI device id",
+          "x-intellij-html-description": "<p>PCI device id</p>\n"
+        },
+        "targetDriver": {
+          "type": "string",
+          "title": "targetDriver",
+          "description": "Target driver to rebind the PCI device to.\n",
+          "markdownDescription": "Target driver to rebind the PCI device to.",
+          "x-intellij-html-description": "<p>Target driver to rebind the PCI device to.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name",
+        "targetDriver"
+      ],
+      "description": "PCIDriverRebindConfig allows to configure PCI driver rebinds."
+    }
+  }
+}

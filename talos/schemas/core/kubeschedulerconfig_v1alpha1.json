@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeSchedulerConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeSchedulerConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeSchedulerConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "By default, kube-scheduler static pod is enabled.\nSet to false to disable the kube-scheduler (assuming it runs on other controlplane node).\n",
+          "markdownDescription": "By default, kube-scheduler static pod is enabled.\nSet to false to disable the kube-scheduler (assuming it runs on other controlplane node).",
+          "x-intellij-html-description": "<p>By default, kube-scheduler static pod is enabled.\nSet to false to disable the kube-scheduler (assuming it runs on other controlplane node).</p>\n"
+        },
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "The container image used to run the kube-scheduler component.\n\nThe image reference should contain the tag, even if it is pinned by digest.\n",
+          "markdownDescription": "The container image used to run the kube-scheduler component.\n\nThe image reference should contain the tag, even if it is pinned by digest.",
+          "x-intellij-html-description": "<p>The container image used to run the kube-scheduler component.</p>\n\n<p>The image reference should contain the tag, even if it is pinned by digest.</p>\n"
+        },
+        "config": {
+          "type": "object",
+          "title": "config",
+          "description": "Provide configuration for the kube-scheduler static pod.\n\nThere is no need  to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.\n\nSee https://kubernetes.io/docs/reference/scheduling/config/ for the details of the configuration schema.\n",
+          "markdownDescription": "Provide configuration for the kube-scheduler static pod.\n\nThere is no need  to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.\n\nSee https://kubernetes.io/docs/reference/scheduling/config/ for the details of the configuration schema.",
+          "x-intellij-html-description": "<p>Provide configuration for the kube-scheduler static pod.</p>\n\n<p>There is no need  to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.</p>\n\n<p>See <a href=\"https://kubernetes.io/docs/reference/scheduling/config/\" target=\"_blank\">https://kubernetes.io/docs/reference/scheduling/config/</a> for the details of the configuration schema.</p>\n"
+        },
+        "extraArgs": {
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "type": "object",
+          "title": "extraArgs",
+          "description": "Extra command line arguments to supply to the kube-scheduler.\n\nIt is preferable to use config field to provide configuration overrides.\n",
+          "markdownDescription": "Extra command line arguments to supply to the kube-scheduler.\n\nIt is preferable to use `config` field to provide configuration overrides.",
+          "x-intellij-html-description": "<p>Extra command line arguments to supply to the kube-scheduler.</p>\n\n<p>It is preferable to use <code>config</code> field to provide configuration overrides.</p>\n"
+        },
+        "env": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "env",
+          "description": "The env field allows for the addition of environment variables for the kube-scheduler.\n",
+          "markdownDescription": "The `env` field allows for the addition of environment variables for the kube-scheduler.",
+          "x-intellij-html-description": "<p>The <code>env</code> field allows for the addition of environment variables for the kube-scheduler.</p>\n"
+        },
+        "resources": {
+          "type": "object",
+          "title": "resources",
+          "description": "Configure the kube-scheduler resources.\n",
+          "markdownDescription": "Configure the kube-scheduler resources.",
+          "x-intellij-html-description": "<p>Configure the kube-scheduler resources.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "image",
+        "kind"
+      ],
+      "description": "KubeSchedulerConfig configures kube-scheduler controlplane static pod."
+    }
+  }
+}

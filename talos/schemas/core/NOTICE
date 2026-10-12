@@ -1,0 +1,14 @@
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+The notice above applies to every *_v1alpha1.json file in this directory.
+They are derived from pkg/machinery/config/schemas/config.schema.json of
+Talos v1.14.2 (https://github.com/siderolabs/talos/blob/v1.14.2/pkg/machinery/config/schemas/config.schema.json,
+commit f513c7358cefc69255e29b517ba96c651e0326ad, sha256
+ee6e70e05e2069f586458f2ea8e338b8c5abec6e11f0b78235f199b007c1585d). The
+upstream repository states no copyright line; its sources carry only the
+MPL-2.0 notice. Modification: the file is split into one schema per
+multi-document kind, each holding a $ref to the kind's definition and the
+$defs it references; definitions are unchanged.
+
+secret_v1.json is not covered by this notice: it is the Kubernetes 1.35.0
+Secret schema from kubernetes-json-schema, Apache-2.0.

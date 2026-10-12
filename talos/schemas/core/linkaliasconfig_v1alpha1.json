@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.LinkAliasConfigV1Alpha1",
+  "$defs": {
+    "network.LinkAliasConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "LinkAliasConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Alias for the link.\n\nDon\u2019t use system interface names like \u201ceth0\u201d, \u201cens3\u201d, \u201cenp0s2\u201d, etc. as those may conflict\nwith existing physical interfaces.\n\nThe name can contain a single integer format verb (%d) to create multiple aliases\nfrom a single config document. When a format verb is detected, each matched link receives a sequential\nalias (e.g. net0, net1, \u2026) based on hardware address order of the links.\nLinks already aliased by a previous config are automatically skipped.\n",
+          "markdownDescription": "Alias for the link.\n\nDon't use system interface names like \"eth0\", \"ens3\", \"enp0s2\", etc. as those may conflict\nwith existing physical interfaces.\n\nThe name can contain a single integer format verb (`%d`) to create multiple aliases\nfrom a single config document. When a format verb is detected, each matched link receives a sequential\nalias (e.g. `net0`, `net1`, ...) based on hardware address order of the links.\nLinks already aliased by a previous config are automatically skipped.",
+          "x-intellij-html-description": "<p>Alias for the link.</p>\n\n<p>Don&rsquo;t use system interface names like &ldquo;eth0&rdquo;, &ldquo;ens3&rdquo;, &ldquo;enp0s2&rdquo;, etc. as those may conflict\nwith existing physical interfaces.</p>\n\n<p>The name can contain a single integer format verb (<code>%d</code>) to create multiple aliases\nfrom a single config document. When a format verb is detected, each matched link receives a sequential\nalias (e.g. <code>net0</code>, <code>net1</code>, &hellip;) based on hardware address order of the links.\nLinks already aliased by a previous config are automatically skipped.</p>\n"
+        },
+        "selector": {
+          "$ref": "#/$defs/network.LinkSelector",
+          "title": "selector",
+          "description": "Selector to match the link to alias.\n\nWhen the alias name is a fixed string, the selector must match exactly one link.\nWhen the alias name contains a format verb (e.g. net%d), the selector may match multiple links\nand each match receives a sequential alias.\nIf multiple selectors match the same link, the first one is used.\n",
+          "markdownDescription": "Selector to match the link to alias.\n\nWhen the alias name is a fixed string, the selector must match exactly one link.\nWhen the alias name contains a format verb (e.g. `net%d`), the selector may match multiple links\nand each match receives a sequential alias.\nIf multiple selectors match the same link, the first one is used.",
+          "x-intellij-html-description": "<p>Selector to match the link to alias.</p>\n\n<p>When the alias name is a fixed string, the selector must match exactly one link.\nWhen the alias name contains a format verb (e.g. <code>net%d</code>), the selector may match multiple links\nand each match receives a sequential alias.\nIf multiple selectors match the same link, the first one is used.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "LinkAliasConfig is a config document to alias (give a different name) to a physical link."
+    },
+    "network.LinkSelector": {
+      "properties": {
+        "match": {
+          "type": "string",
+          "title": "match",
+          "description": "The Common Expression Language (CEL) expression to match the link.\n",
+          "markdownDescription": "The Common Expression Language (CEL) expression to match the link.",
+          "x-intellij-html-description": "<p>The Common Expression Language (CEL) expression to match the link.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "LinkSelector selects a link to alias."
+    }
+  }
+}

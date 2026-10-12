@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.EventSinkV1Alpha1",
+  "$defs": {
+    "runtime.EventSinkV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "EventSinkConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint",
+          "description": "The endpoint for the event sink as \u2018host:port\u2019.\n",
+          "markdownDescription": "The endpoint for the event sink as 'host:port'.",
+          "x-intellij-html-description": "<p>The endpoint for the event sink as &lsquo;host:port&rsquo;.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "EventSinkConfig is a event sink config document."
+    }
+  }
+}

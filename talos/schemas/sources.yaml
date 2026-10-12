@@ -1,0 +1,24 @@
+# QA-7 covers documents with apiVersion and kind. Talos multi-document kinds
+# carry `apiVersion: v1alpha1` without a group, so their schemas sit under
+# core/ as <kind>_v1alpha1.json; the core/v1alpha1 entry names them, the
+# core entry the Kubernetes Secret schema (secret_v1.json).
+# - secret_v1.json: kubernetes-json-schema standalone-strict file of
+#   Kubernetes 1.35.0, unchanged (Apache-2.0).
+# - every *_v1alpha1.json: one Talos multi-document kind each, split from
+#   config.schema.json of Talos v1.14.2 (MPL-2.0, notice in core/NOTICE).
+#   The upstream schema is already closed (additionalProperties: false on
+#   every object with properties); each file keeps the kind's definition and
+#   the $defs it references, unchanged.
+# The v1alpha1 base document (version: v1alpha1, no apiVersion/kind) is not
+# checked by the gate.
+core:
+  software: Kubernetes
+  version: 1.35.0
+  source: https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict
+  license: Apache-2.0
+core/v1alpha1:
+  software: Talos
+  version: 1.14.2
+  source: https://github.com/siderolabs/talos/blob/v1.14.2/pkg/machinery/config/schemas/config.schema.json
+  license: MPL-2.0
+  copyright: "no copyright line upstream; the sources carry only the MPL-2.0 notice (Talos project, Sidero Labs)"

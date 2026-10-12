@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.Layer2VIPConfigV1Alpha1",
+  "$defs": {
+    "network.Layer2VIPConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "Layer2VIPConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "IP address to be advertised as a Layer 2 VIP.\n",
+          "markdownDescription": "IP address to be advertised as a Layer 2 VIP.",
+          "x-intellij-html-description": "<p>IP address to be advertised as a Layer 2 VIP.</p>\n"
+        },
+        "link": {
+          "type": "string",
+          "title": "link",
+          "description": "Name of the link to assign the VIP to.\n\nSelector must match exactly one link, otherwise an error is returned.\nIf multiple selectors match the same link, the first one is used.\n",
+          "markdownDescription": "Name of the link to assign the VIP to.\n\nSelector must match exactly one link, otherwise an error is returned.\nIf multiple selectors match the same link, the first one is used.",
+          "x-intellij-html-description": "<p>Name of the link to assign the VIP to.</p>\n\n<p>Selector must match exactly one link, otherwise an error is returned.\nIf multiple selectors match the same link, the first one is used.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "Layer2VIPConfig is a config document to configure virtual IP using Layer 2 (Ethernet) advertisement.\\nVirtual IP configuration should be used only on controlplane nodes to provide virtual IP for Kubernetes API server.\\nAny other use cases are not supported and may lead to unexpected behavior.\\nVirtual IP will be announced from only one node at a time using gratuitous ARP announcements for IPv4.\\n"
+    }
+  }
+}

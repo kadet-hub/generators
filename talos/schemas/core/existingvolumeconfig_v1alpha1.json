@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/block.ExistingVolumeConfigV1Alpha1",
+  "$defs": {
+    "block.ExistingMountSpec": {
+      "properties": {
+        "readOnly": {
+          "type": "boolean",
+          "title": "readOnly",
+          "description": "Mount the volume read-only.\n",
+          "markdownDescription": "Mount the volume read-only.",
+          "x-intellij-html-description": "<p>Mount the volume read-only.</p>\n"
+        },
+        "disableAccessTime": {
+          "type": "boolean",
+          "title": "disableAccessTime",
+          "description": "If true, disable file access time updates.\n",
+          "markdownDescription": "If true, disable file access time updates.",
+          "x-intellij-html-description": "<p>If true, disable file access time updates.</p>\n"
+        },
+        "secure": {
+          "type": "boolean",
+          "title": "secure",
+          "description": "Enable secure mount options (nosuid, nodev, noexec).\n\nDefaults to true for better security.\n",
+          "markdownDescription": "Enable secure mount options (nosuid, nodev, noexec).\n\nDefaults to true for better security.",
+          "x-intellij-html-description": "<p>Enable secure mount options (nosuid, nodev, noexec).</p>\n\n<p>Defaults to true for better security.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ExistingMountSpec describes how the volume is mounted."
+    },
+    "block.ExistingVolumeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "ExistingVolumeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the volume.\n\nName can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.\n",
+          "markdownDescription": "Name of the volume.\n\nName can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.",
+          "x-intellij-html-description": "<p>Name of the volume.</p>\n\n<p>Name can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.</p>\n"
+        },
+        "discovery": {
+          "$ref": "#/$defs/block.VolumeDiscoverySpec",
+          "title": "discovery",
+          "description": "The discovery describes how to find a volume.\n",
+          "markdownDescription": "The discovery describes how to find a volume.",
+          "x-intellij-html-description": "<p>The discovery describes how to find a volume.</p>\n"
+        },
+        "mount": {
+          "$ref": "#/$defs/block.ExistingMountSpec",
+          "title": "mount",
+          "description": "The mount describes additional mount options.\n",
+          "markdownDescription": "The mount describes additional mount options.",
+          "x-intellij-html-description": "<p>The mount describes additional mount options.</p>\n"
+        },
+        "trim": {
+          "$ref": "#/$defs/block.TrimConfig",
+          "title": "trim",
+          "description": "The trim describes the per-volume filesystem trim (fstrim) configuration.\n",
+          "markdownDescription": "The trim describes the per-volume filesystem trim (fstrim) configuration.",
+          "x-intellij-html-description": "<p>The trim describes the per-volume filesystem trim (fstrim) configuration.</p>\n"
+        },
+        "scrub": {
+          "$ref": "#/$defs/block.ScrubConfig",
+          "title": "scrub",
+          "description": "The scrub describes the per-volume filesystem scrub configuration.\n",
+          "markdownDescription": "The scrub describes the per-volume filesystem scrub configuration.",
+          "x-intellij-html-description": "<p>The scrub describes the per-volume filesystem scrub configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "ExistingVolumeConfig is an existing volume configuration document.\\nExisting volumes allow to mount partitions (or whole disks) that were created\\noutside of Talos. Volume will be mounted under `/var/mnt/<name>`.\\nThe existing volume config name should not conflict with user volume names.\\n"
+    },
+    "block.ScrubConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Enable or disable scrubbing for this volume.\n\nIf not set, scrubbing is enabled by default when scrub section is present.\n",
+          "markdownDescription": "Enable or disable scrubbing for this volume.\n\nIf not set, scrubbing is enabled by default when scrub section is present.",
+          "x-intellij-html-description": "<p>Enable or disable scrubbing for this volume.</p>\n\n<p>If not set, scrubbing is enabled by default when scrub section is present.</p>\n"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "interval",
+          "description": "The interval at which the volume is scrubbed, overriding the global scrub interval.\n",
+          "markdownDescription": "The interval at which the volume is scrubbed, overriding the global scrub interval.",
+          "x-intellij-html-description": "<p>The interval at which the volume is scrubbed, overriding the global scrub interval.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ScrubConfig describes per-volume filesystem scrub configuration.\\n\\nIt overrides the global FilesystemScrubConfig for the volume.\\n"
+    },
+    "block.TrimConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Enable or disable trimming for this volume.\n\nIf not set, trimming is enabled when the global FilesystemTrimConfig is present.\n",
+          "markdownDescription": "Enable or disable trimming for this volume.\n\nIf not set, trimming is enabled when the global FilesystemTrimConfig is present.",
+          "x-intellij-html-description": "<p>Enable or disable trimming for this volume.</p>\n\n<p>If not set, trimming is enabled when the global FilesystemTrimConfig is present.</p>\n"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "interval",
+          "description": "The interval at which the volume is trimmed, overriding the global trim interval.\n",
+          "markdownDescription": "The interval at which the volume is trimmed, overriding the global trim interval.",
+          "x-intellij-html-description": "<p>The interval at which the volume is trimmed, overriding the global trim interval.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "TrimConfig describes per-volume filesystem trim (fstrim) configuration.\\n\\nIt overrides the global FilesystemTrimConfig for the volume.\\n"
+    },
+    "block.VolumeDiscoverySpec": {
+      "properties": {
+        "volumeSelector": {
+          "$ref": "#/$defs/block.VolumeSelector",
+          "title": "volumeSelector",
+          "description": "The volume selector expression.\n",
+          "markdownDescription": "The volume selector expression.",
+          "x-intellij-html-description": "<p>The volume selector expression.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "VolumeDiscoverySpec describes how the volume is discovered."
+    },
+    "block.VolumeSelector": {
+      "properties": {
+        "match": {
+          "type": "string",
+          "title": "match",
+          "description": "The Common Expression Language (CEL) expression to match the volume.\n",
+          "markdownDescription": "The Common Expression Language (CEL) expression to match the volume.",
+          "x-intellij-html-description": "<p>The Common Expression Language (CEL) expression to match the volume.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "VolumeSelector selects an existing volume."
+    }
+  }
+}

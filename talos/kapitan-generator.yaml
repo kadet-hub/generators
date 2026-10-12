@@ -1,0 +1,14 @@
+name: talos
+description: Renders Talos v1.14 machine configurations (v1alpha1 base plus multi-document kinds) for every node of a cluster from one shared base, with optional KubeVirt userdata Secrets and config patches.
+tags: [kubernetes, clusters]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas

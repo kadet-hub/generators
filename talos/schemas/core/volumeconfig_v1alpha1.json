@@ -1,0 +1,415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/block.VolumeConfigV1Alpha1",
+  "$defs": {
+    "block.DiskSelector": {
+      "properties": {
+        "match": {
+          "type": "string",
+          "title": "match",
+          "description": "The Common Expression Language (CEL) expression to match the disk.\n",
+          "markdownDescription": "The Common Expression Language (CEL) expression to match the disk.",
+          "x-intellij-html-description": "<p>The Common Expression Language (CEL) expression to match the disk.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "DiskSelector selects a disk for the volume."
+    },
+    "block.EncryptionKey": {
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "title": "slot",
+          "description": "Key slot number for LUKS2 encryption.\n",
+          "markdownDescription": "Key slot number for LUKS2 encryption.",
+          "x-intellij-html-description": "<p>Key slot number for LUKS2 encryption.</p>\n"
+        },
+        "static": {
+          "$ref": "#/$defs/block.EncryptionKeyStatic",
+          "title": "static",
+          "description": "Key which value is stored in the configuration file.\n",
+          "markdownDescription": "Key which value is stored in the configuration file.",
+          "x-intellij-html-description": "<p>Key which value is stored in the configuration file.</p>\n"
+        },
+        "nodeID": {
+          "$ref": "#/$defs/block.EncryptionKeyNodeID",
+          "title": "nodeID",
+          "description": "Deterministically generated key from the node UUID and PartitionLabel.\n",
+          "markdownDescription": "Deterministically generated key from the node UUID and PartitionLabel.",
+          "x-intellij-html-description": "<p>Deterministically generated key from the node UUID and PartitionLabel.</p>\n"
+        },
+        "kms": {
+          "$ref": "#/$defs/block.EncryptionKeyKMS",
+          "title": "kms",
+          "description": "KMS managed encryption key.\n",
+          "markdownDescription": "KMS managed encryption key.",
+          "x-intellij-html-description": "<p>KMS managed encryption key.</p>\n"
+        },
+        "tpm": {
+          "$ref": "#/$defs/block.EncryptionKeyTPM",
+          "title": "tpm",
+          "description": "Enable TPM based disk encryption.\n",
+          "markdownDescription": "Enable TPM based disk encryption.",
+          "x-intellij-html-description": "<p>Enable TPM based disk encryption.</p>\n"
+        },
+        "lockToState": {
+          "type": "boolean",
+          "title": "lockToState",
+          "description": "Lock the disk encryption key to the random salt stored in the STATE partition. This is useful to prevent the volume from being unlocked if STATE partition is compromised or replaced. It is recommended to use this option with TPM disk encryption for non-STATE volumes.\n",
+          "markdownDescription": "Lock the disk encryption key to the random salt stored in the STATE partition. This is useful to prevent the volume from being unlocked if STATE partition is compromised or replaced. It is recommended to use this option with TPM disk encryption for non-STATE volumes.",
+          "x-intellij-html-description": "<p>Lock the disk encryption key to the random salt stored in the STATE partition. This is useful to prevent the volume from being unlocked if STATE partition is compromised or replaced. It is recommended to use this option with TPM disk encryption for non-STATE volumes.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKey represents configuration for disk encryption key."
+    },
+    "block.EncryptionKeyKMS": {
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint",
+          "description": "KMS endpoint to Seal/Unseal the key.\n\nThe endpoint should be specified as a URL with an explicit scheme, e.g. https://kms.example.com:4443.\nWith the https:// scheme, the connection to the KMS server is established over TLS, and the server certificate\nis verified against the trusted root CAs.\n\nWARNING: if the scheme is omitted (e.g. kms.example.com:4443) or set to grpc://, the connection\nto the KMS server is established without TLS, and the disk encryption key material is transmitted in plaintext.\nUse plaintext endpoints only on fully trusted networks.\n\nNote: when encrypting the STATE volume, custom trusted root CAs from the machine configuration\nmight not be available when unlocking the volume (as the machine configuration is stored on STATE),\nso the KMS server certificate should be signed by a CA trusted by default.\n",
+          "markdownDescription": "KMS endpoint to Seal/Unseal the key.\n\nThe endpoint should be specified as a URL with an explicit scheme, e.g. `https://kms.example.com:4443`.\nWith the `https://` scheme, the connection to the KMS server is established over TLS, and the server certificate\nis verified against the trusted root CAs.\n\nWARNING: if the scheme is omitted (e.g. `kms.example.com:4443`) or set to `grpc://`, the connection\nto the KMS server is established without TLS, and the disk encryption key material is transmitted in plaintext.\nUse plaintext endpoints only on fully trusted networks.\n\nNote: when encrypting the `STATE` volume, custom trusted root CAs from the machine configuration\nmight not be available when unlocking the volume (as the machine configuration is stored on `STATE`),\nso the KMS server certificate should be signed by a CA trusted by default.",
+          "x-intellij-html-description": "<p>KMS endpoint to Seal/Unseal the key.</p>\n\n<p>The endpoint should be specified as a URL with an explicit scheme, e.g. <code>https://kms.example.com:4443</code>.\nWith the <code>https://</code> scheme, the connection to the KMS server is established over TLS, and the server certificate\nis verified against the trusted root CAs.</p>\n\n<p>WARNING: if the scheme is omitted (e.g. <code>kms.example.com:4443</code>) or set to <code>grpc://</code>, the connection\nto the KMS server is established without TLS, and the disk encryption key material is transmitted in plaintext.\nUse plaintext endpoints only on fully trusted networks.</p>\n\n<p>Note: when encrypting the <code>STATE</code> volume, custom trusted root CAs from the machine configuration\nmight not be available when unlocking the volume (as the machine configuration is stored on <code>STATE</code>),\nso the KMS server certificate should be signed by a CA trusted by default.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKeyKMS represents a key that is generated and then sealed/unsealed by the KMS server."
+    },
+    "block.EncryptionKeyNodeID": {
+      "properties": {},
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKeyNodeID represents deterministically generated key from the node UUID and PartitionLabel."
+    },
+    "block.EncryptionKeyStatic": {
+      "properties": {
+        "passphrase": {
+          "type": "string",
+          "title": "passphrase",
+          "description": "Defines the static passphrase value.\n",
+          "markdownDescription": "Defines the static passphrase value.",
+          "x-intellij-html-description": "<p>Defines the static passphrase value.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKeyStatic represents throw away key type."
+    },
+    "block.EncryptionKeyTPM": {
+      "properties": {
+        "options": {
+          "$ref": "#/$defs/block.EncryptionKeyTPMOptions",
+          "title": "options",
+          "description": "TPM options for key protection.\n",
+          "markdownDescription": "TPM options for key protection.",
+          "x-intellij-html-description": "<p>TPM options for key protection.</p>\n"
+        },
+        "checkSecurebootStatusOnEnroll": {
+          "type": "boolean",
+          "title": "checkSecurebootStatusOnEnroll",
+          "description": "Check that Secureboot is enabled in the EFI firmware.\nIf Secureboot is not enabled, the enrollment of the key will fail.\n",
+          "markdownDescription": "Check that Secureboot is enabled in the EFI firmware.\nIf Secureboot is not enabled, the enrollment of the key will fail.",
+          "x-intellij-html-description": "<p>Check that Secureboot is enabled in the EFI firmware.\nIf Secureboot is not enabled, the enrollment of the key will fail.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKeyTPM represents a key that is generated and then sealed/unsealed by the TPM."
+    },
+    "block.EncryptionKeyTPMOptions": {
+      "properties": {
+        "pcrs": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "pcrs",
+          "description": "List of PCRs to bind the key to. If not set, defaults to PCR 7, can be disabled by passing an empty list.\n",
+          "markdownDescription": "List of PCRs to bind the key to. If not set, defaults to PCR 7, can be disabled by passing an empty list.",
+          "x-intellij-html-description": "<p>List of PCRs to bind the key to. If not set, defaults to PCR 7, can be disabled by passing an empty list.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionKeyTPMOptions represents the options for TPM-based key protection."
+    },
+    "block.EncryptionSpec": {
+      "properties": {
+        "provider": {
+          "enum": [
+            "luks2"
+          ],
+          "title": "provider",
+          "description": "Encryption provider to use for the encryption.\n",
+          "markdownDescription": "Encryption provider to use for the encryption.",
+          "x-intellij-html-description": "<p>Encryption provider to use for the encryption.</p>\n"
+        },
+        "keys": {
+          "items": {
+            "$ref": "#/$defs/block.EncryptionKey"
+          },
+          "type": "array",
+          "title": "keys",
+          "description": "Defines the encryption keys generation and storage method.\n",
+          "markdownDescription": "Defines the encryption keys generation and storage method.",
+          "x-intellij-html-description": "<p>Defines the encryption keys generation and storage method.</p>\n"
+        },
+        "cipher": {
+          "enum": [
+            "aes-xts-plain64",
+            "xchacha12,aes-adiantum-plain64",
+            "xchacha20,aes-adiantum-plain64"
+          ],
+          "title": "cipher",
+          "description": "Cipher to use for the encryption. Depends on the encryption provider.\n",
+          "markdownDescription": "Cipher to use for the encryption. Depends on the encryption provider.",
+          "x-intellij-html-description": "<p>Cipher to use for the encryption. Depends on the encryption provider.</p>\n"
+        },
+        "keySize": {
+          "type": "integer",
+          "title": "keySize",
+          "description": "Defines the encryption key length.\n",
+          "markdownDescription": "Defines the encryption key length.",
+          "x-intellij-html-description": "<p>Defines the encryption key length.</p>\n"
+        },
+        "blockSize": {
+          "type": "integer",
+          "title": "blockSize",
+          "description": "Defines the encryption sector size.\n",
+          "markdownDescription": "Defines the encryption sector size.",
+          "x-intellij-html-description": "<p>Defines the encryption sector size.</p>\n"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "options",
+          "description": "Additional \u2013perf parameters for the LUKS2 encryption.\n",
+          "markdownDescription": "Additional --perf parameters for the LUKS2 encryption.",
+          "x-intellij-html-description": "<p>Additional &ndash;perf parameters for the LUKS2 encryption.</p>\n"
+        },
+        "allowDiscards": {
+          "type": "boolean",
+          "title": "allowDiscards",
+          "description": "Allow TRIM/discard requests to be passed through to the underlying device when the encrypted volume is opened.\nDefaults to false.\n",
+          "markdownDescription": "Allow TRIM/discard requests to be passed through to the underlying device when the encrypted volume is opened.\nDefaults to false.",
+          "x-intellij-html-description": "<p>Allow TRIM/discard requests to be passed through to the underlying device when the encrypted volume is opened.\nDefaults to false.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EncryptionSpec represents volume encryption settings."
+    },
+    "block.MountSpec": {
+      "properties": {
+        "secure": {
+          "type": "boolean",
+          "title": "secure",
+          "description": "Enable secure mount options (nosuid, nodev).\n\nFor dedicated ETCD and LOG volumes, this also enables noexec.\n\nDefaults to true for better security.\nSupported for EPHEMERAL and dedicated ETCD, CRI, KUBELET and LOG volumes.\n",
+          "markdownDescription": "Enable secure mount options (nosuid, nodev).\n\nFor dedicated ETCD and LOG volumes, this also enables noexec.\n\nDefaults to true for better security.\nSupported for EPHEMERAL and dedicated ETCD, CRI, KUBELET and LOG volumes.",
+          "x-intellij-html-description": "<p>Enable secure mount options (nosuid, nodev).</p>\n\n<p>For dedicated ETCD and LOG volumes, this also enables noexec.</p>\n\n<p>Defaults to true for better security.\nSupported for EPHEMERAL and dedicated ETCD, CRI, KUBELET and LOG volumes.</p>\n"
+        },
+        "disableAccessTime": {
+          "type": "boolean",
+          "title": "disableAccessTime",
+          "description": "If true, disable file access time updates.\n\nSupported only for EPHEMERAL volume.\n",
+          "markdownDescription": "If true, disable file access time updates.\n\nSupported only for EPHEMERAL volume.",
+          "x-intellij-html-description": "<p>If true, disable file access time updates.</p>\n\n<p>Supported only for EPHEMERAL volume.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "MountSpec describes how the volume is mounted."
+    },
+    "block.ProvisioningSpec": {
+      "properties": {
+        "diskSelector": {
+          "$ref": "#/$defs/block.DiskSelector",
+          "title": "diskSelector",
+          "description": "The disk selector expression.\n",
+          "markdownDescription": "The disk selector expression.",
+          "x-intellij-html-description": "<p>The disk selector expression.</p>\n"
+        },
+        "grow": {
+          "type": "boolean",
+          "title": "grow",
+          "description": "Should the volume grow to the size of the disk (if possible).\n",
+          "markdownDescription": "Should the volume grow to the size of the disk (if possible).",
+          "x-intellij-html-description": "<p>Should the volume grow to the size of the disk (if possible).</p>\n"
+        },
+        "minSize": {
+          "type": "string",
+          "title": "minSize",
+          "description": "The minimum size of the volume.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.\n",
+          "markdownDescription": "The minimum size of the volume.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.",
+          "x-intellij-html-description": "<p>The minimum size of the volume.</p>\n\n<p>Size is specified in bytes, but can be expressed in human readable format, e.g. 100MB.</p>\n"
+        },
+        "maxSize": {
+          "type": "string",
+          "title": "maxSize",
+          "description": "The maximum size of the volume, if not specified the volume can grow to the size of the\ndisk.\n\nSize is specified in bytes or in percents. It can be expressed in human readable format, e.g. 100MB.\n",
+          "markdownDescription": "The maximum size of the volume, if not specified the volume can grow to the size of the\ndisk.\n\nSize is specified in bytes or in percents. It can be expressed in human readable format, e.g. 100MB.",
+          "x-intellij-html-description": "<p>The maximum size of the volume, if not specified the volume can grow to the size of the\ndisk.</p>\n\n<p>Size is specified in bytes or in percents. It can be expressed in human readable format, e.g. 100MB.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ProvisioningSpec describes how the volume is provisioned."
+    },
+    "block.ScrubConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Enable or disable scrubbing for this volume.\n\nIf not set, scrubbing is enabled by default when scrub section is present.\n",
+          "markdownDescription": "Enable or disable scrubbing for this volume.\n\nIf not set, scrubbing is enabled by default when scrub section is present.",
+          "x-intellij-html-description": "<p>Enable or disable scrubbing for this volume.</p>\n\n<p>If not set, scrubbing is enabled by default when scrub section is present.</p>\n"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "interval",
+          "description": "The interval at which the volume is scrubbed, overriding the global scrub interval.\n",
+          "markdownDescription": "The interval at which the volume is scrubbed, overriding the global scrub interval.",
+          "x-intellij-html-description": "<p>The interval at which the volume is scrubbed, overriding the global scrub interval.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ScrubConfig describes per-volume filesystem scrub configuration.\\n\\nIt overrides the global FilesystemScrubConfig for the volume.\\n"
+    },
+    "block.SystemVolumeFilesystemSpec": {
+      "properties": {
+        "xfs": {
+          "$ref": "#/$defs/block.XFSSpec",
+          "title": "xfs",
+          "description": "XFS-specific filesystem options.\n",
+          "markdownDescription": "XFS-specific filesystem options.",
+          "x-intellij-html-description": "<p>XFS-specific filesystem options.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "SystemVolumeFilesystemSpec describes how the system volume is formatted.\\n\\nThe filesystem type is fixed for system volumes, and project quota support is configured via\\nmachine features, so only the filesystem-specific tunables are exposed here.\\n"
+    },
+    "block.TrimConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Enable or disable trimming for this volume.\n\nIf not set, trimming is enabled when the global FilesystemTrimConfig is present.\n",
+          "markdownDescription": "Enable or disable trimming for this volume.\n\nIf not set, trimming is enabled when the global FilesystemTrimConfig is present.",
+          "x-intellij-html-description": "<p>Enable or disable trimming for this volume.</p>\n\n<p>If not set, trimming is enabled when the global FilesystemTrimConfig is present.</p>\n"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "interval",
+          "description": "The interval at which the volume is trimmed, overriding the global trim interval.\n",
+          "markdownDescription": "The interval at which the volume is trimmed, overriding the global trim interval.",
+          "x-intellij-html-description": "<p>The interval at which the volume is trimmed, overriding the global trim interval.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "TrimConfig describes per-volume filesystem trim (fstrim) configuration.\\n\\nIt overrides the global FilesystemTrimConfig for the volume.\\n"
+    },
+    "block.VolumeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "VolumeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the volume.\n",
+          "markdownDescription": "Name of the volume.",
+          "x-intellij-html-description": "<p>Name of the volume.</p>\n"
+        },
+        "provisioning": {
+          "$ref": "#/$defs/block.ProvisioningSpec",
+          "title": "provisioning",
+          "description": "The provisioning describes how the volume is provisioned.\n",
+          "markdownDescription": "The provisioning describes how the volume is provisioned.",
+          "x-intellij-html-description": "<p>The provisioning describes how the volume is provisioned.</p>\n"
+        },
+        "filesystem": {
+          "$ref": "#/$defs/block.SystemVolumeFilesystemSpec",
+          "title": "filesystem",
+          "description": "The filesystem describes how the volume is formatted.\n\nNote: this only takes effect at the time the volume is formatted.\n",
+          "markdownDescription": "The filesystem describes how the volume is formatted.\n\nNote: this only takes effect at the time the volume is formatted.",
+          "x-intellij-html-description": "<p>The filesystem describes how the volume is formatted.</p>\n\n<p>Note: this only takes effect at the time the volume is formatted.</p>\n"
+        },
+        "encryption": {
+          "$ref": "#/$defs/block.EncryptionSpec",
+          "title": "encryption",
+          "description": "The encryption describes how the volume is encrypted.\n",
+          "markdownDescription": "The encryption describes how the volume is encrypted.",
+          "x-intellij-html-description": "<p>The encryption describes how the volume is encrypted.</p>\n"
+        },
+        "mount": {
+          "$ref": "#/$defs/block.MountSpec",
+          "title": "mount",
+          "description": "The mount describes additional mount options.\n",
+          "markdownDescription": "The mount describes additional mount options.",
+          "x-intellij-html-description": "<p>The mount describes additional mount options.</p>\n"
+        },
+        "trim": {
+          "$ref": "#/$defs/block.TrimConfig",
+          "title": "trim",
+          "description": "The trim describes the per-volume filesystem trim (fstrim) configuration.\n",
+          "markdownDescription": "The trim describes the per-volume filesystem trim (fstrim) configuration.",
+          "x-intellij-html-description": "<p>The trim describes the per-volume filesystem trim (fstrim) configuration.</p>\n"
+        },
+        "scrub": {
+          "$ref": "#/$defs/block.ScrubConfig",
+          "title": "scrub",
+          "description": "The scrub describes the per-volume filesystem scrub configuration.\n",
+          "markdownDescription": "The scrub describes the per-volume filesystem scrub configuration.",
+          "x-intellij-html-description": "<p>The scrub describes the per-volume filesystem scrub configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "VolumeConfig is a system volume configuration document.\\nNote: at the moment, only `STATE`, `EPHEMERAL`, `IMAGECACHE`, `ETCD`, `CRI`, `KUBELET` and `LOG`\\nsystem volumes are supported. The `ETCD`, `CRI`, `KUBELET` and `LOG` volumes default to a\\ndirectory under `EPHEMERAL`, and can be placed on a dedicated partition by specifying\\n`provisioning`. The backing of these volumes (directory vs. dedicated partition) can only be\\nchosen at cluster creation time: changing it on an already-provisioned node is not supported.\\n"
+    },
+    "block.XFSSpec": {
+      "properties": {
+        "minAllocationGroupSize": {
+          "type": "string",
+          "title": "minAllocationGroupSize",
+          "description": "The minimum size of an XFS allocation group.\n\nOn non-rotational devices mkfs.xfs sizes the allocation group count to the number of\nCPUs, which on machines with many cores and a modest disk yields hundreds of tiny\nallocation groups. Talos bounds the allocation group size from below to keep the geometry\nsane; this option overrides that bound.\n\nSet to zero to use the mkfs.xfs defaults unchanged.\n\nNote: this only affects volumes at the time they are formatted.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.\n",
+          "markdownDescription": "The minimum size of an XFS allocation group.\n\nOn non-rotational devices `mkfs.xfs` sizes the allocation group count to the number of\nCPUs, which on machines with many cores and a modest disk yields hundreds of tiny\nallocation groups. Talos bounds the allocation group size from below to keep the geometry\nsane; this option overrides that bound.\n\nSet to zero to use the `mkfs.xfs` defaults unchanged.\n\nNote: this only affects volumes at the time they are formatted.\n\nSize is specified in bytes, but can be expressed in human readable format, e.g. 100MB.",
+          "x-intellij-html-description": "<p>The minimum size of an XFS allocation group.</p>\n\n<p>On non-rotational devices <code>mkfs.xfs</code> sizes the allocation group count to the number of\nCPUs, which on machines with many cores and a modest disk yields hundreds of tiny\nallocation groups. Talos bounds the allocation group size from below to keep the geometry\nsane; this option overrides that bound.</p>\n\n<p>Set to zero to use the <code>mkfs.xfs</code> defaults unchanged.</p>\n\n<p>Note: this only affects volumes at the time they are formatted.</p>\n\n<p>Size is specified in bytes, but can be expressed in human readable format, e.g. 100MB.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "XFSSpec configures XFS-specific filesystem options."
+    }
+  }
+}

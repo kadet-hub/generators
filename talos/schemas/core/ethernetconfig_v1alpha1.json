@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.EthernetConfigV1Alpha1",
+  "$defs": {
+    "network.EthernetChannelsConfig": {
+      "properties": {
+        "rx": {
+          "type": "integer",
+          "title": "rx",
+          "description": "Number of RX channels.\n",
+          "markdownDescription": "Number of RX channels.",
+          "x-intellij-html-description": "<p>Number of RX channels.</p>\n"
+        },
+        "tx": {
+          "type": "integer",
+          "title": "tx",
+          "description": "Number of TX channels.\n",
+          "markdownDescription": "Number of TX channels.",
+          "x-intellij-html-description": "<p>Number of TX channels.</p>\n"
+        },
+        "other": {
+          "type": "integer",
+          "title": "other",
+          "description": "Number of other channels.\n",
+          "markdownDescription": "Number of other channels.",
+          "x-intellij-html-description": "<p>Number of other channels.</p>\n"
+        },
+        "combined": {
+          "type": "integer",
+          "title": "combined",
+          "description": "Number of combined channels.\n",
+          "markdownDescription": "Number of combined channels.",
+          "x-intellij-html-description": "<p>Number of combined channels.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EthernetChannelsConfig is a configuration for Ethernet link channels."
+    },
+    "network.EthernetConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "EthernetConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the link (interface).\n",
+          "markdownDescription": "Name of the link (interface).",
+          "x-intellij-html-description": "<p>Name of the link (interface).</p>\n"
+        },
+        "features": {
+          "patternProperties": {
+            ".*": {
+              "type": "boolean"
+            }
+          },
+          "type": "object",
+          "title": "features",
+          "description": "Configuration for Ethernet features.\n\nSet of features available and whether they can be enabled or disabled is driver specific.\nUse talosctl get ethernetstatus &lt;link&gt; -o yaml to get the list of available features and\ntheir current status.\n",
+          "markdownDescription": "Configuration for Ethernet features.\n\nSet of features available and whether they can be enabled or disabled is driver specific.\nUse `talosctl get ethernetstatus <link> -o yaml` to get the list of available features and\ntheir current status.",
+          "x-intellij-html-description": "<p>Configuration for Ethernet features.</p>\n\n<p>Set of features available and whether they can be enabled or disabled is driver specific.\nUse <code>talosctl get ethernetstatus &lt;link&gt; -o yaml</code> to get the list of available features and\ntheir current status.</p>\n"
+        },
+        "rings": {
+          "$ref": "#/$defs/network.EthernetRingsConfig",
+          "title": "rings",
+          "description": "Configuration for Ethernet link rings.\n\nThis is similar to ethtool -G command.\n",
+          "markdownDescription": "Configuration for Ethernet link rings.\n\nThis is similar to `ethtool -G` command.",
+          "x-intellij-html-description": "<p>Configuration for Ethernet link rings.</p>\n\n<p>This is similar to <code>ethtool -G</code> command.</p>\n"
+        },
+        "channels": {
+          "$ref": "#/$defs/network.EthernetChannelsConfig",
+          "title": "channels",
+          "description": "Configuration for Ethernet link channels.\n\nThis is similar to ethtool -L command.\n",
+          "markdownDescription": "Configuration for Ethernet link channels.\n\nThis is similar to `ethtool -L` command.",
+          "x-intellij-html-description": "<p>Configuration for Ethernet link channels.</p>\n\n<p>This is similar to <code>ethtool -L</code> command.</p>\n"
+        },
+        "wakeOnLan": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "wakeOnLan",
+          "description": "Wake-on-LAN modes to enable.\n\nIf this field is omitted, Wake-on-LAN configuration is not changed.\nAn empty list disables Wake-on-LAN.\n\nThis is similar to ethtool -s &lt;link&gt; wol &lt;options&gt; command.\n",
+          "markdownDescription": "Wake-on-LAN modes to enable.\n\nIf this field is omitted, Wake-on-LAN configuration is not changed.\nAn empty list disables Wake-on-LAN.\n\nThis is similar to `ethtool -s <link> wol <options>` command.",
+          "x-intellij-html-description": "<p>Wake-on-LAN modes to enable.</p>\n\n<p>If this field is omitted, Wake-on-LAN configuration is not changed.\nAn empty list disables Wake-on-LAN.</p>\n\n<p>This is similar to <code>ethtool -s &lt;link&gt; wol &lt;options&gt;</code> command.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "EthernetConfig is a config document to configure Ethernet interfaces."
+    },
+    "network.EthernetRingsConfig": {
+      "properties": {
+        "rx": {
+          "type": "integer",
+          "title": "rx",
+          "description": "Number of RX rings.\n",
+          "markdownDescription": "Number of RX rings.",
+          "x-intellij-html-description": "<p>Number of RX rings.</p>\n"
+        },
+        "tx": {
+          "type": "integer",
+          "title": "tx",
+          "description": "Number of TX rings.\n",
+          "markdownDescription": "Number of TX rings.",
+          "x-intellij-html-description": "<p>Number of TX rings.</p>\n"
+        },
+        "rx-mini": {
+          "type": "integer",
+          "title": "rx-mini",
+          "description": "Number of RX mini rings.\n",
+          "markdownDescription": "Number of RX mini rings.",
+          "x-intellij-html-description": "<p>Number of RX mini rings.</p>\n"
+        },
+        "rx-jumbo": {
+          "type": "integer",
+          "title": "rx-jumbo",
+          "description": "Number of RX jumbo rings.\n",
+          "markdownDescription": "Number of RX jumbo rings.",
+          "x-intellij-html-description": "<p>Number of RX jumbo rings.</p>\n"
+        },
+        "rx-buf-len": {
+          "type": "integer",
+          "title": "rx-buf-len",
+          "description": "RX buffer length.\n",
+          "markdownDescription": "RX buffer length.",
+          "x-intellij-html-description": "<p>RX buffer length.</p>\n"
+        },
+        "cqe-size": {
+          "type": "integer",
+          "title": "cqe-size",
+          "description": "CQE size.\n",
+          "markdownDescription": "CQE size.",
+          "x-intellij-html-description": "<p>CQE size.</p>\n"
+        },
+        "tx-push": {
+          "type": "boolean",
+          "title": "tx-push",
+          "description": "TX push enabled.\n",
+          "markdownDescription": "TX push enabled.",
+          "x-intellij-html-description": "<p>TX push enabled.</p>\n"
+        },
+        "rx-push": {
+          "type": "boolean",
+          "title": "rx-push",
+          "description": "RX push enabled.\n",
+          "markdownDescription": "RX push enabled.",
+          "x-intellij-html-description": "<p>RX push enabled.</p>\n"
+        },
+        "tx-push-buf-len": {
+          "type": "integer",
+          "title": "tx-push-buf-len",
+          "description": "TX push buffer length.\n",
+          "markdownDescription": "TX push buffer length.",
+          "x-intellij-html-description": "<p>TX push buffer length.</p>\n"
+        },
+        "tcp-data-split": {
+          "type": "boolean",
+          "title": "tcp-data-split",
+          "description": "TCP data split enabled.\n",
+          "markdownDescription": "TCP data split enabled.",
+          "x-intellij-html-description": "<p>TCP data split enabled.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "EthernetRingsConfig is a configuration for Ethernet link rings."
+    }
+  }
+}

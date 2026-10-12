@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeEtcdEncryptionConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeEtcdEncryptionConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeEtcdEncryptionConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "config": {
+          "type": "object",
+          "title": "config",
+          "description": "Kubernetes API server encryption of secret data at rest.\nKey value should be exact contents of the configuration file, excluding the apiVersion and kind fields.\n",
+          "markdownDescription": "Kubernetes API server [encryption of secret data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/).\nKey value should be exact contents of the configuration file, excluding the apiVersion and kind fields.",
+          "x-intellij-html-description": "<p>Kubernetes API server <a href=\"https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/\" target=\"_blank\">encryption of secret data at rest</a>.\nKey value should be exact contents of the configuration file, excluding the apiVersion and kind fields.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeEtcdEncryptionConfig configures kube-apiserver etcd encryption rules."
+    }
+  }
+}

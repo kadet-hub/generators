@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeAggregatorCAConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeAggregatorCAConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeAggregatorCAConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "issuingCA": {
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "issuingCA",
+          "description": "The currently active issuing certificate authority for the Kubernetes API aggregator flow.\n\nThis field should only be set for the controlplane machines.\nThe value contains a private key and a certificate, PEM encoded.\n",
+          "markdownDescription": "The currently active issuing certificate authority for the Kubernetes API aggregator flow.\n\nThis field should only be set for the controlplane machines.\nThe value contains a private key and a certificate, PEM encoded.",
+          "x-intellij-html-description": "<p>The currently active issuing certificate authority for the Kubernetes API aggregator flow.</p>\n\n<p>This field should only be set for the controlplane machines.\nThe value contains a private key and a certificate, PEM encoded.</p>\n"
+        },
+        "acceptedCAs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "acceptedCAs",
+          "description": "The list of accepted CA certificates for the Kubernetes API server aggregator flow.\n\nThis field should only be set for the controlplane machines.\nThe value should be a PEM encoded certificate.\nThe issuing CA certificate is automatically added to the list of accepted CAs.\n",
+          "markdownDescription": "The list of accepted CA certificates for the Kubernetes API server aggregator flow.\n\nThis field should only be set for the controlplane machines.\nThe value should be a PEM encoded certificate.\nThe issuing CA certificate is automatically added to the list of accepted CAs.",
+          "x-intellij-html-description": "<p>The list of accepted CA certificates for the Kubernetes API server aggregator flow.</p>\n\n<p>This field should only be set for the controlplane machines.\nThe value should be a PEM encoded certificate.\nThe issuing CA certificate is automatically added to the list of accepted CAs.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeAggregatorCAConfig configures Kubernetes API aggregator accepted CAs."
+    }
+  }
+}
