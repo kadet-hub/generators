@@ -1,0 +1,13 @@
+name: docker
+description: Renders Dockerfiles, single- or multi-stage, from short image descriptions in the inventory, with package installation for the base image's distribution and non-root user setup.
+tags: []
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures

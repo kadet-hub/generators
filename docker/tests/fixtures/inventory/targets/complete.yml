@@ -1,0 +1,100 @@
+# Complete: a Python API and a Go worker, both multi-stage, non-root at runtime
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        output_type: plain
+        input_paths:
+          - lib/docker
+        output_path: docker/
+
+  generators:
+    docker:
+      dockerfiles:
+        orders-api:
+          stages:
+            - stage_name: builder
+              base_image: python:3.14.8-slim-trixie
+              workdir: /build
+              packages:
+                - build-essential
+              copy:
+                - src: requirements.txt
+                  dst: .
+              run:
+                - python -m venv /opt/venv
+                - command: /opt/venv/bin/pip install -r requirements.txt
+                  mount: type=cache,target=/root/.cache/pip
+
+            - stage_name: runtime
+              base_image: python:3.14.8-slim-trixie
+              labels:
+                org.opencontainers.image.title: orders-api
+                org.opencontainers.image.source: https://git.example.com/shop/orders-api
+              args:
+                APP_VERSION: "1.4.0"
+              env:
+                PATH: /opt/venv/bin:$PATH
+                PYTHONUNBUFFERED: "1"
+                APP_VERSION: $APP_VERSION
+              workdir: /app
+              create_user: true
+              user: app
+              uid: 10001
+              gid: 10001
+              copy:
+                - src: /opt/venv
+                  dst: /opt/venv
+                  from: builder
+                - src: src/
+                  dst: /app/
+                  chown: "10001:10001"
+              expose:
+                - 8000
+              healthcheck:
+                interval: 30s
+                timeout: 5s
+                start_period: 10s
+                retries: 3
+                cmd: ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+              cmd: ["python", "-m", "orders_api", "--port", "8000"]
+
+        orders-worker:
+          component: workers/orders
+          stages:
+            - stage_name: builder
+              base_image: golang:1.27.2-alpine3.24
+              platform: $BUILDPLATFORM
+              args:
+                TARGETOS: null
+                TARGETARCH: null
+              workdir: /src
+              copy:
+                - . .
+              run:
+                - go mod download
+                - - go vet ./...
+                  - go test ./...
+                - command: CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /out/worker ./cmd/worker
+                  mount: type=cache,target=/root/.cache/go-build
+
+            - stage_name: runtime
+              base_image: alpine:3.24.2
+              packages:
+                - ca-certificates
+                - tzdata
+              create_user: true
+              user: worker
+              uid: 10002
+              gid: 10002
+              copy:
+                - src: /out/worker
+                  dst: /usr/local/bin/worker
+                  from: builder
+                  chmod: "755"
+              healthcheck: NONE
+              entrypoint: ["/usr/local/bin/worker"]

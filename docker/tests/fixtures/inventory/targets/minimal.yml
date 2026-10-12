@@ -1,0 +1,32 @@
+# Minimal: one Alpine image with a non-root user and a shell entrypoint
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        output_type: plain
+        input_paths:
+          - lib/docker
+        output_path: docker/
+
+  generators:
+    docker:
+      dockerfiles:
+        backup-agent:
+          base_image: alpine:3.24.2
+          packages:
+            - ca-certificates
+            - rsync
+          create_user: true
+          user: backup
+          uid: 10001
+          gid: 10001
+          workdir: /app
+          copy:
+            - src: backup.sh
+              dst: /app/backup.sh
+              chmod: "755"
+          entrypoint: ["/app/backup.sh"]
