@@ -1,0 +1,38 @@
+# Minimal: a Machine on one Network with a NetworkInterface and a root Volume.
+# MachineClass and VolumeClass "fast" are operator-managed.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/ironcore
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    ironcore:
+      networks:
+        app-net: {}
+      network_interfaces:
+        web-01:
+          network_ref: app-net
+          ips:
+            - 10.0.0.10
+      volumes:
+        web-01-root:
+          volume_class_ref: fast
+          resources:
+            storage: 20Gi
+      machines:
+        web-01:
+          machine_class_ref: x1-small
+          network_interfaces:
+            - name: primary
+              networkInterfaceRef: web-01
+          volumes:
+            - name: root
+              volumeRef: web-01-root

@@ -1,0 +1,24 @@
+# QA-7: IronCore serves these kinds through its aggregated API server, so there
+# are no CRDs. Each file is the kind's schema from the generated OpenAPI v3
+# document of its API group at this release (gen/v3/apis__<group>__v1alpha1_openapi.json,
+# Apache-2.0), with the components it references copied under definitions
+# ($ref rewritten from #/components/schemas/ to #/definitions/) and closed like
+# kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# v1alpha1 is the only version of these groups at this release.
+compute.ironcore.dev:
+  software: IronCore
+  version: 0.8.0
+  source: https://github.com/ironcore-dev/ironcore/blob/v0.8.0/gen/v3/apis__compute.ironcore.dev__v1alpha1_openapi.json
+  license: Apache-2.0
+networking.ironcore.dev:
+  software: IronCore
+  version: 0.8.0
+  source: https://github.com/ironcore-dev/ironcore/blob/v0.8.0/gen/v3/apis__networking.ironcore.dev__v1alpha1_openapi.json
+  license: Apache-2.0
+storage.ironcore.dev:
+  software: IronCore
+  version: 0.8.0
+  source: https://github.com/ironcore-dev/ironcore/blob/v0.8.0/gen/v3/apis__storage.ironcore.dev__v1alpha1_openapi.json
+  license: Apache-2.0
