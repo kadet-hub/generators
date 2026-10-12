@@ -1,0 +1,26 @@
+# Minimal: a CephCluster on all nodes and devices, dataDirHostPath from the
+# generator default
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/rook-ceph
+        output_path: manifests/
+
+  generators:
+    rook-ceph:
+      namespace: rook-ceph
+      clusters:
+        rook-ceph:
+          ceph_version:
+            image: quay.io/ceph/ceph:v20.2.4
+          spec:
+            # Claims every empty raw disk on every node
+            storage:
+              useAllNodes: true
+              useAllDevices: true
