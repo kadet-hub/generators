@@ -1,0 +1,139 @@
+# Complete: every resource kind, flat keys, spec passthrough, encrypted OSDs on
+# PVCs, the .nfs pool for CephNFS, and flat keys overriding spec (logs warnings)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/rook-ceph
+        output_path: manifests/
+
+  generators:
+    rook-ceph:
+      namespace: rook-ceph
+      clusters:
+        rook-ceph:
+          labels:
+            app.kubernetes.io/part-of: storage
+          data_dir_host_path: /var/lib/rook
+          mon:
+            count: 3
+            allowMultiplePerNode: false
+          mgr:
+            count: 2
+            allowMultiplePerNode: false
+          dashboard:
+            enabled: true
+            ssl: true
+          monitoring:
+            enabled: true
+          priority_class_names:
+            mon: system-node-critical
+            osd: system-node-critical
+            mgr: system-cluster-critical
+          disruption_management:
+            managePodBudgets: true
+            osdMaintenanceTimeout: 30
+          spec:
+            cephVersion:
+              image: quay.io/ceph/ceph:v20.2.4
+              allowUnsupported: false
+            # overridden by the flat key mon (warning)
+            mon:
+              count: 5
+            network:
+              connections:
+                requireMsgr2: true
+            storage:
+              storageClassDeviceSets:
+                - name: set1
+                  count: 3
+                  portable: true
+                  encrypted: true
+                  volumeClaimTemplates:
+                    - metadata:
+                        name: data
+                      spec:
+                        storageClassName: standard
+                        resources:
+                          requests:
+                            storage: 100Gi
+                        volumeMode: Block
+                        accessModes:
+                          - ReadWriteOnce
+      block_pools:
+        # New installs since Rook 1.21 declare the .nfs pool themselves
+        builtin-nfs:
+          failure_domain: host
+          replicated:
+            size: 3
+            requireSafeReplicaSize: true
+          spec:
+            name: .nfs
+        replicapool:
+          failure_domain: host
+          replicated:
+            size: 3
+            requireSafeReplicaSize: true
+          parameters:
+            compression_mode: none
+          spec:
+            # overridden by the flat key failure_domain (warning)
+            failureDomain: osd
+            enableRBDStats: true
+      filesystems:
+        myfs:
+          metadata_pool:
+            replicated:
+              size: 3
+          data_pools:
+            - name: replicated
+              failureDomain: host
+              replicated:
+                size: 3
+          metadata_server:
+            activeCount: 1
+            activeStandby: true
+          spec:
+            preserveFilesystemOnDelete: true
+      object_stores:
+        my-store:
+          metadata_pool:
+            failureDomain: host
+            replicated:
+              size: 3
+          data_pool:
+            failureDomain: host
+            erasureCoded:
+              dataChunks: 2
+              codingChunks: 1
+          gateway:
+            port: 80
+            instances: 1
+          spec:
+            preservePoolsOnDelete: true
+      object_store_users:
+        my-user:
+          store: my-store
+          display_name: my-user
+          quotas:
+            maxBuckets: 10
+            maxSize: 10G
+      # server.active and count come from the generator defaults
+      nfs:
+        my-nfs:
+          server:
+            logLevel: NIV_INFO
+      rbd_mirrors:
+        my-rbd-mirror:
+          priority_class_name: system-cluster-critical
+      clients:
+        rbd-app:
+          client_name: app
+          caps:
+            mon: profile rbd
+            osd: profile rbd pool=replicapool
