@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeAdmissionControlConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeAdmissionControlConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeAdmissionControlConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Admission control plugin name, should be a valid Kubernetes admission control plugin name.\n",
+          "markdownDescription": "Admission control plugin name, should be a valid Kubernetes admission control plugin name.",
+          "x-intellij-html-description": "<p>Admission control plugin name, should be a valid Kubernetes admission control plugin name.</p>\n"
+        },
+        "configuration": {
+          "type": "object",
+          "title": "configuration",
+          "description": "Kubernetes API server admission control plugins.\nThe value is the literal Kubernetes admission control configuration.\n",
+          "markdownDescription": "Kubernetes API server [admission control plugins](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/).\nThe value is the literal Kubernetes admission control configuration.",
+          "x-intellij-html-description": "<p>Kubernetes API server <a href=\"https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/\" target=\"_blank\">admission control plugins</a>.\nThe value is the literal Kubernetes admission control configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeAdmissionControlConfig configures kube-apiserver admission control plugins."
+    }
+  }
+}

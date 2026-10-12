@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/security.TrustedRootsConfigV1Alpha1",
+  "$defs": {
+    "security.TrustedRootsConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "TrustedRootsConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the config document.\n",
+          "markdownDescription": "Name of the config document.",
+          "x-intellij-html-description": "<p>Name of the config document.</p>\n"
+        },
+        "certificates": {
+          "type": "string",
+          "title": "certificates",
+          "description": "List of additional trusted certificate authorities (as PEM-encoded certificates).\n\nMultiple certificates can be provided in a single config document, separated by newline characters.\n",
+          "markdownDescription": "List of additional trusted certificate authorities (as PEM-encoded certificates).\n\nMultiple certificates can be provided in a single config document, separated by newline characters.",
+          "x-intellij-html-description": "<p>List of additional trusted certificate authorities (as PEM-encoded certificates).</p>\n\n<p>Multiple certificates can be provided in a single config document, separated by newline characters.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "TrustedRootsConfig allows to configure additional trusted CA roots."
+    }
+  }
+}

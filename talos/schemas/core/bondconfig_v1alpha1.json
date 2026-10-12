@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.BondConfigV1Alpha1",
+  "$defs": {
+    "network.AddressConfig": {
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+/\\d{1,3}$",
+          "title": "address",
+          "description": "IP address to be assigned to the link.\n\nThis field must include the network prefix length (e.g. /24 for IPv4, /64 for IPv6).\n",
+          "markdownDescription": "IP address to be assigned to the link.\n\nThis field must include the network prefix length (e.g. /24 for IPv4, /64 for IPv6).",
+          "x-intellij-html-description": "<p>IP address to be assigned to the link.</p>\n\n<p>This field must include the network prefix length (e.g. /24 for IPv4, /64 for IPv6).</p>\n"
+        },
+        "routePriority": {
+          "type": "integer",
+          "title": "routePriority",
+          "description": "Configure the route priority (metric) for routes created for this address.\n\nIf not specified, the system default route priority will be used.\n",
+          "markdownDescription": "Configure the route priority (metric) for routes created for this address.\n\nIf not specified, the system default route priority will be used.",
+          "x-intellij-html-description": "<p>Configure the route priority (metric) for routes created for this address.</p>\n\n<p>If not specified, the system default route priority will be used.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "address"
+      ],
+      "description": "AddressConfig represents a network address configuration."
+    },
+    "network.BondConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "BondConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the bond link (interface) to be created.\n",
+          "markdownDescription": "Name of the bond link (interface) to be created.",
+          "x-intellij-html-description": "<p>Name of the bond link (interface) to be created.</p>\n"
+        },
+        "hardwareAddr": {
+          "type": "string",
+          "pattern": "^[0-9a-f:]+$",
+          "title": "hardwareAddr",
+          "description": "Override the hardware (MAC) address of the link.\n",
+          "markdownDescription": "Override the hardware (MAC) address of the link.",
+          "x-intellij-html-description": "<p>Override the hardware (MAC) address of the link.</p>\n"
+        },
+        "links": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "links",
+          "description": "Names of the links (interfaces) on which the bond will be created.\nLink aliases can be used here as well.\n",
+          "markdownDescription": "Names of the links (interfaces) on which the bond will be created.\nLink aliases can be used here as well.",
+          "x-intellij-html-description": "<p>Names of the links (interfaces) on which the bond will be created.\nLink aliases can be used here as well.</p>\n"
+        },
+        "bondMode": {
+          "enum": [
+            "balance-rr",
+            "active-backup",
+            "balance-xor",
+            "broadcast",
+            "802.3ad",
+            "balance-tlb",
+            "balance-alb"
+          ],
+          "title": "bondMode",
+          "description": "Bond mode.\n",
+          "markdownDescription": "Bond mode.",
+          "x-intellij-html-description": "<p>Bond mode.</p>\n"
+        },
+        "miimon": {
+          "type": "integer",
+          "title": "miimon",
+          "description": "Link monitoring frequency in milliseconds.\n",
+          "markdownDescription": "Link monitoring frequency in milliseconds.",
+          "x-intellij-html-description": "<p>Link monitoring frequency in milliseconds.</p>\n"
+        },
+        "updelay": {
+          "type": "integer",
+          "title": "updelay",
+          "description": "The time, in milliseconds, to wait before enabling a slave after a link recovery has been detected.\n",
+          "markdownDescription": "The time, in milliseconds, to wait before enabling a slave after a link recovery has been detected.",
+          "x-intellij-html-description": "<p>The time, in milliseconds, to wait before enabling a slave after a link recovery has been detected.</p>\n"
+        },
+        "downdelay": {
+          "type": "integer",
+          "title": "downdelay",
+          "description": "The time, in milliseconds, to wait before disabling a slave after a link failure has been detected.\n",
+          "markdownDescription": "The time, in milliseconds, to wait before disabling a slave after a link failure has been detected.",
+          "x-intellij-html-description": "<p>The time, in milliseconds, to wait before disabling a slave after a link failure has been detected.</p>\n"
+        },
+        "useCarrier": {
+          "type": "boolean",
+          "title": "useCarrier",
+          "description": "Specifies whether or not miimon should use MII or ETHTOOL.\n",
+          "markdownDescription": "Specifies whether or not miimon should use MII or ETHTOOL.",
+          "x-intellij-html-description": "<p>Specifies whether or not miimon should use MII or ETHTOOL.</p>\n"
+        },
+        "xmitHashPolicy": {
+          "enum": [
+            "layer2",
+            "layer3+4",
+            "layer2+3",
+            "encap2+3",
+            "encap3+4"
+          ],
+          "title": "xmitHashPolicy",
+          "description": "Selects the transmit hash policy to use for slave selection.\n",
+          "markdownDescription": "Selects the transmit hash policy to use for slave selection.",
+          "x-intellij-html-description": "<p>Selects the transmit hash policy to use for slave selection.</p>\n"
+        },
+        "arpInterval": {
+          "type": "integer",
+          "title": "arpInterval",
+          "description": "ARP link monitoring frequency in milliseconds.\n",
+          "markdownDescription": "ARP link monitoring frequency in milliseconds.",
+          "x-intellij-html-description": "<p>ARP link monitoring frequency in milliseconds.</p>\n"
+        },
+        "arpIpTargets": {
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f.:]+$"
+          },
+          "type": "array",
+          "title": "arpIpTargets",
+          "description": "The list of IPv4 addresses to use for ARP link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.\n",
+          "markdownDescription": "The list of IPv4 addresses to use for ARP link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.",
+          "x-intellij-html-description": "<p>The list of IPv4 addresses to use for ARP link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.</p>\n"
+        },
+        "nsIp6Targets": {
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f.:]+$"
+          },
+          "type": "array",
+          "title": "nsIp6Targets",
+          "description": "The list of IPv6 addresses to use for NS link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.\n",
+          "markdownDescription": "The list of IPv6 addresses to use for NS link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.",
+          "x-intellij-html-description": "<p>The list of IPv6 addresses to use for NS link monitoring when arpInterval is set.\nMaximum of 16 targets are supported.</p>\n"
+        },
+        "arpValidate": {
+          "enum": [
+            "none",
+            "active",
+            "backup",
+            "all",
+            "filter",
+            "filter-active",
+            "filter-backup"
+          ],
+          "title": "arpValidate",
+          "description": "Specifies whether or not ARP probes and replies should be validated.\n",
+          "markdownDescription": "Specifies whether or not ARP probes and replies should be validated.",
+          "x-intellij-html-description": "<p>Specifies whether or not ARP probes and replies should be validated.</p>\n"
+        },
+        "arpAllTargets": {
+          "enum": [
+            "any",
+            "all"
+          ],
+          "title": "arpAllTargets",
+          "description": "Specifies whether ARP probes should be sent to any or all targets.\n",
+          "markdownDescription": "Specifies whether ARP probes should be sent to any or all targets.",
+          "x-intellij-html-description": "<p>Specifies whether ARP probes should be sent to any or all targets.</p>\n"
+        },
+        "lacpRate": {
+          "enum": [
+            "slow",
+            "fast"
+          ],
+          "title": "lacpRate",
+          "description": "LACPDU frames periodic transmission rate.\n",
+          "markdownDescription": "LACPDU frames periodic transmission rate.",
+          "x-intellij-html-description": "<p>LACPDU frames periodic transmission rate.</p>\n"
+        },
+        "failOverMac": {
+          "enum": [
+            "none",
+            "active",
+            "follow"
+          ],
+          "title": "failOverMac",
+          "description": "Specifies whether active-backup mode should set all slaves to the same MAC address\nat enslavement, when enabled, or perform special handling.\n",
+          "markdownDescription": "Specifies whether active-backup mode should set all slaves to the same MAC address\nat enslavement, when enabled, or perform special handling.",
+          "x-intellij-html-description": "<p>Specifies whether active-backup mode should set all slaves to the same MAC address\nat enslavement, when enabled, or perform special handling.</p>\n"
+        },
+        "adSelect": {
+          "enum": [
+            "stable",
+            "bandwidth",
+            "count"
+          ],
+          "title": "adSelect",
+          "description": "Aggregate selection policy for 802.3ad.\n",
+          "markdownDescription": "Aggregate selection policy for 802.3ad.",
+          "x-intellij-html-description": "<p>Aggregate selection policy for 802.3ad.</p>\n"
+        },
+        "adActorSysPrio": {
+          "type": "integer",
+          "title": "adActorSysPrio",
+          "description": "Actor system priority for 802.3ad.\n",
+          "markdownDescription": "Actor system priority for 802.3ad.",
+          "x-intellij-html-description": "<p>Actor system priority for 802.3ad.</p>\n"
+        },
+        "adUserPortKey": {
+          "type": "integer",
+          "title": "adUserPortKey",
+          "description": "User port key (upper 10 bits) for 802.3ad.\n",
+          "markdownDescription": "User port key (upper 10 bits) for 802.3ad.",
+          "x-intellij-html-description": "<p>User port key (upper 10 bits) for 802.3ad.</p>\n"
+        },
+        "adLACPActive": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "title": "adLACPActive",
+          "description": "Whether to send LACPDU frames periodically, defaults to \u201con\u201d if mode is 802.3ad.\n",
+          "markdownDescription": "Whether to send LACPDU frames periodically, defaults to \"on\" if mode is 802.3ad.",
+          "x-intellij-html-description": "<p>Whether to send LACPDU frames periodically, defaults to &ldquo;on&rdquo; if mode is 802.3ad.</p>\n"
+        },
+        "primaryReselect": {
+          "enum": [
+            "always",
+            "better",
+            "failure"
+          ],
+          "title": "primaryReselect",
+          "description": "Policy under which the primary slave should be reselected.\n",
+          "markdownDescription": "Policy under which the primary slave should be reselected.",
+          "x-intellij-html-description": "<p>Policy under which the primary slave should be reselected.</p>\n"
+        },
+        "resendIGMP": {
+          "type": "integer",
+          "title": "resendIGMP",
+          "description": "The number of times IGMP packets should be resent.\n",
+          "markdownDescription": "The number of times IGMP packets should be resent.",
+          "x-intellij-html-description": "<p>The number of times IGMP packets should be resent.</p>\n"
+        },
+        "minLinks": {
+          "type": "integer",
+          "title": "minLinks",
+          "description": "The minimum number of active links required for the bond to be considered active.\n",
+          "markdownDescription": "The minimum number of active links required for the bond to be considered active.",
+          "x-intellij-html-description": "<p>The minimum number of active links required for the bond to be considered active.</p>\n"
+        },
+        "lpInterval": {
+          "type": "integer",
+          "title": "lpInterval",
+          "description": "The number of seconds between instances where the bonding driver sends learning packets to each slave\u2019s peer switch.\n",
+          "markdownDescription": "The number of seconds between instances where the bonding driver sends learning packets to each slave's peer switch.",
+          "x-intellij-html-description": "<p>The number of seconds between instances where the bonding driver sends learning packets to each slave&rsquo;s peer switch.</p>\n"
+        },
+        "packetsPerSlave": {
+          "type": "integer",
+          "title": "packetsPerSlave",
+          "description": "The number of packets to transmit through a slave before moving to the next one.\n",
+          "markdownDescription": "The number of packets to transmit through a slave before moving to the next one.",
+          "x-intellij-html-description": "<p>The number of packets to transmit through a slave before moving to the next one.</p>\n"
+        },
+        "numPeerNotif": {
+          "type": "integer",
+          "title": "numPeerNotif",
+          "description": "The number of peer notifications (gratuitous ARPs and unsolicited IPv6 Neighbor Advertisements)\nto be issued after a failover event.\n",
+          "markdownDescription": "The number of peer notifications (gratuitous ARPs and unsolicited IPv6 Neighbor Advertisements)\nto be issued after a failover event.",
+          "x-intellij-html-description": "<p>The number of peer notifications (gratuitous ARPs and unsolicited IPv6 Neighbor Advertisements)\nto be issued after a failover event.</p>\n"
+        },
+        "tlbLogicalLb": {
+          "type": "integer",
+          "title": "tlbLogicalLb",
+          "description": "Whether dynamic shuffling of flows is enabled in tlb or alb mode.\n",
+          "markdownDescription": "Whether dynamic shuffling of flows is enabled in tlb or alb mode.",
+          "x-intellij-html-description": "<p>Whether dynamic shuffling of flows is enabled in tlb or alb mode.</p>\n"
+        },
+        "allSlavesActive": {
+          "type": "integer",
+          "title": "allSlavesActive",
+          "description": "Whether duplicate frames (received on inactive ports) should be dropped (0) or delivered (1).\n",
+          "markdownDescription": "Whether duplicate frames (received on inactive ports) should be dropped (0) or delivered (1).",
+          "x-intellij-html-description": "<p>Whether duplicate frames (received on inactive ports) should be dropped (0) or delivered (1).</p>\n"
+        },
+        "peerNotifDelay": {
+          "type": "integer",
+          "title": "peerNotifDelay",
+          "description": "The delay, in milliseconds, between each peer notification.\n",
+          "markdownDescription": "The delay, in milliseconds, between each peer notification.",
+          "x-intellij-html-description": "<p>The delay, in milliseconds, between each peer notification.</p>\n"
+        },
+        "missedMax": {
+          "type": "integer",
+          "title": "missedMax",
+          "description": "The number of arpInterval monitor checks that must fail in order for an interface to be marked down by the ARP monitor.\n",
+          "markdownDescription": "The number of arpInterval monitor checks that must fail in order for an interface to be marked down by the ARP monitor.",
+          "x-intellij-html-description": "<p>The number of arpInterval monitor checks that must fail in order for an interface to be marked down by the ARP monitor.</p>\n"
+        },
+        "up": {
+          "type": "boolean",
+          "title": "up",
+          "description": "Bring the link up or down.\n\nIf not specified, the link will be brought up.\n",
+          "markdownDescription": "Bring the link up or down.\n\nIf not specified, the link will be brought up.",
+          "x-intellij-html-description": "<p>Bring the link up or down.</p>\n\n<p>If not specified, the link will be brought up.</p>\n"
+        },
+        "mtu": {
+          "type": "integer",
+          "title": "mtu",
+          "description": "Configure LinkMTU (Maximum Transmission Unit) for the link.\n\nIf not specified, the system default LinkMTU will be used (usually 1500).\n",
+          "markdownDescription": "Configure LinkMTU (Maximum Transmission Unit) for the link.\n\nIf not specified, the system default LinkMTU will be used (usually 1500).",
+          "x-intellij-html-description": "<p>Configure LinkMTU (Maximum Transmission Unit) for the link.</p>\n\n<p>If not specified, the system default LinkMTU will be used (usually 1500).</p>\n"
+        },
+        "addresses": {
+          "items": {
+            "$ref": "#/$defs/network.AddressConfig"
+          },
+          "type": "array",
+          "title": "addresses",
+          "description": "Configure addresses to be statically assigned to the link.\n",
+          "markdownDescription": "Configure addresses to be statically assigned to the link.",
+          "x-intellij-html-description": "<p>Configure addresses to be statically assigned to the link.</p>\n"
+        },
+        "routes": {
+          "items": {
+            "$ref": "#/$defs/network.RouteConfig"
+          },
+          "type": "array",
+          "title": "routes",
+          "description": "Configure routes to be statically created via the link.\n",
+          "markdownDescription": "Configure routes to be statically created via the link.",
+          "x-intellij-html-description": "<p>Configure routes to be statically created via the link.</p>\n"
+        },
+        "multicast": {
+          "type": "boolean",
+          "title": "multicast",
+          "description": "Set the multicast capability of the link.\n",
+          "markdownDescription": "Set the multicast capability of the link.",
+          "x-intellij-html-description": "<p>Set the multicast capability of the link.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "bondMode",
+        "kind",
+        "links",
+        "name"
+      ],
+      "description": "BondConfig is a config document to create a bond (link aggregation) over a set of links."
+    },
+    "network.RouteConfig": {
+      "properties": {
+        "destination": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+/\\d{1,3}$",
+          "title": "destination",
+          "description": "The route\u2019s destination as an address prefix.\n\nIf not specified, a default route will be created for the address family of the gateway.\n",
+          "markdownDescription": "The route's destination as an address prefix.\n\nIf not specified, a default route will be created for the address family of the gateway.",
+          "x-intellij-html-description": "<p>The route&rsquo;s destination as an address prefix.</p>\n\n<p>If not specified, a default route will be created for the address family of the gateway.</p>\n"
+        },
+        "gateway": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+$",
+          "title": "gateway",
+          "description": "The route\u2019s gateway (if empty, creates link scope route).\n",
+          "markdownDescription": "The route's gateway (if empty, creates link scope route).",
+          "x-intellij-html-description": "<p>The route&rsquo;s gateway (if empty, creates link scope route).</p>\n"
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+$",
+          "title": "source",
+          "description": "The route\u2019s source address (optional).\n",
+          "markdownDescription": "The route's source address (optional).",
+          "x-intellij-html-description": "<p>The route&rsquo;s source address (optional).</p>\n"
+        },
+        "metric": {
+          "type": "integer",
+          "title": "metric",
+          "description": "The optional metric for the route.\n",
+          "markdownDescription": "The optional metric for the route.",
+          "x-intellij-html-description": "<p>The optional metric for the route.</p>\n"
+        },
+        "mtu": {
+          "type": "integer",
+          "title": "mtu",
+          "description": "The optional MTU for the route.\n",
+          "markdownDescription": "The optional MTU for the route.",
+          "x-intellij-html-description": "<p>The optional MTU for the route.</p>\n"
+        },
+        "table": {
+          "type": "string",
+          "title": "table",
+          "description": "The routing table to use for the route.\n\nIf not specified, the main routing table will be used.\n",
+          "markdownDescription": "The routing table to use for the route.\n\nIf not specified, the main routing table will be used.",
+          "x-intellij-html-description": "<p>The routing table to use for the route.</p>\n\n<p>If not specified, the main routing table will be used.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "RouteConfig represents a network route configuration."
+    }
+  }
+}

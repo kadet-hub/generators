@@ -1,0 +1,30 @@
+# Minimal: one control plane node with the default flannel CNI; the installer
+# image comes from the generator default
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/talos
+        output_path: talos/
+
+  generators:
+    talos:
+      nodes:
+        cp-1:
+          type: controlplane
+          hostname: cp-1
+          machine:
+            install:
+              disk: /dev/sda
+          cluster:
+            clusterName: lab
+            controlPlane:
+              endpoint: https://10.0.0.11:6443
+            network:
+              cni:
+                name: flannel

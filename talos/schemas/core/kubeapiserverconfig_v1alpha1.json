@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeAPIServerConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeAPIServerConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeAPIServerConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "The container image used to run the kube-apiserver component.\n\nThe image reference should contain the tag, even if it is pinned by digest.\n",
+          "markdownDescription": "The container image used to run the kube-apiserver component.\n\nThe image reference should contain the tag, even if it is pinned by digest.",
+          "x-intellij-html-description": "<p>The container image used to run the kube-apiserver component.</p>\n\n<p>The image reference should contain the tag, even if it is pinned by digest.</p>\n"
+        },
+        "extraArgs": {
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "type": "object",
+          "title": "extraArgs",
+          "description": "Extra command line arguments to supply to the kube-apiserver.\n\nArguments owned by other configuration documents are rejected:\nanonymous-auth, authentication-config and oidc-* are set via KubeAuthenticationConfig, while\nauthorization-config, authorization-mode and authorization-webhook-* are set via KubeAuthorizerConfig.\n\nThe single exception is oidc-signing-algs, which cannot be set at all: see KubeAuthenticationConfig.\n",
+          "markdownDescription": "Extra command line arguments to supply to the kube-apiserver.\n\nArguments owned by other configuration documents are rejected:\n`anonymous-auth`, `authentication-config` and `oidc-*` are set via `KubeAuthenticationConfig`, while\n`authorization-config`, `authorization-mode` and `authorization-webhook-*` are set via `KubeAuthorizerConfig`.\n\nThe single exception is `oidc-signing-algs`, which cannot be set at all: see `KubeAuthenticationConfig`.",
+          "x-intellij-html-description": "<p>Extra command line arguments to supply to the kube-apiserver.</p>\n\n<p>Arguments owned by other configuration documents are rejected:\n<code>anonymous-auth</code>, <code>authentication-config</code> and <code>oidc-*</code> are set via <code>KubeAuthenticationConfig</code>, while\n<code>authorization-config</code>, <code>authorization-mode</code> and <code>authorization-webhook-*</code> are set via <code>KubeAuthorizerConfig</code>.</p>\n\n<p>The single exception is <code>oidc-signing-algs</code>, which cannot be set at all: see <code>KubeAuthenticationConfig</code>.</p>\n"
+        },
+        "env": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "env",
+          "description": "The env field allows for the addition of environment variables for the kube-apiserver.\n",
+          "markdownDescription": "The `env` field allows for the addition of environment variables for the kube-apiserver.",
+          "x-intellij-html-description": "<p>The <code>env</code> field allows for the addition of environment variables for the kube-apiserver.</p>\n"
+        },
+        "resources": {
+          "type": "object",
+          "title": "resources",
+          "description": "Configure the kube-apiserver resources.\n",
+          "markdownDescription": "Configure the kube-apiserver resources.",
+          "x-intellij-html-description": "<p>Configure the kube-apiserver resources.</p>\n"
+        },
+        "apiPort": {
+          "type": "integer",
+          "title": "apiPort",
+          "description": "The port on which the kube-apiserver will listen for requests.\n\nDefault is 6443.\n",
+          "markdownDescription": "The port on which the kube-apiserver will listen for requests.\n\nDefault is 6443.",
+          "x-intellij-html-description": "<p>The port on which the kube-apiserver will listen for requests.</p>\n\n<p>Default is 6443.</p>\n"
+        },
+        "certExtraSANs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "certExtraSANs",
+          "description": "Provide extra certificate SANs (hostnames, IPs) to add to the kube-apiserver serving certificate.\n\nTalos automatically adds machine\u2019s addresses and hostnames, Kubernetes names, and control plane endpoint\nderived SANs to the kube-apiserver serving certificate.\nThis field allows for adding additional SANs to the serving certificate.\n",
+          "markdownDescription": "Provide extra certificate SANs (hostnames, IPs) to add to the kube-apiserver serving certificate.\n\nTalos automatically adds machine's addresses and hostnames, Kubernetes names, and control plane endpoint\nderived SANs to the kube-apiserver serving certificate.\nThis field allows for adding additional SANs to the serving certificate.",
+          "x-intellij-html-description": "<p>Provide extra certificate SANs (hostnames, IPs) to add to the kube-apiserver serving certificate.</p>\n\n<p>Talos automatically adds machine&rsquo;s addresses and hostnames, Kubernetes names, and control plane endpoint\nderived SANs to the kube-apiserver serving certificate.\nThis field allows for adding additional SANs to the serving certificate.</p>\n"
+        },
+        "startupProbes": {
+          "type": "boolean",
+          "title": "startupProbes",
+          "description": "Enable or disable startup probes for kube-apiserver.\n\nDefault is enabled.\n",
+          "markdownDescription": "Enable or disable startup probes for kube-apiserver.\n\nDefault is enabled.",
+          "x-intellij-html-description": "<p>Enable or disable startup probes for kube-apiserver.</p>\n\n<p>Default is enabled.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "image",
+        "kind"
+      ],
+      "description": "KubeAPIServerConfig configures kube-apiserver controlplane static pod."
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeletConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeletConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeletConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "The container image used to run the kubelet component.\n\nThe image reference should contain the tag, even if it is pinned by digest.\n",
+          "markdownDescription": "The container image used to run the kubelet component.\n\nThe image reference should contain the tag, even if it is pinned by digest.",
+          "x-intellij-html-description": "<p>The container image used to run the kubelet component.</p>\n\n<p>The image reference should contain the tag, even if it is pinned by digest.</p>\n"
+        },
+        "config": {
+          "type": "object",
+          "title": "config",
+          "description": "Provide extra configuration for the kubelet.\n\nThere is no need to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.\n\nSee https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/ for the details of the configuration schema.\n",
+          "markdownDescription": "Provide extra configuration for the kubelet.\n\nThere is no need to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.\n\nSee https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/ for the details of the configuration schema.",
+          "x-intellij-html-description": "<p>Provide extra configuration for the kubelet.</p>\n\n<p>There is no need to specify kind and apiVersion fields (they will be set automatically),\nbut the rest of the configuration should be provided as is.</p>\n\n<p>See <a href=\"https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/\" target=\"_blank\">https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/</a> for the details of the configuration schema.</p>\n"
+        },
+        "extraArgs": {
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "type": "object",
+          "title": "extraArgs",
+          "description": "Extra command line arguments to supply to the kubelet.\n\nIt is preferable to use config field to provide configuration overrides.\n",
+          "markdownDescription": "Extra command line arguments to supply to the kubelet.\n\nIt is preferable to use `config` field to provide configuration overrides.",
+          "x-intellij-html-description": "<p>Extra command line arguments to supply to the kubelet.</p>\n\n<p>It is preferable to use <code>config</code> field to provide configuration overrides.</p>\n"
+        },
+        "clusterDNS": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "clusterDNS",
+          "description": "The ClusterDNS field is an optional reference to an alternative kubelet clusterDNS ip list.\n",
+          "markdownDescription": "The `ClusterDNS` field is an optional reference to an alternative kubelet clusterDNS ip list.",
+          "x-intellij-html-description": "<p>The <code>ClusterDNS</code> field is an optional reference to an alternative kubelet clusterDNS ip list.</p>\n"
+        },
+        "defaultRuntimeSeccompProfileEnabled": {
+          "type": "boolean",
+          "title": "defaultRuntimeSeccompProfileEnabled",
+          "description": "Enable container runtime default Seccomp profile.\n",
+          "markdownDescription": "Enable container runtime default Seccomp profile.",
+          "x-intellij-html-description": "<p>Enable container runtime default Seccomp profile.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "image",
+        "kind"
+      ],
+      "description": "KubeletConfig configures kubelet component on the node."
+    }
+  }
+}

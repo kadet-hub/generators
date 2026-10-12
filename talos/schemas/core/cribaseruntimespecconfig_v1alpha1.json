@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.CRIBaseRuntimeSpecConfigV1Alpha1",
+  "$defs": {
+    "cri.CRIBaseRuntimeSpecConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "CRIBaseRuntimeSpecConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "overrides": {
+          "type": "object",
+          "title": "overrides",
+          "description": "Overrides for the default OCI runtime specification used by CRI containers.\n\nThis document is mutually exclusive with the deprecated\n.machine.baseRuntimeSpecOverrides field.\n\nStrategic merge patches replace this overrides object as a whole, so\nreapplying the same document is idempotent.\n\nApplying, updating, or removing these overrides restarts CRI automatically.\nA machine reboot is not required.\n",
+          "markdownDescription": "Overrides for the default OCI runtime specification used by CRI containers.\n\nThis document is mutually exclusive with the deprecated\n`.machine.baseRuntimeSpecOverrides` field.\n\nStrategic merge patches replace this overrides object as a whole, so\nreapplying the same document is idempotent.\n\nApplying, updating, or removing these overrides restarts CRI automatically.\nA machine reboot is not required.",
+          "x-intellij-html-description": "<p>Overrides for the default OCI runtime specification used by CRI containers.</p>\n\n<p>This document is mutually exclusive with the deprecated\n<code>.machine.baseRuntimeSpecOverrides</code> field.</p>\n\n<p>Strategic merge patches replace this overrides object as a whole, so\nreapplying the same document is idempotent.</p>\n\n<p>Applying, updating, or removing these overrides restarts CRI automatically.\nA machine reboot is not required.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "CRIBaseRuntimeSpecConfig configures the base OCI runtime specification for CRI containers."
+    }
+  }
+}

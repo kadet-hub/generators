@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeNodeConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeNodeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeNodeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "skipNodeRegistration": {
+          "type": "boolean",
+          "title": "skipNodeRegistration",
+          "description": "The skipNodeRegistration is used to run the kubelet without registering with the apiserver.\nThis runs kubelet as standalone and only runs static pods.\nWhen this is set to true, other fields in this document are ignored.\n",
+          "markdownDescription": "The `skipNodeRegistration` is used to run the kubelet without registering with the apiserver.\nThis runs kubelet as standalone and only runs static pods.\nWhen this is set to true, other fields in this document are ignored.",
+          "x-intellij-html-description": "<p>The <code>skipNodeRegistration</code> is used to run the kubelet without registering with the apiserver.\nThis runs kubelet as standalone and only runs static pods.\nWhen this is set to true, other fields in this document are ignored.</p>\n"
+        },
+        "registerWithFQDN": {
+          "type": "boolean",
+          "title": "registerWithFQDN",
+          "description": "The registerWithFQDN field is used to force kubelet to use the node FQDN for registration.\nThis is required in clouds like AWS.\n",
+          "markdownDescription": "The `registerWithFQDN` field is used to force kubelet to use the node FQDN for registration.\nThis is required in clouds like AWS.",
+          "x-intellij-html-description": "<p>The <code>registerWithFQDN</code> field is used to force kubelet to use the node FQDN for registration.\nThis is required in clouds like AWS.</p>\n"
+        },
+        "nodeIP": {
+          "$ref": "#/$defs/k8s.NodeIPConfig",
+          "title": "nodeIP",
+          "description": "The nodeIP field is used to configure --node-ip flag for the kubelet.\nThis field should be set when a node has multiple addresses to choose from.\n",
+          "markdownDescription": "The `nodeIP` field is used to configure `--node-ip` flag for the kubelet.\nThis field should be set when a node has multiple addresses to choose from.",
+          "x-intellij-html-description": "<p>The <code>nodeIP</code> field is used to configure <code>--node-ip</code> flag for the kubelet.\nThis field should be set when a node has multiple addresses to choose from.</p>\n"
+        },
+        "labels": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "labels",
+          "description": "Configures the node labels for the machine.\n\nNote: In the default Kubernetes configuration, worker nodes are restricted to set\nlabels with some prefixes (see NodeRestriction admission plugin).\n",
+          "markdownDescription": "Configures the node labels for the machine.\n\nNote: In the default Kubernetes configuration, worker nodes are restricted to set\nlabels with some prefixes (see [NodeRestriction](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#noderestriction) admission plugin).",
+          "x-intellij-html-description": "<p>Configures the node labels for the machine.</p>\n\n<p>Note: In the default Kubernetes configuration, worker nodes are restricted to set\nlabels with some prefixes (see <a href=\"https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#noderestriction\" target=\"_blank\">NodeRestriction</a> admission plugin).</p>\n"
+        },
+        "annotations": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "annotations",
+          "description": "Configures the node annotations for the machine.\n",
+          "markdownDescription": "Configures the node annotations for the machine.",
+          "x-intellij-html-description": "<p>Configures the node annotations for the machine.</p>\n"
+        },
+        "taints": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "taints",
+          "description": "Configures the node taints for the machine. Effect is optional.\n\nNote: In the default Kubernetes configuration, worker nodes are not allowed to\nmodify the taints (see NodeRestriction admission plugin).\n",
+          "markdownDescription": "Configures the node taints for the machine. Effect is optional.\n\nNote: In the default Kubernetes configuration, worker nodes are not allowed to\nmodify the taints (see [NodeRestriction](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#noderestriction) admission plugin).",
+          "x-intellij-html-description": "<p>Configures the node taints for the machine. Effect is optional.</p>\n\n<p>Note: In the default Kubernetes configuration, worker nodes are not allowed to\nmodify the taints (see <a href=\"https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#noderestriction\" target=\"_blank\">NodeRestriction</a> admission plugin).</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KubeNodeConfig configures Kubernetes node."
+    },
+    "k8s.NodeIPConfig": {
+      "properties": {
+        "validSubnets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "validSubnets",
+          "description": "The validSubnets field configures the networks to pick kubelet node IP from.\nFor dual stack configuration, there should be two subnets: one for IPv4, another for IPv6.\nIPs can be excluded from the list by using negative match with !, e.g !10.0.0.0/8.\nNegative subnet matches should be specified last to filter out IPs picked by positive matches.\nIf not specified, node IP is picked based on cluster podCIDRs: IPv4/IPv6 address or both.\n",
+          "markdownDescription": "The `validSubnets` field configures the networks to pick kubelet node IP from.\nFor dual stack configuration, there should be two subnets: one for IPv4, another for IPv6.\nIPs can be excluded from the list by using negative match with `!`, e.g `!10.0.0.0/8`.\nNegative subnet matches should be specified last to filter out IPs picked by positive matches.\nIf not specified, node IP is picked based on cluster podCIDRs: IPv4/IPv6 address or both.",
+          "x-intellij-html-description": "<p>The <code>validSubnets</code> field configures the networks to pick kubelet node IP from.\nFor dual stack configuration, there should be two subnets: one for IPv4, another for IPv6.\nIPs can be excluded from the list by using negative match with <code>!</code>, e.g <code>!10.0.0.0/8</code>.\nNegative subnet matches should be specified last to filter out IPs picked by positive matches.\nIf not specified, node IP is picked based on cluster podCIDRs: IPv4/IPv6 address or both.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "NodeIPConfig represents the node IP configuration."
+    }
+  }
+}

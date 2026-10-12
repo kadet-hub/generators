@@ -1,0 +1,149 @@
+# Complete: three nodes sharing a base, shorthands (one overriding the nested
+# hostname), keyed-list dict forms, worker hardening, a
+# KubeVirt userdata Secret for the VM worker, a config patch and a talosconfig.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/talos
+        output_path: talos/
+
+  generators:
+    talos:
+      base:
+        machine:
+          # Placeholders, not key material: real values belong in Kapitan refs.
+          token: placeholder-machine-token
+          ca:
+            crt: placeholder-machine-ca-crt
+            key: placeholder-machine-ca-key
+          features:
+            kubePrism:
+              enabled: true
+              port: 7445
+          network:
+            nameservers:
+              - 10.0.0.2
+            interfaces:
+              eth0:
+                dhcp: false
+                routes:
+                  0.0.0.0/0:
+                    gateway: 10.0.0.1
+          files:
+            /etc/cri/conf.d/20-customization.part:
+              op: create
+              permissions: 420  # 0644; an octal literal parses differently per backend
+              content: |
+                [plugins."io.containerd.cri.v1.images"]
+                  discard_unpacked_layers = false
+        cluster:
+          clusterName: prod
+          controlPlane:
+            endpoint: https://k8s.example.com:6443
+          id: placeholder-cluster-id
+          secret: placeholder-cluster-secret
+          token: placeholder-cluster-token
+          secretboxEncryptionSecret: placeholder-secretbox-secret
+          serviceAccount:
+            key: placeholder-service-account-key
+          ca:
+            crt: placeholder-cluster-ca-crt
+            key: placeholder-cluster-ca-key
+          aggregatorCA:
+            crt: placeholder-aggregator-ca-crt
+            key: placeholder-aggregator-ca-key
+          etcd:
+            ca:
+              crt: placeholder-etcd-ca-crt
+              key: placeholder-etcd-ca-key
+          network:
+            cni:
+              name: none
+            podSubnets:
+              - 10.244.0.0/16
+            serviceSubnets:
+              - 10.96.0.0/12
+          proxy:
+            disabled: true
+          apiServer:
+            certSANs:
+              - k8s.example.com
+          discovery:
+            enabled: true
+            registries:
+              service: {}
+          inlineManifests:
+            cilium-namespace:
+              contents: |
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: cilium
+      nodes:
+        cp-1:
+          type: controlplane
+          hostname: cp-1
+          ip: 10.0.0.11/24
+          machine:
+            install:
+              diskSelector:
+                type: ssd
+            certSANs:
+              - k8s.example.com
+              - 10.0.0.10
+            network:
+              interfaces:
+                eth0:
+                  vip:
+                    ip: 10.0.0.10
+        worker-1:
+          type: worker
+          # Overrides the nested hostname below and logs a warning.
+          hostname: worker-1
+          ip: 10.0.0.21/24
+          machine:
+            install:
+              disk: /dev/sda
+            network:
+              hostname: wrk-1
+              interfaces:
+                eth0:
+                  vlans:
+                    20:
+                      addresses:
+                        - 10.20.0.21/24
+            nodeLabels:
+              node.kubernetes.io/pool: general
+        worker-2:
+          type: worker
+          hostname: worker-2
+          ip: 10.0.0.22/24
+          userdataSecret:
+            name: worker-2-userdata
+            namespace: talos-vms
+          machine:
+            install:
+              disk: /dev/vda
+              # A KubeVirt VM boots the nocloud platform image.
+              image: factory.talos.dev/nocloud-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba:v1.14.2
+      patches:
+        patch-time:
+          apiVersion: v1alpha1
+          kind: TimeSyncConfig
+          ntp:
+            servers:
+              - time.example.com
+      talosconfig:
+        context: prod
+        contexts:
+          prod:
+            endpoints:
+              - 10.0.0.11
+            nodes:
+              - 10.0.0.11

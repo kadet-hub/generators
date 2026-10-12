@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cluster.DiscoveryIdentityConfigV1Alpha1",
+  "$defs": {
+    "cluster.DiscoveryIdentityConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "DiscoveryIdentityConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "clusterID": {
+          "type": "string",
+          "title": "clusterID",
+          "description": "Globally unique identifier for this cluster (base64 encoded random 32 bytes).\n",
+          "markdownDescription": "Globally unique identifier for this cluster (base64 encoded random 32 bytes).",
+          "x-intellij-html-description": "<p>Globally unique identifier for this cluster (base64 encoded random 32 bytes).</p>\n"
+        },
+        "clusterSecret": {
+          "type": "string",
+          "title": "clusterSecret",
+          "description": "Shared secret of cluster (base64 encoded random 32 bytes).\nThis secret is shared among cluster members but should never be sent over the network.\n",
+          "markdownDescription": "Shared secret of cluster (base64 encoded random 32 bytes).\nThis secret is shared among cluster members but should never be sent over the network.",
+          "x-intellij-html-description": "<p>Shared secret of cluster (base64 encoded random 32 bytes).\nThis secret is shared among cluster members but should never be sent over the network.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "clusterID",
+        "clusterSecret",
+        "kind"
+      ],
+      "description": "DiscoveryIdentityConfig is a config document to configure the cluster identity used by the discovery service."
+    }
+  }
+}

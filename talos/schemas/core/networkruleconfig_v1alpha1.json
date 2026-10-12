@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.RuleConfigV1Alpha1",
+  "$defs": {
+    "network.IngressRule": {
+      "properties": {
+        "subnet": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+/\\d{1,3}$",
+          "title": "subnet",
+          "description": "Subnet defines a source subnet.\n",
+          "markdownDescription": "Subnet defines a source subnet.",
+          "x-intellij-html-description": "<p>Subnet defines a source subnet.</p>\n"
+        },
+        "except": {
+          "type": "string",
+          "pattern": "^[0-9a-f.:]+/\\d{1,3}$",
+          "title": "except",
+          "description": "Except defines a source subnet to exclude from the rule, it gets excluded from the subnet.\n",
+          "markdownDescription": "Except defines a source subnet to exclude from the rule, it gets excluded from the `subnet`.",
+          "x-intellij-html-description": "<p>Except defines a source subnet to exclude from the rule, it gets excluded from the <code>subnet</code>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "IngressRule is a ingress rule."
+    },
+    "network.RuleConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "NetworkRuleConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the config document.\n",
+          "markdownDescription": "Name of the config document.",
+          "x-intellij-html-description": "<p>Name of the config document.</p>\n"
+        },
+        "portSelector": {
+          "$ref": "#/$defs/network.RulePortSelector",
+          "title": "portSelector",
+          "description": "Port selector defines which ports and protocols on the host are affected by the rule.\n",
+          "markdownDescription": "Port selector defines which ports and protocols on the host are affected by the rule.",
+          "x-intellij-html-description": "<p>Port selector defines which ports and protocols on the host are affected by the rule.</p>\n"
+        },
+        "ingress": {
+          "items": {
+            "$ref": "#/$defs/network.IngressRule"
+          },
+          "type": "array",
+          "title": "ingress",
+          "description": "Ingress defines which source subnets are allowed to access the host ports/protocols defined by the portSelector.\n",
+          "markdownDescription": "Ingress defines which source subnets are allowed to access the host ports/protocols defined by the `portSelector`.",
+          "x-intellij-html-description": "<p>Ingress defines which source subnets are allowed to access the host ports/protocols defined by the <code>portSelector</code>.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "NetworkRuleConfig is a network firewall rule config document."
+    },
+    "network.RulePortSelector": {
+      "properties": {
+        "ports": {
+          "items": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "type": "array",
+          "title": "ports",
+          "description": "Ports defines a list of port ranges or single ports.\nThe port ranges are inclusive, and should not overlap.\n",
+          "markdownDescription": "Ports defines a list of port ranges or single ports.\nThe port ranges are inclusive, and should not overlap.",
+          "x-intellij-html-description": "<p>Ports defines a list of port ranges or single ports.\nThe port ranges are inclusive, and should not overlap.</p>\n"
+        },
+        "protocol": {
+          "enum": [
+            "tcp",
+            "udp",
+            "icmp",
+            "icmpv6"
+          ],
+          "title": "protocol",
+          "description": "Protocol defines traffic protocol (e.g. TCP or UDP).\n",
+          "markdownDescription": "Protocol defines traffic protocol (e.g. TCP or UDP).",
+          "x-intellij-html-description": "<p>Protocol defines traffic protocol (e.g. TCP or UDP).</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "RulePortSelector is a port selector for the network rule."
+    }
+  }
+}

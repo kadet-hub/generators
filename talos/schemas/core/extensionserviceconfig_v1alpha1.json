@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/extensions.ServiceConfigV1Alpha1",
+  "$defs": {
+    "extensions.ConfigFile": {
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content",
+          "description": "The content of the extension service config file.\n",
+          "markdownDescription": "The content of the extension service config file.",
+          "x-intellij-html-description": "<p>The content of the extension service config file.</p>\n"
+        },
+        "mountPath": {
+          "type": "string",
+          "title": "mountPath",
+          "description": "The mount path of the extension service config file.\n",
+          "markdownDescription": "The mount path of the extension service config file.",
+          "x-intellij-html-description": "<p>The mount path of the extension service config file.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ConfigFile is a config file for extension services."
+    },
+    "extensions.ServiceConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "ExtensionServiceConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the extension service.\n",
+          "markdownDescription": "Name of the extension service.",
+          "x-intellij-html-description": "<p>Name of the extension service.</p>\n"
+        },
+        "configFiles": {
+          "items": {
+            "$ref": "#/$defs/extensions.ConfigFile"
+          },
+          "type": "array",
+          "title": "configFiles",
+          "description": "The config files for the extension service.\n",
+          "markdownDescription": "The config files for the extension service.",
+          "x-intellij-html-description": "<p>The config files for the extension service.</p>\n"
+        },
+        "environment": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "environment",
+          "description": "The environment for the extension service.\n",
+          "markdownDescription": "The environment for the extension service.",
+          "x-intellij-html-description": "<p>The environment for the extension service.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "ExtensionServiceConfig is a extensionserviceconfig document."
+    }
+  }
+}

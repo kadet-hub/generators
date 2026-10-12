@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cluster.DiscoveryServiceConfigV1Alpha1",
+  "$defs": {
+    "cluster.DiscoveryServiceConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "DiscoveryServiceConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the discovery service configuration.\n",
+          "markdownDescription": "Name of the discovery service configuration.",
+          "x-intellij-html-description": "<p>Name of the discovery service configuration.</p>\n"
+        },
+        "endpoint": {
+          "type": "string",
+          "pattern": "^(http|https|grpc)://",
+          "title": "endpoint",
+          "description": "Discovery service endpoint to use.\n",
+          "markdownDescription": "Discovery service endpoint to use.",
+          "x-intellij-html-description": "<p>Discovery service endpoint to use.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "endpoint",
+        "kind",
+        "name"
+      ],
+      "description": "DiscoveryServiceConfig is a config document to configure a discovery service."
+    }
+  }
+}

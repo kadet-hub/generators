@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.TCPProbeConfigV1Alpha1",
+  "$defs": {
+    "network.TCPProbeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "TCPProbeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the probe.\n",
+          "markdownDescription": "Name of the probe.",
+          "x-intellij-html-description": "<p>Name of the probe.</p>\n"
+        },
+        "interval": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "interval",
+          "description": "Interval between probe attempts.\nDefaults to 1s.\n",
+          "markdownDescription": "Interval between probe attempts.\nDefaults to 1s.",
+          "x-intellij-html-description": "<p>Interval between probe attempts.\nDefaults to 1s.</p>\n"
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "title": "failureThreshold",
+          "description": "Number of consecutive failures for the probe to be considered failed after having succeeded.\nDefaults to 0 (immediately fail on first failure).\n",
+          "markdownDescription": "Number of consecutive failures for the probe to be considered failed after having succeeded.\nDefaults to 0 (immediately fail on first failure).",
+          "x-intellij-html-description": "<p>Number of consecutive failures for the probe to be considered failed after having succeeded.\nDefaults to 0 (immediately fail on first failure).</p>\n"
+        },
+        "endpoint": {
+          "type": "string",
+          "title": "endpoint",
+          "description": "Endpoint to probe in the format host:port.\n",
+          "markdownDescription": "Endpoint to probe in the format host:port.",
+          "x-intellij-html-description": "<p>Endpoint to probe in the format host:port.</p>\n"
+        },
+        "timeout": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "timeout",
+          "description": "Timeout for the probe.\nDefaults to 10s.\n",
+          "markdownDescription": "Timeout for the probe.\nDefaults to 10s.",
+          "x-intellij-html-description": "<p>Timeout for the probe.\nDefaults to 10s.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "endpoint",
+        "kind",
+        "name"
+      ],
+      "description": "TCPProbeConfig is a config document to configure network TCP connectivity probes."
+    }
+  }
+}

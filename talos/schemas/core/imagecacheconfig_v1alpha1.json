@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.ImageCacheConfigV1Alpha1",
+  "$defs": {
+    "cri.ImageCacheConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "ImageCacheConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "local": {
+          "$ref": "#/$defs/cri.LocalImageCacheConfig",
+          "title": "local",
+          "description": "Local (to the machine) image cache configuration.\n",
+          "markdownDescription": "Local (to the machine) image cache configuration.",
+          "x-intellij-html-description": "<p>Local (to the machine) image cache configuration.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "ImageCacheConfig configures Image Cache feature."
+    },
+    "cri.LocalImageCacheConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "Is the local image cache enabled.\n",
+          "markdownDescription": "Is the local image cache enabled.",
+          "x-intellij-html-description": "<p>Is the local image cache enabled.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "LocalImageCacheConfig configures local image cache."
+    }
+  }
+}

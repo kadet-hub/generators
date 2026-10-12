@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/cri.RegistryMirrorConfigV1Alpha1",
+  "$defs": {
+    "cri.RegistryEndpoint": {
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^(http|https)://",
+          "title": "url",
+          "description": "The URL of the registry mirror endpoint.\n",
+          "markdownDescription": "The URL of the registry mirror endpoint.",
+          "x-intellij-html-description": "<p>The URL of the registry mirror endpoint.</p>\n"
+        },
+        "overridePath": {
+          "type": "boolean",
+          "title": "overridePath",
+          "description": "Use endpoint path as supplied, without adding /v2/ suffix.\n",
+          "markdownDescription": "Use endpoint path as supplied, without adding `/v2/` suffix.",
+          "x-intellij-html-description": "<p>Use endpoint path as supplied, without adding <code>/v2/</code> suffix.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "description": "RegistryEndpoint defines a registry mirror endpoint."
+    },
+    "cri.RegistryMirrorConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "RegistryMirrorConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Registry name to apply the mirror configuration to.\n\nRegistry name is the first segment of image identifier, with \u2018docker.io\u2019\nbeing default one.\n\nA special name \u2018*\u2019 can be used to define mirror configuration\nthat applies to all registries.\n",
+          "markdownDescription": "Registry name to apply the mirror configuration to.\n\nRegistry name is the first segment of image identifier, with 'docker.io'\nbeing default one.\n\nA special name '*' can be used to define mirror configuration\nthat applies to all registries.",
+          "x-intellij-html-description": "<p>Registry name to apply the mirror configuration to.</p>\n\n<p>Registry name is the first segment of image identifier, with &lsquo;docker.io&rsquo;\nbeing default one.</p>\n\n<p>A special name &lsquo;*&rsquo; can be used to define mirror configuration\nthat applies to all registries.</p>\n"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "#/$defs/cri.RegistryEndpoint"
+          },
+          "type": "array",
+          "title": "endpoints",
+          "description": "List of mirror endpoints for the registry.\nMirrors will be used in the order they are specified,\nfalling back to the default registry is skipFallback is not set to true.\n",
+          "markdownDescription": "List of mirror endpoints for the registry.\nMirrors will be used in the order they are specified,\nfalling back to the default registry is `skipFallback` is not set to true.",
+          "x-intellij-html-description": "<p>List of mirror endpoints for the registry.\nMirrors will be used in the order they are specified,\nfalling back to the default registry is <code>skipFallback</code> is not set to true.</p>\n"
+        },
+        "skipFallback": {
+          "type": "boolean",
+          "title": "skipFallback",
+          "description": "Skip fallback to the original registry if none of the mirrors are available\nor contain the requested image.\n",
+          "markdownDescription": "Skip fallback to the original registry if none of the mirrors are available\nor contain the requested image.",
+          "x-intellij-html-description": "<p>Skip fallback to the original registry if none of the mirrors are available\nor contain the requested image.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "name"
+      ],
+      "description": "RegistryMirrorConfig configures an image registry mirror."
+    }
+  }
+}

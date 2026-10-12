@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/block.ExternalVolumeConfigV1Alpha1",
+  "$defs": {
+    "block.ExternalMountSpec": {
+      "properties": {
+        "readOnly": {
+          "type": "boolean",
+          "title": "readOnly",
+          "description": "Mount the volume read-only.\n",
+          "markdownDescription": "Mount the volume read-only.",
+          "x-intellij-html-description": "<p>Mount the volume read-only.</p>\n"
+        },
+        "disableAccessTime": {
+          "type": "boolean",
+          "title": "disableAccessTime",
+          "description": "If true, disable file access time updates.\n",
+          "markdownDescription": "If true, disable file access time updates.",
+          "x-intellij-html-description": "<p>If true, disable file access time updates.</p>\n"
+        },
+        "secure": {
+          "type": "boolean",
+          "title": "secure",
+          "description": "Enable secure mount options (nosuid, nodev, noexec).\n\nDefaults to true for better security.\n",
+          "markdownDescription": "Enable secure mount options (nosuid, nodev, noexec).\n\nDefaults to true for better security.",
+          "x-intellij-html-description": "<p>Enable secure mount options (nosuid, nodev, noexec).</p>\n\n<p>Defaults to true for better security.</p>\n"
+        },
+        "virtiofs": {
+          "$ref": "#/$defs/block.VirtiofsMountSpec",
+          "title": "virtiofs",
+          "description": "Virtiofs mount options.\n",
+          "markdownDescription": "Virtiofs mount options.",
+          "x-intellij-html-description": "<p>Virtiofs mount options.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ExternalMountSpec describes how the external volume is mounted."
+    },
+    "block.ExternalVolumeConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "ExternalVolumeConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the mount.\n\nName might be between 1 and 34 characters long and can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.\n",
+          "markdownDescription": "Name of the mount.\n\nName might be between 1 and 34 characters long and can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.",
+          "x-intellij-html-description": "<p>Name of the mount.</p>\n\n<p>Name might be between 1 and 34 characters long and can only contain:\nlowercase and uppercase ASCII letters, digits, and hyphens.</p>\n"
+        },
+        "filesystemType": {
+          "enum": [
+            "virtiofs"
+          ],
+          "title": "filesystemType",
+          "description": "Filesystem type.\n",
+          "markdownDescription": "Filesystem type.",
+          "x-intellij-html-description": "<p>Filesystem type.</p>\n"
+        },
+        "mount": {
+          "$ref": "#/$defs/block.ExternalMountSpec",
+          "title": "mount",
+          "description": "The mount describes additional mount options.\n",
+          "markdownDescription": "The mount describes additional mount options.",
+          "x-intellij-html-description": "<p>The mount describes additional mount options.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "ExternalVolumeConfig is an external disk mount configuration document.\\nExternal volumes allow to mount volumes that were created outside of Talos,\\nover the network or API. Volume will be mounted under `/var/mnt/<name>`.\\nThe external volume config name should not conflict with user volume names.\\n"
+    },
+    "block.VirtiofsMountSpec": {
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "tag",
+          "description": "Selector tag for the Virtiofs mount.\n",
+          "markdownDescription": "Selector tag for the Virtiofs mount.",
+          "x-intellij-html-description": "<p>Selector tag for the Virtiofs mount.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "VirtiofsMountSpec describes Virtiofs mount options."
+    }
+  }
+}

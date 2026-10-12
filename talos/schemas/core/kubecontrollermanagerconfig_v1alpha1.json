@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/k8s.KubeControllerManagerConfigV1Alpha1",
+  "$defs": {
+    "k8s.KubeControllerManagerConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KubeControllerManagerConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enabled",
+          "description": "By default, kube-controller-manager static pod is enabled.\nSet to false to disable the kube-controller-manager (assuming it runs on other controlplane node).\n",
+          "markdownDescription": "By default, kube-controller-manager static pod is enabled.\nSet to false to disable the kube-controller-manager (assuming it runs on other controlplane node).",
+          "x-intellij-html-description": "<p>By default, kube-controller-manager static pod is enabled.\nSet to false to disable the kube-controller-manager (assuming it runs on other controlplane node).</p>\n"
+        },
+        "image": {
+          "type": "string",
+          "title": "image",
+          "description": "The container image used to run the kube-controller-manager component.\n\nThe image reference should contain the tag, even if it is pinned by digest.\n",
+          "markdownDescription": "The container image used to run the kube-controller-manager component.\n\nThe image reference should contain the tag, even if it is pinned by digest.",
+          "x-intellij-html-description": "<p>The container image used to run the kube-controller-manager component.</p>\n\n<p>The image reference should contain the tag, even if it is pinned by digest.</p>\n"
+        },
+        "extraArgs": {
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "type": "object",
+          "title": "extraArgs",
+          "description": "Extra command line arguments to supply to the kube-controller-manager.\n",
+          "markdownDescription": "Extra command line arguments to supply to the kube-controller-manager.",
+          "x-intellij-html-description": "<p>Extra command line arguments to supply to the kube-controller-manager.</p>\n"
+        },
+        "env": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "title": "env",
+          "description": "The env field allows for the addition of environment variables for the kube-controller-manager.\n",
+          "markdownDescription": "The `env` field allows for the addition of environment variables for the kube-controller-manager.",
+          "x-intellij-html-description": "<p>The <code>env</code> field allows for the addition of environment variables for the kube-controller-manager.</p>\n"
+        },
+        "resources": {
+          "type": "object",
+          "title": "resources",
+          "description": "Configure the kube-controller-manager resources.\n",
+          "markdownDescription": "Configure the kube-controller-manager resources.",
+          "x-intellij-html-description": "<p>Configure the kube-controller-manager resources.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "image",
+        "kind"
+      ],
+      "description": "KubeControllerManagerConfig configures kube-controller-manager controlplane static pod."
+    }
+  }
+}

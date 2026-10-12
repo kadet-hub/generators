@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/network.HostnameConfigV1Alpha1",
+  "$defs": {
+    "network.HostnameConfigV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "HostnameConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "auto": {
+          "enum": [
+            "stable",
+            "off"
+          ],
+          "title": "auto",
+          "description": "A method to automatically generate a hostname for the machine.\n\nThere are two methods available:\n  - stable - generates a stable hostname based on machine identity\n  - off - disables automatic hostname generation, Talos will wait for an external source to provide a hostname (DHCP, cloud-init, etc).\n\nAutomatic hostnames have the lowest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with hostname field.\n",
+          "markdownDescription": "A method to automatically generate a hostname for the machine.\n\nThere are two methods available:\n  - `stable` - generates a stable hostname based on machine identity\n  - `off` - disables automatic hostname generation, Talos will wait for an external source to provide a hostname (DHCP, cloud-init, etc).\n\nAutomatic hostnames have the lowest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with `hostname` field.",
+          "x-intellij-html-description": "<p>A method to automatically generate a hostname for the machine.</p>\n\n<p>There are two methods available:\n  - <code>stable</code> - generates a stable hostname based on machine identity\n  - <code>off</code> - disables automatic hostname generation, Talos will wait for an external source to provide a hostname (DHCP, cloud-init, etc).</p>\n\n<p>Automatic hostnames have the lowest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with <code>hostname</code> field.</p>\n"
+        },
+        "hostname": {
+          "type": "string",
+          "title": "hostname",
+          "description": "A static hostname to set for the machine.\n\nThis hostname has the highest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with auto field.\n",
+          "markdownDescription": "A static hostname to set for the machine.\n\nThis hostname has the highest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with `auto` field.",
+          "x-intellij-html-description": "<p>A static hostname to set for the machine.</p>\n\n<p>This hostname has the highest priority over any other hostname sources: DHCP, cloud-init, etc.\nConflicts with <code>auto</code> field.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "HostnameConfig is a config document to configure the hostname: either a static hostname or an automatically generated hostname."
+    }
+  }
+}

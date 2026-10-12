@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.KmsgLogV1Alpha1",
+  "$defs": {
+    "runtime.KmsgLogV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "KmsgLogConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Name of the config document.\n",
+          "markdownDescription": "Name of the config document.",
+          "x-intellij-html-description": "<p>Name of the config document.</p>\n"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^(tcp|udp)://",
+          "title": "url",
+          "description": "The URL encodes the log destination.\nThe scheme must be tcp:// or udp://.\nThe path must be empty.\nThe port is required.\n",
+          "markdownDescription": "The URL encodes the log destination.\nThe scheme must be tcp:// or udp://.\nThe path must be empty.\nThe port is required.",
+          "x-intellij-html-description": "<p>The URL encodes the log destination.\nThe scheme must be tcp:// or udp://.\nThe path must be empty.\nThe port is required.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "KmsgLogConfig is a event sink config document."
+    }
+  }
+}

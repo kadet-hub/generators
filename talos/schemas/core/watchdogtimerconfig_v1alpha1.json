@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/runtime.WatchdogTimerV1Alpha1",
+  "$defs": {
+    "runtime.WatchdogTimerV1Alpha1": {
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "v1alpha1"
+          ],
+          "title": "apiVersion",
+          "description": "apiVersion is the API version of the resource.\n",
+          "markdownDescription": "apiVersion is the API version of the resource.",
+          "x-intellij-html-description": "<p>apiVersion is the API version of the resource.</p>\n"
+        },
+        "kind": {
+          "enum": [
+            "WatchdogTimerConfig"
+          ],
+          "title": "kind",
+          "description": "kind is the kind of the resource.\n",
+          "markdownDescription": "kind is the kind of the resource.",
+          "x-intellij-html-description": "<p>kind is the kind of the resource.</p>\n"
+        },
+        "device": {
+          "type": "string",
+          "title": "device",
+          "description": "Path to the watchdog device.\n",
+          "markdownDescription": "Path to the watchdog device.",
+          "x-intellij-html-description": "<p>Path to the watchdog device.</p>\n"
+        },
+        "timeout": {
+          "type": "string",
+          "pattern": "^[-+]?(((\\d+(\\.\\d*)?|\\d*(\\.\\d+)+)([nu\u00b5m]?s|m|h))|0)+$",
+          "title": "timeout",
+          "description": "Timeout for the watchdog.\n\nIf Talos is unresponsive for this duration, the watchdog will reset the system.\n\nDefault value is 1 minute, minimum value is 10 seconds.\n",
+          "markdownDescription": "Timeout for the watchdog.\n\nIf Talos is unresponsive for this duration, the watchdog will reset the system.\n\nDefault value is 1 minute, minimum value is 10 seconds.",
+          "x-intellij-html-description": "<p>Timeout for the watchdog.</p>\n\n<p>If Talos is unresponsive for this duration, the watchdog will reset the system.</p>\n\n<p>Default value is 1 minute, minimum value is 10 seconds.</p>\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "description": "WatchdogTimerConfig is a watchdog timer config document."
+    }
+  }
+}
