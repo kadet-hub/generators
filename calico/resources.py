@@ -1,8 +1,8 @@
-"""Calico resource generators for Kapitan.
+"""Calico day-2 resources in projectcalico.org/v3.
 
-Renders projectcalico.org/v3 NetworkPolicy, GlobalNetworkPolicy, NetworkSet,
-GlobalNetworkSet, IPPool, BGPPeer and BGPConfiguration for Calico v3.33.0;
-see README.md for the inventory contract.
+Renders NetworkPolicy, GlobalNetworkPolicy, NetworkSet, GlobalNetworkSet,
+IPPool, BGPPeer and BGPConfiguration for Calico v3.33.0 from the sections of
+parameters.generators.calico; see README.md for the inventory contract.
 """
 
 from __future__ import annotations
@@ -10,68 +10,20 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from kapitan.inputs.kadet import BaseObj, inventory
-
-from . import k8s
+from . import _convert_to_dict, _warn_collisions, inv, k8s
 
 
-inv = inventory()
 logger = logging.getLogger(__name__)
-
-__version__ = "1.0.0"
 
 API_VERSION = "projectcalico.org/v3"
 
 
-_OMEGACONF_TYPES: tuple[type, ...]
-try:
-    from omegaconf import DictConfig, ListConfig
-
-    _OMEGACONF_TYPES = (DictConfig, ListConfig)
-except ImportError:
-    _OMEGACONF_TYPES = ()
-
-
 def _default_namespace() -> str:
-    """generators.calico_resources.namespace -> parameters.namespace -> "default"."""
-    generator_config = (
-        inv.parameters.get("generators", {}).get("calico_resources", {}) or {}
-    )
+    """generators.calico.namespace -> parameters.namespace -> "default"."""
+    generator_config = inv.parameters.get("generators", {}).get("calico", {}) or {}
     return str(
         generator_config.get("namespace") or inv.parameters.get("namespace", "default")
     )
-
-
-def _convert_to_dict(obj: Any) -> Any:
-    """Recursively convert BaseObj / OmegaConf objects to plain Python dicts."""
-    if _OMEGACONF_TYPES and isinstance(obj, _OMEGACONF_TYPES):
-        from omegaconf import OmegaConf
-
-        return _convert_to_dict(OmegaConf.to_container(obj, resolve=True))
-    if hasattr(obj, "to_dict"):
-        return obj.to_dict()
-    if hasattr(obj, "root"):
-        return _convert_to_dict(obj.root)
-    if isinstance(obj, dict):
-        return {k: _convert_to_dict(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_convert_to_dict(item) for item in obj]
-    return obj
-
-
-def _warn_collisions(config: dict, mapping: dict[str, str], name: str) -> None:
-    """Warn when flat keys will override passthrough values from ``spec``."""
-    spec = _convert_to_dict(config.get("spec")) or {}
-    if not spec:
-        return
-    for flat_key, crd_key in mapping.items():
-        if config.get(flat_key) is not None and spec.get(crd_key) is not None:
-            logger.warning(
-                "Flat key '%s' overrides spec passthrough '%s' for resource '%s'",
-                flat_key,
-                crd_key,
-                name,
-            )
 
 
 # =============================================================================
@@ -303,12 +255,8 @@ SECTIONS = (
 )
 
 
-def main(input_params: dict | None = None) -> BaseObj:
-    """Kapitan kadet entry point. Reads parameters.generators.calico_resources."""
-    obj = BaseObj()
-    generator_config = _convert_to_dict(
-        inv.parameters.get("generators", {}).get("calico_resources", {}) or {}
-    )
+def render(obj: Any, generator_config: dict) -> None:
+    """Add the resources of every section in generator_config to obj."""
     default_namespace = _default_namespace()
     for section, resource_class, suffix in SECTIONS:
         for name, config in (generator_config.get(section) or {}).items():
@@ -317,7 +265,6 @@ def main(input_params: dict | None = None) -> BaseObj:
             if resource_class.NAMESPACED:
                 key = f"{config.get('namespace') or default_namespace}/{key}"
             obj.root[key] = resource_class(name=name, config=config)
-    return obj
 
 
 __all__ = [
@@ -330,7 +277,5 @@ __all__ = [
     "IPPool",
     "NetworkPolicy",
     "NetworkSet",
-    "inv",
-    "k8s",
-    "main",
+    "render",
 ]

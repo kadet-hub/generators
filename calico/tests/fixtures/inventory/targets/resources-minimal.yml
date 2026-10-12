@@ -4,16 +4,16 @@ classes: []
 parameters:
   kapitan:
     vars:
-      target: minimal
+      target: resources-minimal
     compile:
       - input_type: kadet
         input_paths:
-          - lib/calico-resources
+          - lib/calico
         output_path: manifests/
 
   namespace: shop
   generators:
-    calico_resources:
+    calico:
       network_policies:
         web:
           selector:

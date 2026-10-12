@@ -4,16 +4,16 @@ classes: []
 parameters:
   kapitan:
     vars:
-      target: complete
+      target: resources-complete
     compile:
       - input_type: kadet
         input_paths:
-          - lib/calico-resources
+          - lib/calico
         output_path: manifests/
 
   namespace: apps
   generators:
-    calico_resources:
+    calico:
       namespace: shop
       network_policies:
         api:

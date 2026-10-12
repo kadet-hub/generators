@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Renders the `projectcalico.org/v3` NetworkPolicy, GlobalNetworkPolicy, NetworkSet, GlobalNetworkSet, IPPool, BGPPeer and BGPConfiguration from new sections under `parameters.generators.calico`, with their Calico 3.33.0 schemas. They come from the `calico-resources` generator, which is no longer listed: move `generators.calico_resources` to `generators.calico` and compile `lib/calico`. Output keys and rendered documents are unchanged; the Installation is rendered in those targets as well.
+
 ## 1.0.0
 
 First release on kadet-hub, migrated from kapitan-generators.
