@@ -7,3 +7,8 @@ kyverno.io:
   version: 1.19.1
   source: https://github.com/kyverno/kyverno/tree/v1.19.1/config/crds/kyverno
   license: Apache-2.0
+policies.kyverno.io:
+  software: Kyverno
+  version: 1.19.1
+  source: https://github.com/kyverno/kyverno/tree/v1.19.1/config/crds/policies.kyverno.io
+  license: Apache-2.0
