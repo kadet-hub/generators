@@ -6,14 +6,17 @@ Generates Kyverno resources for Kubernetes policy management:
 - PolicyException: Exceptions to exclude resources from policy enforcement
 - ClusterCleanupPolicy: Cluster-wide cleanup policies (TTL-based resource deletion)
 - CleanupPolicy: Namespace-scoped cleanup policies
+- The policies.kyverno.io CEL kinds: ValidatingPolicy, MutatingPolicy,
+  GeneratingPolicy, DeletingPolicy, their namespaced variants, PolicyException
 
-Schema reference: kyverno.io/v1, kyverno.io/v2
+Schema reference: kyverno.io/v1, kyverno.io/v2, policies.kyverno.io/v1beta1
 See: https://kyverno.io/docs/
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 import logging
+import re
 from typing import Any
 
 from kapitan.inputs.kadet import BaseObj, inventory
@@ -259,7 +262,12 @@ class ClusterPolicy(KyvernoBase):
         if rules:
             spec.rules = self._build_rules(rules)
 
-        # Validation failure action
+        # Validation failure action, deprecated in favour of the rule's
+        # validate.failureAction, which Kyverno resolves before the spec-level one.
+        # The field stays where moving it changes a resolved action: a rule-level
+        # action outranks spec-level overrides, verifyImages rules read the
+        # spec-level action, and the policy-wide action is the first rule-level
+        # one, so a rule with its own action keeps the rest at spec level.
         validation_failure_action = config.get("validation_failure_action")
         if validation_failure_action:
             _validate_enum(
@@ -267,7 +275,19 @@ class ClusterPolicy(KyvernoBase):
                 VALID_VALIDATION_FAILURE_ACTIONS,
                 "validationFailureAction",
             )
-            spec.validationFailureAction = validation_failure_action
+            rules = spec.get("rules") or []
+            if (
+                config.get("validation_failure_action_overrides")
+                or spec.get("validationFailureActionOverrides")
+                or any("verifyImages" in rule for rule in rules)
+                or any("failureAction" in (rule.get("validate") or {}) for rule in rules)
+            ):
+                spec.validationFailureAction = validation_failure_action
+            else:
+                spec.pop("validationFailureAction", None)
+                for rule in rules:
+                    if "validate" in rule:
+                        rule["validate"]["failureAction"] = validation_failure_action.capitalize()
 
         # Validation failure action overrides
         overrides = config.get("validation_failure_action_overrides")
@@ -284,20 +304,29 @@ class ClusterPolicy(KyvernoBase):
         if admission is not None:
             spec.admission = admission
 
-        # Failure policy
+        # Webhook configuration, before the deprecated keys that move into it
+        webhook_config = config.get("webhook_configuration")
+        if webhook_config:
+            spec.webhookConfiguration = _convert_to_dict(webhook_config)
+
+        # Failure policy, deprecated in favour of webhookConfiguration.failurePolicy
         failure_policy = config.get("failure_policy")
         if failure_policy:
             _validate_enum(failure_policy, VALID_FAILURE_POLICIES, "failurePolicy")
-            spec.failurePolicy = failure_policy
+            self._to_webhook_configuration(
+                config, "failure_policy", "failurePolicy", "failurePolicy"
+            )
 
-        # Webhook timeout
+        # Webhook timeout, deprecated in favour of webhookConfiguration.timeoutSeconds
         webhook_timeout = config.get("webhook_timeout_seconds")
         if webhook_timeout is not None:
             if webhook_timeout not in VALID_WEBHOOK_TIMEOUT_SECONDS:
                 raise ValueError(
                     f"webhookTimeoutSeconds must be between 1 and 30, got {webhook_timeout}"
                 )
-            spec.webhookTimeoutSeconds = webhook_timeout
+            self._to_webhook_configuration(
+                config, "webhook_timeout_seconds", "webhookTimeoutSeconds", "timeoutSeconds"
+            )
 
         # Apply rules (One/All)
         apply_rules = config.get("apply_rules")
@@ -314,20 +343,52 @@ class ClusterPolicy(KyvernoBase):
         if mutate_existing is not None:
             spec.mutateExistingOnPolicyUpdate = mutate_existing
 
-        # Generate existing on policy update
+        # Generate existing on policy update: Kyverno rejects the spec-level field
+        # even when false; each generate rule's generateExisting replaces it.
         generate_existing = config.get("generate_existing_on_policy_update")
         if generate_existing is not None:
-            spec.generateExistingOnPolicyUpdate = generate_existing
+            spec.pop("generateExistingOnPolicyUpdate", None)
+            for rule in spec.get("rules") or []:
+                if "generate" not in rule:
+                    continue
+                if "generateExisting" in rule["generate"]:
+                    logger.warning(
+                        "Rule '%s' generate.generateExisting overrides flat key '%s' for resource '%s'",
+                        rule.get("name"),
+                        "generate_existing_on_policy_update",
+                        self.kwargs.name,
+                    )
+                else:
+                    rule["generate"]["generateExisting"] = generate_existing
 
         # Use server-side apply for mutation
         use_server_side_apply = config.get("use_server_side_apply")
         if use_server_side_apply is not None:
             spec.useServerSideApply = use_server_side_apply
 
-        # Webhook configuration
-        webhook_config = config.get("webhook_configuration")
-        if webhook_config:
-            spec.webhookConfiguration = _convert_to_dict(webhook_config)
+    def _to_webhook_configuration(
+        self, config: dict, flat_key: str, deprecated: str, field: str
+    ) -> None:
+        """Set ``spec.webhookConfiguration[field]`` from a deprecated flat key.
+
+        Kyverno reads webhookConfiguration first, falls back to the deprecated
+        spec-level field and rejects a policy that sets both.
+        """
+        spec = self.root.spec
+        if field in (_convert_to_dict(config.get("webhook_configuration")) or {}):
+            raise ValueError(
+                f"Set '{flat_key}' or 'webhook_configuration.{field}', not both; "
+                f"Kyverno rejects a policy with both (resource '{self.kwargs.name}')"
+            )
+        if field in (spec.get("webhookConfiguration") or {}):
+            logger.warning(
+                "Flat key '%s' overrides spec passthrough '%s' for resource '%s'",
+                flat_key,
+                f"webhookConfiguration.{field}",
+                self.kwargs.name,
+            )
+        spec.pop(deprecated, None)
+        spec.setdefault("webhookConfiguration", {})[field] = config[flat_key]
 
     def _build_rules(self, rules_config: list) -> list:
         """Build policy rules."""
@@ -709,6 +770,190 @@ class CleanupPolicy(ClusterCleanupPolicy):
 
 
 # =============================================================================
+# policies.kyverno.io CEL kinds
+# =============================================================================
+
+# Resources of the GA built-in kinds per group/version, from the discovery
+# documents api__v1.json and aggregated_v2.json of Kubernetes 1.37.1:
+# https://github.com/kubernetes/kubernetes/tree/v1.37.1/api/discovery
+_BUILTIN_RESOURCES = {
+    "v1": {
+        "Binding": "bindings", "ComponentStatus": "componentstatuses", "ConfigMap": "configmaps",
+        "Endpoints": "endpoints", "Event": "events", "LimitRange": "limitranges", "Namespace": "namespaces",
+        "Node": "nodes", "PersistentVolume": "persistentvolumes", "PersistentVolumeClaim": "persistentvolumeclaims",
+        "Pod": "pods", "PodTemplate": "podtemplates", "ReplicationController": "replicationcontrollers",
+        "ResourceQuota": "resourcequotas", "Secret": "secrets", "Service": "services",
+        "ServiceAccount": "serviceaccounts",
+    },
+    "admissionregistration.k8s.io/v1": {
+        "MutatingAdmissionPolicy": "mutatingadmissionpolicies",
+        "MutatingAdmissionPolicyBinding": "mutatingadmissionpolicybindings",
+        "MutatingWebhookConfiguration": "mutatingwebhookconfigurations",
+        "ValidatingAdmissionPolicy": "validatingadmissionpolicies",
+        "ValidatingAdmissionPolicyBinding": "validatingadmissionpolicybindings",
+        "ValidatingWebhookConfiguration": "validatingwebhookconfigurations",
+    },
+    "apiextensions.k8s.io/v1": {"CustomResourceDefinition": "customresourcedefinitions"},
+    "apiregistration.k8s.io/v1": {"APIService": "apiservices"},
+    "apps/v1": {
+        "ControllerRevision": "controllerrevisions", "DaemonSet": "daemonsets", "Deployment": "deployments",
+        "ReplicaSet": "replicasets", "StatefulSet": "statefulsets",
+    },
+    "authentication.k8s.io/v1": {"SelfSubjectReview": "selfsubjectreviews", "TokenReview": "tokenreviews"},
+    "authorization.k8s.io/v1": {
+        "LocalSubjectAccessReview": "localsubjectaccessreviews", "SelfSubjectAccessReview": "selfsubjectaccessreviews",
+        "SelfSubjectRulesReview": "selfsubjectrulesreviews", "SubjectAccessReview": "subjectaccessreviews",
+    },
+    "autoscaling/v2": {"HorizontalPodAutoscaler": "horizontalpodautoscalers"},
+    "batch/v1": {"CronJob": "cronjobs", "Job": "jobs"},
+    "certificates.k8s.io/v1": {
+        "CertificateSigningRequest": "certificatesigningrequests", "ClusterTrustBundle": "clustertrustbundles",
+        "PodCertificateRequest": "podcertificaterequests",
+    },
+    "coordination.k8s.io/v1": {"Lease": "leases"},
+    "discovery.k8s.io/v1": {"EndpointSlice": "endpointslices"},
+    "events.k8s.io/v1": {"Event": "events"},
+    "flowcontrol.apiserver.k8s.io/v1": {
+        "FlowSchema": "flowschemas", "PriorityLevelConfiguration": "prioritylevelconfigurations",
+    },
+    "networking.k8s.io/v1": {
+        "IPAddress": "ipaddresses", "Ingress": "ingresses", "IngressClass": "ingressclasses",
+        "NetworkPolicy": "networkpolicies", "ServiceCIDR": "servicecidrs",
+    },
+    "node.k8s.io/v1": {"RuntimeClass": "runtimeclasses"},
+    "policy/v1": {"PodDisruptionBudget": "poddisruptionbudgets"},
+    "rbac.authorization.k8s.io/v1": {
+        "ClusterRole": "clusterroles", "ClusterRoleBinding": "clusterrolebindings", "Role": "roles",
+        "RoleBinding": "rolebindings",
+    },
+    "resource.k8s.io/v1": {
+        "DeviceClass": "deviceclasses", "DeviceTaintRule": "devicetaintrules", "ResourceClaim": "resourceclaims",
+        "ResourceClaimTemplate": "resourceclaimtemplates", "ResourceSlice": "resourceslices",
+    },
+    "scheduling.k8s.io/v1": {"PriorityClass": "priorityclasses"},
+    "storage.k8s.io/v1": {
+        "CSIDriver": "csidrivers", "CSINode": "csinodes", "CSIStorageCapacity": "csistoragecapacities",
+        "StorageClass": "storageclasses", "VolumeAttachment": "volumeattachments",
+        "VolumeAttributesClass": "volumeattributesclasses",
+    },
+    "storagemigration.k8s.io/v1": {"StorageVersionMigration": "storageversionmigrations"},
+}
+
+
+def _resource_rules(kinds: list, operations: tuple) -> list:
+    """``match_kinds`` of a CEL kind: one ``matchConstraints.resourceRules`` entry per built-in kind."""
+    rules = []
+    for kind in kinds:
+        found = [(gv, resources[kind]) for gv, resources in _BUILTIN_RESOURCES.items() if kind in resources]
+        if not found:
+            raise ValueError(
+                f"match_kinds: '{kind}' is not a built-in Kubernetes kind; "
+                "list it under match_constraints.resourceRules"
+            )
+        rules.append(
+            {
+                "apiGroups": [gv.rpartition("/")[0] for gv, _ in found],
+                "apiVersions": sorted({gv.rpartition("/")[2] for gv, _ in found}),
+                "operations": list(operations),
+                "resources": [found[0][1]],
+            }
+        )
+    return rules
+
+
+class CelPolicy(KyvernoBase):
+    """A policies.kyverno.io resource.
+
+    Required kwargs:
+        name: Resource name.
+        config: Resource configuration dictionary.
+        kind: The kind.
+        namespaced: Whether the kind is namespace-scoped.
+        fields: The spec fields that take a flat key (their snake_case spelling).
+        operations: The operations ``match_kinds`` matches; None if the kind has
+            no matchConstraints.
+    """
+
+    def new(self) -> None:
+        self.need("name")
+        self.kwargs.apiVersion = "policies.kyverno.io/v1beta1"
+        super().new()
+
+    def body(self) -> None:
+        super().body()
+        config = self.kwargs.config
+        self._add_common_metadata(config, include_namespace=self.kwargs.namespaced)
+
+        flat_keys = {
+            re.sub("([A-Z])", r"_\1", field).lower(): field for field in self.kwargs.fields
+        }
+        if self.kwargs.operations:
+            flat_keys["match_kinds"] = "matchConstraints.resourceRules"
+        # An ignored key could widen what a policy or exception applies to
+        allowed = {"name", "labels", "annotations", "spec", *flat_keys}
+        if self.kwargs.namespaced:
+            allowed.add("namespace")
+        unknown = sorted(set(config) - allowed)
+        if unknown:
+            raise ValueError(
+                f"{self.kwargs.kind} '{self.kwargs.name}': unknown keys {', '.join(unknown)}"
+            )
+
+        spec = self.root.spec
+        _merge_spec_passthrough(spec, config)
+        _warn_collisions(config, flat_keys, self.kwargs.name)
+        for flat_key, field in flat_keys.items():
+            if flat_key != "match_kinds":
+                _set_field(spec, config, flat_key, target_key=field)
+        if self.kwargs.operations and config.get("match_kinds"):
+            spec.setdefault("matchConstraints", {})["resourceRules"] = _resource_rules(
+                config["match_kinds"], self.kwargs.operations
+            )
+
+
+_ADMISSION_OPERATIONS = ("CREATE", "UPDATE")
+_VALIDATING_FIELDS = (
+    "auditAnnotations", "autogen", "evaluation", "failurePolicy", "matchConditions",
+    "matchConstraints", "validationActions", "validations", "variables", "webhookConfiguration",
+)
+_MUTATING_FIELDS = (
+    "auditAnnotations", "autogen", "evaluation", "failurePolicy", "matchConditions",
+    "matchConstraints", "mutations", "reinvocationPolicy", "targetMatchConditions",
+    "targetMatchConstraints", "variables", "webhookConfiguration",
+)
+_GENERATING_FIELDS = (
+    "auditAnnotations", "evaluation", "generate", "matchConditions", "matchConstraints",
+    "useServerSideApply", "variables", "webhookConfiguration",
+)
+_DELETING_FIELDS = (
+    "conditions", "deletionPropagationPolicy", "matchConstraints", "schedule", "variables",
+)
+_EXCEPTION_FIELDS = (
+    "allowedValues", "evaluationMode", "expiresAt", "images", "matchConditions",
+    "policyRefs", "properties", "reportResult",
+)
+
+# Inventory key: (kind, output suffix, namespaced, spec fields, match_kinds operations)
+_CEL_KINDS = {
+    "validating_policies": ("ValidatingPolicy", "vpol", False, _VALIDATING_FIELDS, _ADMISSION_OPERATIONS),
+    "namespaced_validating_policies": (
+        "NamespacedValidatingPolicy", "nvpol", True, _VALIDATING_FIELDS, _ADMISSION_OPERATIONS,
+    ),
+    "mutating_policies": ("MutatingPolicy", "mpol", False, _MUTATING_FIELDS, _ADMISSION_OPERATIONS),
+    "namespaced_mutating_policies": (
+        "NamespacedMutatingPolicy", "nmpol", True, _MUTATING_FIELDS, _ADMISSION_OPERATIONS,
+    ),
+    "generating_policies": ("GeneratingPolicy", "gpol", False, _GENERATING_FIELDS, _ADMISSION_OPERATIONS),
+    "namespaced_generating_policies": (
+        "NamespacedGeneratingPolicy", "ngpol", True, _GENERATING_FIELDS, _ADMISSION_OPERATIONS,
+    ),
+    "deleting_policies": ("DeletingPolicy", "dpol", False, _DELETING_FIELDS, ("*",)),
+    "namespaced_deleting_policies": ("NamespacedDeletingPolicy", "ndpol", True, _DELETING_FIELDS, ("*",)),
+    "cel_policy_exceptions": ("PolicyException", "celpolex", True, _EXCEPTION_FIELDS, None),
+}
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -722,6 +967,7 @@ def main(input_params) -> BaseObj:
     - policy_exceptions: PolicyException configurations
     - cluster_cleanup_policies: ClusterCleanupPolicy configurations
     - cleanup_policies: CleanupPolicy configurations
+    - the keys of _CEL_KINDS: policies.kyverno.io configurations
     """
     obj = BaseObj()
 
@@ -774,6 +1020,23 @@ def main(input_params) -> BaseObj:
             name=policy_name, config=config
         )
 
+    # policies.kyverno.io CEL kinds
+    for key, (kind, suffix, namespaced, fields, operations) in _CEL_KINDS.items():
+        for name, config in (kyverno_config.get(key) or {}).items():
+            config = _convert_to_dict(config) or {}
+            resource_name = config.get("name", name)
+            path = f"{resource_name}-{suffix}"
+            if namespaced:
+                path = f"{config.get('namespace', _default_namespace())}/{path}"
+            obj.root[path] = CelPolicy(
+                name=resource_name,
+                config=config,
+                kind=kind,
+                namespaced=namespaced,
+                fields=fields,
+                operations=operations,
+            )
+
     return obj
 
 
@@ -784,6 +1047,7 @@ __all__ = [
     "PolicyException",
     "ClusterCleanupPolicy",
     "CleanupPolicy",
+    "CelPolicy",
     # Base class
     "KyvernoBase",
     # Entry point

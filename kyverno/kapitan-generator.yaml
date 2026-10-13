@@ -1,5 +1,5 @@
 name: kyverno
-description: Renders Kyverno ClusterPolicies, Policies, PolicyExceptions and cleanup policies from inventory parameters.
+description: Renders Kyverno ValidatingPolicies, MutatingPolicies, GeneratingPolicies, DeletingPolicies and PolicyExceptions, and the legacy ClusterPolicies, Policies and cleanup policies, from inventory parameters.
 tags: [kubernetes, operators, security]
 license: Apache-2.0
 owners: [3042152]

@@ -1,5 +1,7 @@
-# Complete: all five kinds, the match_kinds shorthand on rules, exceptions and
-# cleanup policies, spec passthrough, and a flat key overriding spec (logs a warning).
+# Complete: all kyverno.io and policies.kyverno.io kinds, the match_kinds shorthand
+# on rules, exceptions, cleanup and CEL policies, the deprecated spec-level keys
+# moved to their replacements, spec passthrough, and flat keys overriding spec
+# (each logs a warning).
 classes: []
 
 parameters:
@@ -59,6 +61,56 @@ parameters:
                   metadata:
                     labels:
                       +(app.kubernetes.io/managed-by): kapitan
+        default-namespace-limits:
+          # deprecated spec-level key, rendered as each generate rule's generateExisting;
+          # the limit-range rule keeps its own value and logs a warning
+          generate_existing_on_policy_update: true
+          rules:
+            - name: resource-quota
+              match_kinds:
+                - Namespace
+              generate:
+                apiVersion: v1
+                kind: ResourceQuota
+                name: default-quota
+                namespace: "{{request.object.metadata.name}}"
+                synchronize: true
+                data:
+                  spec:
+                    hard:
+                      pods: "50"
+            - name: limit-range
+              match_kinds:
+                - Namespace
+              generate:
+                generateExisting: false
+                apiVersion: v1
+                kind: LimitRange
+                name: default-limits
+                namespace: "{{request.object.metadata.name}}"
+                synchronize: true
+                data:
+                  spec:
+                    limits:
+                      - type: Container
+                        defaultRequest:
+                          cpu: 100m
+                          memory: 128Mi
+        require-readiness-probe:
+          # deprecated spec-level keys, rendered under webhookConfiguration
+          failure_policy: Ignore
+          webhook_timeout_seconds: 15
+          rules:
+            - name: readiness-probe
+              match_kinds:
+                - Pod
+              validate:
+                message: "A readinessProbe is required"
+                pattern:
+                  spec:
+                    containers:
+                      - readinessProbe:
+                          periodSeconds: ">0"
       policies:
         require-memory-limits:
           rules:
@@ -94,6 +146,12 @@ parameters:
           namespace: ci
           match_kinds:
             - Pod
+          # match_kinds alone would exempt Pods in every namespace
+          conditions:
+            any:
+              - key: "{{ request.object.metadata.namespace }}"
+                operator: Equals
+                value: ci
           exceptions:
             - policy_name: disallow-privileged-containers
               rule_names:
@@ -122,3 +180,132 @@ parameters:
                   selector:
                     matchLabels:
                       env: preview
+      validating_policies:
+        # validation_actions unset: Kyverno denies a request that fails
+        require-team-label:
+          match_kinds:
+            - Deployment
+            - StatefulSet
+          validations:
+            - expression: "has(object.metadata.labels) && has(object.metadata.labels.team)"
+              message: "label team is required"
+        disallow-latest-tag:
+          annotations:
+            policies.kyverno.io/title: Disallow Latest Tag
+          labels:
+            policy-type: validation
+          # match_kinds sets resourceRules, the namespaceSelector stays
+          match_kinds:
+            - Pod
+          match_constraints:
+            namespaceSelector:
+              matchExpressions:
+                - key: kubernetes.io/metadata.name
+                  operator: NotIn
+                  values:
+                    - kube-system
+          validation_actions:
+            - Audit
+            - Warn
+          # flat failure_policy wins over spec.failurePolicy and logs a warning
+          failure_policy: Ignore
+          spec:
+            failurePolicy: Fail
+            webhookConfiguration:
+              timeoutSeconds: 15
+          variables:
+            - name: images
+              expression: "object.spec.containers.map(c, c.image)"
+          validations:
+            - expression: "variables.images.all(image, !image.endsWith(':latest'))"
+              message: "images must not use the latest tag"
+      namespaced_validating_policies:
+        require-requests:
+          match_kinds:
+            - Pod
+          validations:
+            - expression: "object.spec.containers.all(c, has(c.resources) && has(c.resources.requests))"
+              messageExpression: "'resource requests are required in namespace ' + object.metadata.namespace"
+      mutating_policies:
+        add-environment-label:
+          match_kinds:
+            - Deployment
+            - StatefulSet
+          mutations:
+            - patchType: ApplyConfiguration
+              applyConfiguration:
+                expression: >-
+                  Object{metadata: Object.metadata{labels: Object.metadata.labels{environment: "production"}}}
+      namespaced_mutating_policies:
+        disable-service-links:
+          match_kinds:
+            - Pod
+          mutations:
+            - patchType: JSONPatch
+              jsonPatch:
+                expression: >-
+                  [JSONPatch{op: "add", path: "/spec/enableServiceLinks", value: false}]
+      generating_policies:
+        default-deny-ingress:
+          match_kinds:
+            - Namespace
+          evaluation:
+            synchronize:
+              enabled: true
+          variables:
+            - name: nsName
+              expression: "object.metadata.name"
+            - name: downstream
+              expression: >-
+                [{"apiVersion": dyn("networking.k8s.io/v1"), "kind": dyn("NetworkPolicy"),
+                "metadata": dyn({"name": "default-deny-ingress", "namespace": string(variables.nsName)}),
+                "spec": dyn({"podSelector": dyn({}), "policyTypes": dyn(["Ingress"])})}]
+          generate:
+            - expression: "generator.Apply(variables.nsName, variables.downstream)"
+      namespaced_generating_policies:
+        service-account-config:
+          match_kinds:
+            - ServiceAccount
+          # generator.Apply of a namespaced policy takes only the resources,
+          # which land in the policy's namespace
+          variables:
+            - name: saName
+              expression: "object.metadata.name"
+            - name: downstream
+              expression: >-
+                [{"apiVersion": dyn("v1"), "kind": dyn("ConfigMap"),
+                "metadata": dyn({"name": string(variables.saName) + "-config"}),
+                "data": dyn({"owner": string(variables.saName)})}]
+          generate:
+            - expression: "generator.Apply(variables.downstream)"
+      deleting_policies:
+        succeeded-jobs:
+          schedule: "0 1 * * *"
+          match_kinds:
+            - Job
+          conditions:
+            - name: succeeded
+              expression: "has(object.status) && has(object.status.succeeded) && object.status.succeeded > 0"
+      namespaced_deleting_policies:
+        preview-configmaps:
+          schedule: "*/30 * * * *"
+          deletion_propagation_policy: Foreground
+          match_kinds:
+            - ConfigMap
+          match_constraints:
+            objectSelector:
+              matchLabels:
+                env: preview
+      cel_policy_exceptions:
+        node-exporter-latest:
+          namespace: monitoring
+          policy_refs:
+            - name: disallow-latest-tag
+              kind: ValidatingPolicy
+          # the exception's namespace does not limit it; the conditions do
+          match_conditions:
+            - name: monitoring-namespace
+              expression: "object.metadata.namespace == 'monitoring'"
+            - name: node-exporter
+              expression: "object.metadata.name.startsWith('node-exporter-')"
+          report_result: pass
