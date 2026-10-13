@@ -205,7 +205,7 @@ def outdated(gen):
     sources = yaml.load((ROOT / gen / "schemas" / "sources.yaml").read_text(), Loader=yaml.BaseLoader)
     updates = []
     for group, entry in sources.items():
-        old = list(zip(entry["source"].split(), entry["version"].split(" / "), strict=True))
+        old = pairs(entry)
         new, reasons = [], []
         for url, version in old:
             c = classify(url)
@@ -232,8 +232,15 @@ def outdated(gen):
     return updates
 
 
+def pairs(entry):
+    """[(url, version)] of a sources.yaml entry; one version applies to every URL."""
+    urls, versions = entry["source"].split(), entry["version"].split(" / ")
+    return list(zip(urls, versions * len(urls) if len(versions) == 1 else versions, strict=True))
+
+
 def label(update, key):
-    return " / ".join(v for _, v in update[key])
+    versions = [v for _, v in update[key]]
+    return versions[0] if len(set(versions)) == 1 else " / ".join(versions)
 
 
 def subject(updates):

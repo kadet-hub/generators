@@ -391,6 +391,11 @@ class Titles(unittest.TestCase):
         update = dict(UPDATE, software="RabbitMQ Cluster Operator / Messaging Topology Operator", new=[("a", "2.24.0"), ("b", "1.20.3")])
         self.assertEqual(upstream.issue_title("rabbitmq", [update]), "[upstream] rabbitmq: RabbitMQ Cluster Operator / Messaging Topology Operator 2.24.0 / 1.20.3")
 
+    def test_label_of_urls_sharing_one_version(self):
+        self.assertEqual(upstream.label(dict(UPDATE, new=[("a", "2.9.0"), ("b", "2.9.0")]), "new"), "2.9.0")
+        self.assertEqual(upstream.pairs({"source": "a b", "version": "2.9.0"}), [("a", "2.9.0"), ("b", "2.9.0")])
+        self.assertEqual(upstream.pairs({"source": "a b", "version": "1 / 2"}), [("a", "1"), ("b", "2")])
+
     def test_pr_title_is_a_conventional_commit(self):
         self.assertEqual(upstream.pr_title("kubevirt", [UPDATE]), "feat(kubevirt): update schemas to KubeVirt 1.10.0")
 
