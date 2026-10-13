@@ -15,7 +15,7 @@ See: https://docs.tigera.io/calico/3.33/reference/installation/api
      https://github.com/tigera/operator/tree/v1.44.0
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 import logging
 from typing import Any

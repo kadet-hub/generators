@@ -6,7 +6,7 @@ using Kapitan's kadet input type.
 All classes are re-exported from submodules for backward compatibility.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 # Re-export utilities
 # Re-export k8s base

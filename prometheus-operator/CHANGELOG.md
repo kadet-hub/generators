@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
+
 ## 1.1.0
 
 - New sections `service_monitors`, `pod_monitors` and `prometheus_rules` render ServiceMonitor, PodMonitor and PrometheusRule (`monitoring.coreos.com/v1`), so the generator covers every `monitoring.coreos.com` kind the kube-prometheus-stack chart installs. Their Prometheus Operator v0.94.1 CRD schemas are added under `schemas/`.
