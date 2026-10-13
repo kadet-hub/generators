@@ -10,7 +10,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from . import _convert_to_dict, _warn_collisions, inv, k8s
+from kapitan.inputs.kadet import inventory
+
+from . import _convert_to_dict, _warn_collisions, k8s
 
 
 logger = logging.getLogger(__name__)
@@ -19,7 +21,12 @@ API_VERSION = "projectcalico.org/v3"
 
 
 def _default_namespace() -> str:
-    """generators.calico.namespace -> parameters.namespace -> "default"."""
+    """generators.calico.namespace -> parameters.namespace -> "default".
+
+    Reads the inventory per call: Kapitan re-runs only the package __init__ per
+    target, so an inventory bound at import time served the first target's values.
+    """
+    inv = inventory()
     generator_config = inv.parameters.get("generators", {}).get("calico", {}) or {}
     return str(
         generator_config.get("namespace") or inv.parameters.get("namespace", "default")
