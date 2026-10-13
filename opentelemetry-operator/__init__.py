@@ -19,7 +19,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 API_GROUP = "opentelemetry.io"
 TARGET_ALLOCATOR_LABEL = "opentelemetry.io/target-allocator"

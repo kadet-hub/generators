@@ -13,7 +13,7 @@ See: https://docs.cilium.io/en/stable/network/kubernetes/policy/
      https://docs.cilium.io/en/latest/network/l2-announcements/
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import logging
 from typing import Any

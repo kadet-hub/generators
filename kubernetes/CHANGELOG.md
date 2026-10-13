@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
+
 ## 1.0.1
 
 README: ingress-nginx to Gateway API mapping. The rendered output is unchanged.

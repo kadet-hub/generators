@@ -17,7 +17,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 API_VERSION = "loki.grafana.com/v1"
 STACK_LABEL = "loki.grafana.com/lokistack"

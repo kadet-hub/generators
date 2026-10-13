@@ -5,6 +5,8 @@ inherit from. It handles common metadata operations like labels, annotations,
 and namespaces.
 """
 
+import re
+
 from kapitan.inputs.kadet import BaseObj
 
 
@@ -35,7 +37,14 @@ class Base(BaseObj):
         self.root.kind = self.kwargs.kind
         self.name = self.kwargs.name
         self.root.metadata.name = self.kwargs.get("rendered_name", self.name)
-        self.add_label("name", self.root.metadata.name)
+        name = self.root.metadata.name
+        if len(name) > 63 or not re.fullmatch(r"(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?", name):
+            raise ValueError(
+                f"{self.root.kind} '{name}': the name is also the value of the 'name' label, and a label"
+                f" value must be at most 63 characters (this one has {len(name)}) of letters, digits,"
+                " '-', '_' or '.', starting and ending with a letter or digit; use a shorter name"
+            )
+        self.add_label("name", name)
 
     def add_labels(self, labels: dict[str, str]) -> None:
         """Add multiple labels to the resource metadata.

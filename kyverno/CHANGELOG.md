@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
+
 ## 1.1.0
 
 - Renders the `policies.kyverno.io` kinds of Kyverno 1.19.1 at their storage version `v1beta1`: ValidatingPolicy, MutatingPolicy, GeneratingPolicy and DeletingPolicy with their namespaced variants under `validating_policies`, `namespaced_validating_policies`, `mutating_policies`, `namespaced_mutating_policies`, `generating_policies`, `namespaced_generating_policies`, `deleting_policies` and `namespaced_deleting_policies`, and PolicyException under `cel_policy_exceptions`. Their schemas ship under `schemas/policies.kyverno.io/`.

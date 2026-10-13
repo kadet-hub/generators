@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
+
 ## 1.0.0
 
 First release on kadet-hub, migrated from kapitan-generators.

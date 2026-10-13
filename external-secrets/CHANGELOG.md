@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
+
 ## 1.0.1
 
 Ships the upstream CRD schemas under `schemas/`; the kadet-hub gate validates the compiled output against them (QA-7).

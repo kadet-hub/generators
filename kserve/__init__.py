@@ -14,7 +14,7 @@ Schema reference: serving.kserve.io/v1beta1, v1alpha1, v1alpha2 (LLM kinds)
 See: https://kserve.github.io/website/
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import logging
 from typing import Any
