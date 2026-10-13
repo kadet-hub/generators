@@ -1,0 +1,51 @@
+# Minimal: a function, a namespaced XRD from the version/spec_schema shorthand
+# and a Composition whose compositeTypeRef derives from the XRD
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/crossplane
+        output_path: manifests/
+
+  generators:
+    crossplane:
+      functions:
+        function-patch-and-transform:
+          package: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform
+          version: v0.11.0
+      composite_resource_definitions:
+        buckets.platform.example.com:
+          kind: Bucket
+          version: v1alpha1
+          spec_schema:
+            type: object
+            properties:
+              region:
+                type: string
+            required:
+              - region
+      compositions:
+        buckets-aws:
+          xrd: buckets.platform.example.com
+          pipeline:
+            - function: function-patch-and-transform
+              input:
+                apiVersion: pt.fn.crossplane.io/v1beta1
+                kind: Resources
+                resources:
+                  - name: bucket
+                    base:
+                      apiVersion: s3.aws.m.upbound.io/v1beta1
+                      kind: Bucket
+                      spec:
+                        forProvider:
+                          region: eu-central-1
+                    patches:
+                      - type: FromCompositeFieldPath
+                        fromFieldPath: spec.region
+                        toFieldPath: spec.forProvider.region
