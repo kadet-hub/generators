@@ -1,0 +1,177 @@
+# Complete: two clusters, every flat key and shorthand, spec passthrough and a flat key overriding spec
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/strimzi
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    strimzi:
+      namespace: streaming
+      cluster: events
+      kafkas:
+        events:
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          version: 4.3.1
+          metadata_version: 4.3-IV0
+          node_pools:
+            controller:
+              roles: [controller]
+              storage: 20Gi
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 2Gi
+                limits:
+                  memory: 2Gi
+            broker:
+              roles: [broker]
+              replicas: 4
+              storage:
+                type: jbod
+                volumes:
+                  - id: 0
+                    type: persistent-claim
+                    size: 500Gi
+                    class: fast-ssd
+                    kraftMetadata: shared
+                  - id: 1
+                    type: persistent-claim
+                    size: 500Gi
+                    class: fast-ssd
+              spec:
+                template:
+                  pod:
+                    affinity:
+                      podAntiAffinity:
+                        preferredDuringSchedulingIgnoredDuringExecution:
+                          - weight: 100
+                            podAffinityTerm:
+                              topologyKey: kubernetes.io/hostname
+                              labelSelector:
+                                matchLabels:
+                                  strimzi.io/pool-name: broker
+          listeners:
+            - name: tls
+              port: 9093
+              type: internal
+              tls: true
+              authentication:
+                type: tls
+            - name: scram
+              port: 9094
+              type: internal
+              tls: true
+              authentication:
+                type: scram-sha-512
+            - name: external
+              port: 9095
+              type: loadbalancer
+              tls: true
+              authentication:
+                type: tls
+              configuration:
+                bootstrap:
+                  loadBalancerIP: 192.0.2.10
+          config:
+            auto.create.topics.enable: false
+          spec:
+            kafka:
+              version: 4.2.2
+              rack:
+                topologyKey: topology.kubernetes.io/zone
+              authorization:
+                superUsers:
+                  - CN=platform-admin
+            cruiseControl: {}
+        dev:
+          namespace: dev
+          authorization: simple
+          node_pools:
+            dual:
+              roles: [controller, broker]
+              replicas: 1
+              storage:
+                type: jbod
+                volumes:
+                  - id: 0
+                    type: ephemeral
+                    kraftMetadata: shared
+        clickstream:
+          namespace: analytics
+          authorization: none
+          entity_operator: false
+          node_pools:
+            controller:
+              roles: [controller]
+              storage: 10Gi
+            broker:
+              roles: [broker]
+              replicas: 2
+              storage: 200Gi
+      topics:
+        orders:
+          partitions: 12
+          config:
+            retention.ms: 604800000
+            cleanup.policy: delete
+        Payments_EU:
+          labels:
+            team: payments
+          partitions: 6
+        audit-log:
+          topic_name: audit.log
+          replicas: 4
+          spec:
+            partitions: 3
+            config:
+              cleanup.policy: compact
+        scratch:
+          cluster: dev
+          partitions: 1
+      users:
+        orders-app:
+          authentication: tls
+          acls:
+            - topic: orders
+              operations: [Describe, Read, Write]
+            - group: orders-
+              pattern_type: prefix
+              operations: [Read]
+            - transactional_id: orders-app
+              operations: [Describe, Write]
+            - cluster: true
+              operations: [IdempotentWrite]
+          quotas:
+            producerByteRate: 1048576
+            consumerByteRate: 2097152
+        reporting:
+          authentication: scram-sha-512
+          acls:
+            - resource:
+                type: topic
+                name: orders
+              operations: [Describe, Read]
+              host: 198.51.100.20
+            - topic: Payments_EU
+              type: deny
+              operations: [All]
+          spec:
+            authorization:
+              type: simple
+              acls: []
+        dev-client:
+          cluster: dev
+          spec:
+            authentication:
+              type: tls-external
