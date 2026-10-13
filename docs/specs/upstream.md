@@ -52,7 +52,7 @@ and CHANGELOG entry before merging.
   rows is reported as unchecked in the workflow log.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #43
+  - Since: #39, #43, #56
 
 ## Regeneration
 
