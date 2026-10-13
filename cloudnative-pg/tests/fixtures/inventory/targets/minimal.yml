@@ -1,0 +1,23 @@
+# Minimal: one Cluster with the storage shorthand and one Database
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/cloudnative-pg
+        output_path: manifests/
+
+  namespace: databases
+  generators:
+    cloudnative-pg:
+      clusters:
+        app-db:
+          storage: 10Gi
+      databases:
+        app:
+          cluster: app-db
+          owner: app
