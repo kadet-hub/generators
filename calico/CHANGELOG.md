@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+Namespaced `projectcalico.org/v3` resources without their own `namespace` get the namespace of the target being compiled. Before, they could get the default namespace of another target compiled earlier in the same Kapitan worker, so the output depended on target order.
+
 ## 1.1.1
 
 Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
