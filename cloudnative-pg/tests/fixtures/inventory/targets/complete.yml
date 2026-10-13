@@ -1,0 +1,138 @@
+# Complete: every kind, the backup, storage, cluster and schedule shorthands,
+# metrics over TLS, managed roles for Database owners, and flat keys
+# overriding spec passthrough
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/cloudnative-pg
+        output_path: manifests/
+
+  namespace: apps
+  generators:
+    cloudnative-pg:
+      namespace: databases
+      object_stores:
+        app-db-store:
+          configuration:
+            destinationPath: s3://pg-backups/app-db
+            endpointURL: https://s3.example.com
+            s3Credentials:
+              accessKeyId:
+                name: app-db-s3
+                key: ACCESS_KEY_ID
+              secretAccessKey:
+                name: app-db-s3
+                key: ACCESS_SECRET_KEY
+            wal:
+              compression: gzip
+            data:
+              compression: gzip
+          retention_policy: 30d
+      clusters:
+        app-db:
+          labels:
+            team: payments
+          annotations:
+            example.com/owner: payments
+          instances: 3
+          image_name: ghcr.io/cloudnative-pg/postgresql:18.6-system-trixie
+          storage:
+            size: 50Gi
+            storageClass: fast-ssd
+          wal_storage: 10Gi
+          postgresql:
+            parameters:
+              max_connections: "200"
+              shared_buffers: 512MB
+          bootstrap:
+            initdb:
+              database: app
+              owner: app
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              memory: 2Gi
+          monitoring:
+            tls:
+              enabled: true
+          managed:
+            roles:
+              - name: analytics
+                ensure: present
+                login: true
+                passwordSecret:
+                  name: app-db-analytics
+          backup:
+            object_store: app-db-store
+            server_name: app-db-pg18
+          spec:
+            instances: 2
+            primaryUpdateStrategy: unsupervised
+            enablePDB: true
+        reporting-db:
+          namespace: reporting
+          spec:
+            instances: 1
+            storage:
+              pvcTemplate:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 20Gi
+      databases:
+        app:
+          cluster: app-db
+          owner: app
+        analytics:
+          cluster: app-db
+          database_name: analytics_prod
+          owner: analytics
+          encoding: UTF8
+          extensions:
+            - name: pg_stat_statements
+              ensure: present
+        reports:
+          namespace: reporting
+          cluster:
+            name: reporting-db
+          owner: app
+          database_reclaim_policy: delete
+      poolers:
+        app-db-pooler-rw:
+          cluster: app-db
+          instances: 2
+          type: rw
+          pool_mode: transaction
+          spec:
+            pgbouncer:
+              poolMode: session
+              parameters:
+                max_client_conn: "1000"
+                default_pool_size: "20"
+        app-db-pooler-ro:
+          cluster: app-db
+          type: ro
+      scheduled_backups:
+        app-db-daily:
+          cluster: app-db
+          schedule: 0 3 * * *
+          immediate: true
+        app-db-weekly:
+          spec:
+            cluster:
+              name: app-db
+            schedule: 0 0 4 * * 0
+            target: primary
+          target: prefer-standby
+      backups:
+        app-db-before-upgrade:
+          cluster: app-db
