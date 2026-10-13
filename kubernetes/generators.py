@@ -324,6 +324,13 @@ def _expand_gateway_services(gateway_name, gateway_config):
                 f"gateway {gateway_name!r} service {service_name!r}: "
                 "tls_secret is required for its HTTPS listener"
             )
+        status_code = service_config.get("redirect_status_code", 301)
+        if type(status_code) is not int or status_code not in (301, 302, 303, 307, 308):
+            raise ValueError(
+                f"gateway {gateway_name!r} service {service_name!r}: "
+                "redirect_status_code must be 301, 302, 303, 307 or 308, "
+                f"not {status_code!r}"
+            )
 
         listener_name = f"https-{service_name}"
         listeners[listener_name] = _build_https_listener(service_config)
@@ -332,7 +339,7 @@ def _expand_gateway_services(gateway_name, gateway_config):
         # gRPC clients typically don't follow HTTP redirects
         if http_redirect and route_type == "http":
             routes[f"http-{service_name}-redirect"] = _build_redirect_route(
-                hostname, namespace, http_listener
+                hostname, namespace, http_listener, status_code
             )
 
         routes[f"https-{service_name}-route"] = _build_backend_route(
@@ -395,7 +402,7 @@ def _build_https_listener(service_config):
     }
 
 
-def _build_redirect_route(hostname, namespace, listener):
+def _build_redirect_route(hostname, namespace, listener, status_code):
     """Build an HTTP->HTTPS redirect route for an expanded gateway service."""
     return {
         "type": "http",
@@ -406,7 +413,7 @@ def _build_redirect_route(hostname, namespace, listener):
             "redirect-to-https": {
                 "redirect": {
                     "scheme": "https",
-                    "status_code": 301,
+                    "status_code": status_code,
                 },
                 "matches": {
                     "root-path": {
