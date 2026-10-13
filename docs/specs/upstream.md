@@ -47,7 +47,8 @@ and CHANGELOG entry before merging.
   (`tigera/operator` v1.40.16 after v1.44.0).
 
   A source of several space-separated URLs, with their versions separated
-  by ` / ` in `version`, is checked per URL. A source matching none of the
+  by ` / ` in `version`, is checked per URL. A single `version` applies to
+  every URL, and the label shows it once while all URLs share it. A source matching none of the
   rows is reported as unchecked in the workflow log.
 
   - Test: `tools/test_upstream.py`
