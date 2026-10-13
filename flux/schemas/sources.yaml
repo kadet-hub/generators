@@ -1,0 +1,21 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+# Versions are the controller releases that Flux 2.9.6 pins in
+# https://github.com/fluxcd/flux2/tree/v2.9.6/manifests/bases.
+source.toolkit.fluxcd.io:
+  software: Flux source-controller
+  version: 1.9.6
+  source: https://github.com/fluxcd/source-controller/tree/v1.9.6/config/crd/bases
+  license: Apache-2.0
+kustomize.toolkit.fluxcd.io:
+  software: Flux kustomize-controller
+  version: 1.9.6
+  source: https://github.com/fluxcd/kustomize-controller/tree/v1.9.6/config/crd/bases
+  license: Apache-2.0
+helm.toolkit.fluxcd.io:
+  software: Flux helm-controller
+  version: 1.6.5
+  source: https://github.com/fluxcd/helm-controller/tree/v1.6.5/config/crd/bases
+  license: Apache-2.0

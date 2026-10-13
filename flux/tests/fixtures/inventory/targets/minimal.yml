@@ -1,0 +1,25 @@
+# Minimal: the upstream podinfo example, a GitRepository and the Kustomization
+# that applies its ./kustomize directory, linked by the source shorthand.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/flux
+        output_path: manifests/
+
+  generators:
+    flux:
+      git_repositories:
+        podinfo:
+          url: https://github.com/stefanprodan/podinfo
+          ref: master
+      kustomizations:
+        podinfo:
+          source: podinfo
+          path: ./kustomize
+          target_namespace: default

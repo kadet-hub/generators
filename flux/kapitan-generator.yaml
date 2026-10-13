@@ -1,0 +1,14 @@
+name: flux
+description: Renders Flux GitRepositories, OCIRepositories, HelmRepositories, Kustomizations and HelmReleases from inventory parameters, linking each consumer to its source by name.
+tags: [kubernetes, operators, ci]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas
