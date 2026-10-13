@@ -264,8 +264,10 @@ class ClusterPolicy(KyvernoBase):
 
         # Validation failure action, deprecated in favour of the rule's
         # validate.failureAction, which Kyverno resolves before the spec-level one.
-        # A rule-level action would outrank spec-level overrides, and verifyImages
-        # rules read the spec-level action, so with either the field stays.
+        # The field stays where moving it changes a resolved action: a rule-level
+        # action outranks spec-level overrides, verifyImages rules read the
+        # spec-level action, and the policy-wide action is the first rule-level
+        # one, so a rule with its own action keeps the rest at spec level.
         validation_failure_action = config.get("validation_failure_action")
         if validation_failure_action:
             _validate_enum(
@@ -278,15 +280,14 @@ class ClusterPolicy(KyvernoBase):
                 config.get("validation_failure_action_overrides")
                 or spec.get("validationFailureActionOverrides")
                 or any("verifyImages" in rule for rule in rules)
+                or any("failureAction" in (rule.get("validate") or {}) for rule in rules)
             ):
                 spec.validationFailureAction = validation_failure_action
             else:
                 spec.pop("validationFailureAction", None)
                 for rule in rules:
                     if "validate" in rule:
-                        rule["validate"].setdefault(
-                            "failureAction", validation_failure_action.capitalize()
-                        )
+                        rule["validate"]["failureAction"] = validation_failure_action.capitalize()
 
         # Validation failure action overrides
         overrides = config.get("validation_failure_action_overrides")
@@ -342,10 +343,23 @@ class ClusterPolicy(KyvernoBase):
         if mutate_existing is not None:
             spec.mutateExistingOnPolicyUpdate = mutate_existing
 
-        # Generate existing on policy update
+        # Generate existing on policy update: Kyverno rejects the spec-level field
+        # even when false; each generate rule's generateExisting replaces it.
         generate_existing = config.get("generate_existing_on_policy_update")
         if generate_existing is not None:
-            spec.generateExistingOnPolicyUpdate = generate_existing
+            spec.pop("generateExistingOnPolicyUpdate", None)
+            for rule in spec.get("rules") or []:
+                if "generate" not in rule:
+                    continue
+                if "generateExisting" in rule["generate"]:
+                    logger.warning(
+                        "Rule '%s' generate.generateExisting overrides flat key '%s' for resource '%s'",
+                        rule.get("name"),
+                        "generate_existing_on_policy_update",
+                        self.kwargs.name,
+                    )
+                else:
+                    rule["generate"]["generateExisting"] = generate_existing
 
         # Use server-side apply for mutation
         use_server_side_apply = config.get("use_server_side_apply")
@@ -875,6 +889,15 @@ class CelPolicy(KyvernoBase):
         }
         if self.kwargs.operations:
             flat_keys["match_kinds"] = "matchConstraints.resourceRules"
+        # An ignored key could widen what a policy or exception applies to
+        allowed = {"name", "labels", "annotations", "spec", *flat_keys}
+        if self.kwargs.namespaced:
+            allowed.add("namespace")
+        unknown = sorted(set(config) - allowed)
+        if unknown:
+            raise ValueError(
+                f"{self.kwargs.kind} '{self.kwargs.name}': unknown keys {', '.join(unknown)}"
+            )
 
         spec = self.root.spec
         _merge_spec_passthrough(spec, config)

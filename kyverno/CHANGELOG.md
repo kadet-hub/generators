@@ -4,8 +4,10 @@
 
 - Renders the `policies.kyverno.io` kinds of Kyverno 1.19.1 at their storage version `v1beta1`: ValidatingPolicy, MutatingPolicy, GeneratingPolicy and DeletingPolicy with their namespaced variants under `validating_policies`, `namespaced_validating_policies`, `mutating_policies`, `namespaced_mutating_policies`, `generating_policies`, `namespaced_generating_policies`, `deleting_policies` and `namespaced_deleting_policies`, and PolicyException under `cel_policy_exceptions`. Their schemas ship under `schemas/policies.kyverno.io/`.
 - `match_kinds` on these kinds expands to `matchConstraints.resourceRules` for the GA built-in kinds of Kubernetes 1.37.1. No Kyverno defaults are added; the README lists them with sources.
-- ClusterPolicy and Policy render the deprecated `failure_policy` and `webhook_timeout_seconds` as `webhookConfiguration.failurePolicy` and `webhookConfiguration.timeoutSeconds`, and `validation_failure_action` as each validate rule's `failureAction`, unless the policy has `validation_failure_action_overrides` or a `verifyImages` rule. Output changes only for inventories that set these keys, with the same effect in Kyverno.
+- ClusterPolicy and Policy render the deprecated `failure_policy` and `webhook_timeout_seconds` as `webhookConfiguration.failurePolicy` and `webhookConfiguration.timeoutSeconds`, and `validation_failure_action` as each validate rule's `failureAction`, unless a validate rule sets its own `failureAction` or the policy has `validation_failure_action_overrides` or a `verifyImages` rule. Output changes only for inventories that set these keys, with the same effect in Kyverno.
 - `failure_policy` or `webhook_timeout_seconds` together with the same field in `webhook_configuration` now stops the compile; Kyverno's admission already rejected such a policy.
+- `generate_existing_on_policy_update` renders as `generateExisting` in each generate rule that sets none. 1.0.0 emitted `spec.generateExistingOnPolicyUpdate`, which Kyverno 1.19.1 rejects even when it is `false`.
+- A key that a `policies.kyverno.io` kind does not take, such as `match_kinds` on a PolicyException, stops the compile.
 
 ## 1.0.0
 

@@ -61,6 +61,41 @@ parameters:
                   metadata:
                     labels:
                       +(app.kubernetes.io/managed-by): kapitan
+        default-namespace-limits:
+          # deprecated spec-level key, rendered as each generate rule's generateExisting;
+          # the limit-range rule keeps its own value and logs a warning
+          generate_existing_on_policy_update: true
+          rules:
+            - name: resource-quota
+              match_kinds:
+                - Namespace
+              generate:
+                apiVersion: v1
+                kind: ResourceQuota
+                name: default-quota
+                namespace: "{{request.object.metadata.name}}"
+                synchronize: true
+                data:
+                  spec:
+                    hard:
+                      pods: "50"
+            - name: limit-range
+              match_kinds:
+                - Namespace
+              generate:
+                generateExisting: false
+                apiVersion: v1
+                kind: LimitRange
+                name: default-limits
+                namespace: "{{request.object.metadata.name}}"
+                synchronize: true
+                data:
+                  spec:
+                    limits:
+                      - type: Container
+                        defaultRequest:
+                          cpu: 100m
+                          memory: 128Mi
         require-readiness-probe:
           # deprecated spec-level keys, rendered under webhookConfiguration
           failure_policy: Ignore
@@ -111,6 +146,12 @@ parameters:
           namespace: ci
           match_kinds:
             - Pod
+          # match_kinds alone would exempt Pods in every namespace
+          conditions:
+            any:
+              - key: "{{ request.object.metadata.namespace }}"
+                operator: Equals
+                value: ci
           exceptions:
             - policy_name: disallow-privileged-containers
               rule_names:
@@ -146,7 +187,7 @@ parameters:
             - Deployment
             - StatefulSet
           validations:
-            - expression: "has(object.metadata.labels.team)"
+            - expression: "has(object.metadata.labels) && has(object.metadata.labels.team)"
               message: "label team is required"
         disallow-latest-tag:
           annotations:
@@ -225,14 +266,18 @@ parameters:
         service-account-config:
           match_kinds:
             - ServiceAccount
+          # generator.Apply of a namespaced policy takes only the resources,
+          # which land in the policy's namespace
           variables:
+            - name: saName
+              expression: "object.metadata.name"
             - name: downstream
               expression: >-
                 [{"apiVersion": dyn("v1"), "kind": dyn("ConfigMap"),
-                "metadata": dyn({"name": object.metadata.name + "-config", "namespace": object.metadata.namespace}),
-                "data": dyn({"owner": object.metadata.name})}]
+                "metadata": dyn({"name": string(variables.saName) + "-config"}),
+                "data": dyn({"owner": string(variables.saName)})}]
           generate:
-            - expression: "generator.Apply(object.metadata.namespace, variables.downstream)"
+            - expression: "generator.Apply(variables.downstream)"
       deleting_policies:
         succeeded-jobs:
           schedule: "0 1 * * *"
@@ -240,7 +285,7 @@ parameters:
             - Job
           conditions:
             - name: succeeded
-              expression: "has(object.status.succeeded) && object.status.succeeded > 0"
+              expression: "has(object.status) && has(object.status.succeeded) && object.status.succeeded > 0"
       namespaced_deleting_policies:
         preview-configmaps:
           schedule: "*/30 * * * *"
@@ -257,7 +302,10 @@ parameters:
           policy_refs:
             - name: disallow-latest-tag
               kind: ValidatingPolicy
+          # the exception's namespace does not limit it; the conditions do
           match_conditions:
+            - name: monitoring-namespace
+              expression: "object.metadata.namespace == 'monitoring'"
             - name: node-exporter
               expression: "object.metadata.name.startsWith('node-exporter-')"
           report_result: pass
