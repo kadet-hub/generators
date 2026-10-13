@@ -1,0 +1,36 @@
+# Minimal: one KRaft cluster with controller and broker pools, a topic and a TLS user with ACLs
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/strimzi
+        output_path: manifests/
+
+  namespace: kafka
+  generators:
+    strimzi:
+      kafkas:
+        events:
+          node_pools:
+            controller:
+              roles: [controller]
+              storage: 20Gi
+            broker:
+              roles: [broker]
+              storage: 100Gi
+      topics:
+        orders:
+          partitions: 6
+      users:
+        orders-app:
+          authentication: tls
+          acls:
+            - topic: orders
+              operations: [Describe, Read, Write]
+            - group: orders-app
+              operations: [Read]

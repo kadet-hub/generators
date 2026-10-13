@@ -1,0 +1,19 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at these releases (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+apiextensions.crossplane.io:
+  software: Crossplane
+  version: 2.4.2
+  source: https://github.com/crossplane/crossplane/tree/v2.4.2/cluster/crds
+  license: Apache-2.0
+pkg.crossplane.io:
+  software: Crossplane
+  version: 2.4.2
+  source: https://github.com/crossplane/crossplane/tree/v2.4.2/cluster/crds
+  license: Apache-2.0
+aws.m.upbound.io:
+  software: Crossplane Provider AWS
+  version: 2.9.0
+  source: https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.9.0/package/crds/aws.m.upbound.io_providerconfigs.yaml https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.9.0/package/crds/aws.m.upbound.io_clusterproviderconfigs.yaml
+  license: Apache-2.0

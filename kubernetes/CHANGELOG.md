@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+README: ingress-nginx to Gateway API mapping. The rendered output is unchanged.
+
 ## 1.0.0
 
 First release on kadet-hub, migrated from kapitan-generators.

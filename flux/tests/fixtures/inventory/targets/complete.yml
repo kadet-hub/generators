@@ -1,0 +1,110 @@
+# Complete: every kind, the source, ref, secret_ref and depends_on shorthands,
+# a cross-namespace source, a chart from an OCIRepository and from a
+# HelmRepository, prune opted in, and a flat key overriding spec.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/flux
+        output_path: manifests/
+
+  generators:
+    flux:
+      namespace: flux-system
+      git_repositories:
+        fleet:
+          url: https://git.example.com/platform/fleet.git
+          ref: main
+          secret_ref: fleet-git-token
+          ignore: |
+            /*
+            !/clusters
+            !/apps
+      oci_repositories:
+        podinfo-chart:
+          namespace: apps
+          url: oci://ghcr.io/stefanprodan/charts/podinfo
+          ref:
+            semver: ">=6.0.0"
+        platform-manifests:
+          url: oci://registry.example.com/platform/manifests
+          ref: 1.4.0
+          provider: generic
+          secret_ref: registry-auth
+      helm_repositories:
+        bitnami:
+          url: oci://registry-1.docker.io/bitnamicharts
+        jetstack:
+          url: https://charts.jetstack.io
+          interval: 1h
+      kustomizations:
+        infrastructure:
+          source: fleet
+          path: ./clusters/production/infrastructure
+          prune: true
+          labels:
+            app.kubernetes.io/part-of: platform
+        apps:
+          source: fleet
+          path: ./apps/production
+          prune: true
+          depends_on:
+            - infrastructure
+          service_account_name: flux-apps
+          post_build:
+            substitute:
+              cluster_name: production
+              cluster_domain: example.com
+          spec:
+            interval: 10m
+            timeout: 5m
+        platform:
+          source: platform-manifests
+          path: ./
+          target_namespace: platform
+          interval: 15m
+          spec:
+            interval: 30m
+            force: false
+        shared:
+          source:
+            kind: GitRepository
+            name: shared-config
+            namespace: tenants
+          path: ./base
+      helm_releases:
+        podinfo:
+          namespace: apps
+          source: podinfo-chart
+          release_name: podinfo
+          values:
+            replicaCount: 2
+          values_from:
+            - kind: ConfigMap
+              name: podinfo-values
+        cert-manager:
+          namespace: cert-manager
+          source: jetstack
+          version: v1.21.2
+          target_namespace: cert-manager
+          install:
+            crds: Create
+          upgrade:
+            crds: CreateReplace
+          values:
+            crds:
+              enabled: true
+        redis:
+          namespace: apps
+          source: bitnami
+          chart: redis
+          version: 28.3.1
+          timeout: 10m
+          spec:
+            driftDetection:
+              mode: enabled
