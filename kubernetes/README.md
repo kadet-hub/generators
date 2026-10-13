@@ -149,3 +149,83 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`.
 
 `schemas/` holds the JSON Schemas of these kinds: built-in kinds from [kubernetes-json-schema](https://github.com/yannh/kubernetes-json-schema) v1.37.1-standalone-strict, CRD kinds from the upstream CRDs at the versions above, closed against unknown fields. BackendConfig is not schema-checked, because GKE publishes no BackendConfig CRD file; kinds rendered through `manifests` are checked only where `schemas/` has their schema.
+
+## ingress-nginx annotations
+
+For moving an Ingress from `ingresses.<name>` to `generators.kubernetes.gateways`, the table maps common [ingress-nginx annotations][inx] (controller v1.15.1, prefix `nginx.ingress.kubernetes.io/`) to the Gateway API 1.6.3 standard channel this generator renders, and to the generator keys below `generators.kubernetes` that render the field. Ingress and Gateway can run side by side during the move: the Ingress keeps its `annotations`, and the Gateway gets its own address ([ingress-nginx migration guide][gw-inx]). [ingress2gateway][i2g] v1.2.0 converts most of these annotations and warns about the rest.
+
+| Annotation | Gateway API 1.6.3 standard | Generator |
+|---|---|---|
+| [`ssl-redirect`, `force-ssl-redirect`][inx-ssl] | [`RequestRedirect`][gw-redirect] filter with `scheme: https` on a route attached to the HTTP listener | `gateways.<gw>.services.<svc>` (301, `http_redirect: false` drops it), or a `gateways.<gw>.routes` rule with `redirect.scheme` and `redirect.status_code` |
+| [`rewrite-target`][inx-rewrite] | [`URLRewrite`][gw-redirect] filter, `path.type` `ReplacePrefixMatch` or `ReplaceFullPath` | none |
+| [`backend-protocol`][inx-proto] | `GRPC`: [GRPCRoute][gw-grpc]; `HTTPS`: [BackendTLSPolicy][gw-btls]; `GRPCS`: both; `FCGI`: none | `type: grpc` on a `services` entry or route; `backend_tls_policies` |
+| [`canary`, `canary-weight`][inx-canary] | two `backendRefs` with [`weight`][gw-split] in one rule; `canary-by-header` is a [`headers` match][gw-routing] | none |
+| [`enable-cors`, `cors-*`][inx-cors] | [`CORS`][gw-cors] filter | none |
+| [`use-regex`][inx-regex] | path match `type: RegularExpression` | `gateways.<gw>.routes.<route>.rules.<rule>.matches.<match>.type: RegularExpression` |
+| [`proxy-body-size`][inx-body] | none | none |
+| [`whitelist-source-range`][inx-ip] | none | none |
+| [`auth-url`][inx-auth] | none; experimental channel: `ExternalAuth` filter ([GEP-1494][gep-1494]) | none |
+| [`affinity`][inx-affinity], [`session-cookie-*`][inx-cookie] | none; experimental channel: rule `sessionPersistence` ([GEP-1619][gep-1619]) | none |
+| [`server-snippet`][inx-server-snippet], [`configuration-snippet`][inx-snippet] | none | none |
+
+A Gateway API field with "none" in the generator column is one the route keys cannot render: a route rule renders one backend, path (or gRPC method) matches and no filter other than `redirect`. That route goes in `generators.kubernetes.manifests` as `kind: HTTPRoute` with its spec under `body`, as do the implementation policies below. Experimental fields also need the experimental channel CRDs in the cluster.
+
+ingress-nginx redirects to HTTPS with 308 ([ssl-redirect][inx-ssl]). The `services` shorthand uses 301, which does not guarantee that the client keeps the request method; a route rule with `status_code: 308` (Extended support) behaves like ingress-nginx ([redirects][gw-redirect]). The redirect route does not depend on TLS on the Gateway, so `ssl-redirect` and `force-ssl-redirect` map to the same route, and `ssl-redirect: "false"` means no redirect route. ingress2gateway adds the 308 redirect only for hosts with TLS on the Ingress and does not convert `force-ssl-redirect`.
+
+`ReplacePrefixMatch` with an empty `replacePrefixMatch` strips the matched prefix: `/foo/bar` with prefix `/foo` becomes `/bar` ([API spec][gw-prefix]). That covers the common `path: /something(/|$)(.*)` with `rewrite-target: /$2` ([rewrite example][inx-rewrite-example]). Other capture group references have no equivalent; ingress2gateway converts `rewrite-target` to `ReplaceFullPath` and flags them. Path rewrites are Extended support.
+
+BackendTLSPolicy (standard since v1.4.0) requires `validation.hostname` and a CA from `caCertificateRefs` or `wellKnownCACertificates`, so it always verifies the backend certificate ([BackendTLSPolicy][gw-btls]). `backend-protocol: HTTPS` alone does not, because `proxy-ssl-verify` defaults to `off` ([backend certificate authentication][inx-proxy-ssl]); ingress2gateway emits a BackendTLSPolicy only when `proxy-ssl-verify` and `proxy-ssl-server-name` are `on` and `proxy-ssl-secret` and `proxy-ssl-name` name the CA Secret and the hostname ([backend_tls.go][i2g-btls]).
+
+Weights are proportional, not percentages: `canary-weight: "10"` with the default `canary-weight-total` of 100 is weight 90 on the main backend and 10 on the canary ([traffic splitting][gw-split]). ingress2gateway converts `canary-weight`, `canary-by-header` and `canary-by-header-value`, and warns on `canary-by-cookie` and `canary-by-header-pattern`.
+
+The CORS filter is standard since v1.5.0 with Extended support ([CORS][gw-cors]) and has none of the ingress-nginx defaults. ingress-nginx allows origin `*`, allows credentials and caches preflights for 1728000 seconds ([CORS][inx-cors]); the filter has no default origins, methods or headers, sends `Access-Control-Allow-Credentials` only with `allowCredentials: true` and defaults `maxAge` to 5 seconds. Set `allowOrigins`, `allowMethods`, `allowHeaders`, `exposeHeaders`, `allowCredentials` and `maxAge` explicitly.
+
+`RegularExpression` path matches have Implementation-specific support, so the regex dialect and case sensitivity are the implementation's ([extension points][gw-ext]). ingress-nginx matches case-insensitively, on every path of the host once one of its Ingresses sets `use-regex` ([use-regex][inx-regex]); ingress2gateway writes `(?i)<path>.*` ([regex.go][i2g-regex]).
+
+Body size, IP ranges, external auth, session affinity and snippets need an implementation extension: a policy that targets the Gateway or route, or an `ExtensionRef` filter in the route ([extension points][gw-ext]). Examples from Envoy Gateway 1.9 and NGINX Gateway Fabric:
+
+- `proxy-body-size`: Envoy Gateway BackendTrafficPolicy `requestBuffer.limit` ([request buffering][eg-buffer]), which ingress2gateway's envoy-gateway emitter renders ([buffer.go][i2g-eg-buffer]). Above the limit it answers 413 like ingress-nginx, but it buffers the whole request, so streaming gRPC and WebSocket routes can hang.
+- `whitelist-source-range`, `denylist-source-range`: Envoy Gateway SecurityPolicy `authorization` rules with `principal.clientCIDRs` ([IP allowlist][eg-ip]), also rendered by the envoy-gateway emitter ([iprange.go][i2g-eg-ip]).
+- `auth-url`: Envoy Gateway SecurityPolicy `extAuth` ([external authorization][eg-extauth]). ingress2gateway does not convert it.
+- `affinity: cookie`: Envoy Gateway implements the experimental `sessionPersistence` ([session persistence][eg-session]); `session-cookie-name` becomes `sessionName`. ingress2gateway converts affinity only with its gce emitter ([gce.go][i2g-gce]).
+- `server-snippet`, `configuration-snippet`: NGINX Gateway Fabric SnippetsFilter, NGINX syntax referenced through `extensionRef` ([snippets][ngf-snippets]), or Envoy Gateway EnvoyPatchPolicy, JSON patches to the generated Envoy configuration ([Envoy patch policy][eg-patch]). Both are disabled by default. ingress2gateway does not convert snippets.
+
+[inx]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md
+[inx-ssl]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#server-side-https-enforcement-through-redirect
+[inx-rewrite]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#rewrite
+[inx-rewrite-example]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/examples/rewrite/README.md
+[inx-proto]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#backend-protocol
+[inx-proxy-ssl]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#backend-certificate-authentication
+[inx-canary]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#canary
+[inx-cors]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#enable-cors
+[inx-regex]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#use-regex
+[inx-body]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#custom-max-body-size
+[inx-ip]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#whitelist-source-range
+[inx-auth]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#external-authentication
+[inx-affinity]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#session-affinity
+[inx-cookie]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#cookie-affinity
+[inx-server-snippet]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#server-snippet
+[inx-snippet]: https://github.com/kubernetes/ingress-nginx/blob/controller-v1.15.1/docs/user-guide/nginx-configuration/annotations.md#configuration-snippet
+[gw-inx]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/getting-started/migrating-from-ingress-nginx.md
+[gw-ext]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/getting-started/migrating-from-ingress.md#approach-to-extensibility
+[gw-redirect]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/http-redirect-rewrite.md
+[gw-prefix]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/apis/v1/httproute_types.go#L1188-L1200
+[gw-grpc]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/grpc-routing.md
+[gw-btls]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/reference/api-types/policy/backendtlspolicy.md
+[gw-split]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/traffic-splitting.md
+[gw-routing]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/http-routing.md
+[gw-cors]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/http-cors.md
+[gep-1494]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/geps/gep-1494/index.md
+[gep-1619]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/geps/gep-1619/index.md
+[i2g]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/providers/ingressnginx/README.md
+[i2g-btls]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/providers/ingressnginx/backend_tls.go
+[i2g-regex]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/providers/ingressnginx/regex.go
+[i2g-eg-buffer]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/emitters/envoygateway/buffer.go
+[i2g-eg-ip]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/emitters/envoygateway/iprange.go
+[i2g-gce]: https://github.com/kubernetes-sigs/ingress2gateway/blob/v1.2.0/pkg/i2gw/emitters/gce/gce.go
+[eg-buffer]: https://gateway.envoyproxy.io/v1.9/tasks/traffic/request-buffering/
+[eg-ip]: https://gateway.envoyproxy.io/v1.9/tasks/security/restrict-ip-access/
+[eg-extauth]: https://gateway.envoyproxy.io/v1.9/tasks/security/ext-auth/
+[eg-session]: https://gateway.envoyproxy.io/v1.9/tasks/traffic/session-persistence/
+[eg-patch]: https://gateway.envoyproxy.io/v1.9/tasks/extensibility/envoy-patch-policy/
+[ngf-snippets]: https://docs.nginx.com/nginx-gateway-fabric/traffic-management/snippets/
