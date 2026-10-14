@@ -121,7 +121,7 @@ and CHANGELOG entry before merging.
   to copy; their sources stay not regenerable (UPD-4).
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40, #43, tbd
+  - Since: #39, #40, #43, #61
 
 ## Pull requests and issues
 
@@ -138,7 +138,7 @@ and CHANGELOG entry before merging.
   replacing commits pushed to it.
 
   - Test: `tools/test_upstream.py`; manual: dispatch the workflow
-  - Since: #39, tbd
+  - Since: #39, #61
 
 - UPD-4: For the groups of a generator whose newer release cannot be
   proposed in a pull request, the workflow MUST open one issue, or update
@@ -153,7 +153,7 @@ and CHANGELOG entry before merging.
   cause per group and, for a failing check, its tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, tbd
+  - Since: #39, #61
 
 ## Credentials
 
