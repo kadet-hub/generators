@@ -17,7 +17,7 @@ from kapitan.inputs.kadet import BaseObj, inventory
 from . import k8s
 
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 inv = inventory()
 logger = logging.getLogger(__name__)

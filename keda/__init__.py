@@ -17,7 +17,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 API_VERSION = "keda.sh/v1alpha1"
 
