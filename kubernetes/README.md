@@ -109,7 +109,7 @@ A Service needs at least one container port with a `service_port`, except `headl
 
 For PersistentVolumes and PersistentVolumeClaims, `spec` is merged over the generator defaults first, then the flat keys are applied; a flat key that overrides a `spec` value logs a warning.
 
-The Gateway `services` shorthand turns `hostname`, `namespace`, `tls_secret`, `backend` and optional `cluster_issuer`/`issuer` into an HTTPS listener, an HTTP to HTTPS redirect route (not for `type: grpc`) and the backend route. A listener without `allowed_routes.namespaces_from` admits the namespaces of the routes the generator renders for it: `Same` when they all live in the Gateway's namespace, otherwise a `Selector` on `kubernetes.io/metadata.name` listing them. The upstream default is `Same` ([AllowedRoutes](https://gateway-api.sigs.k8s.io/reference/spec/#allowedroutes)); `All` would let any namespace attach routes to the listener's hostnames. Routes rendered elsewhere need `allowed_routes` set explicitly.
+The Gateway `services` shorthand turns `hostname`, `namespace`, `tls_secret`, `backend` and optional `cluster_issuer`/`issuer` into an HTTPS listener, an HTTP to HTTPS redirect route (not for `type: grpc`) and the backend route. `redirect_status_code` sets the redirect's `statusCode`, default 301. 301 and 302 are Core support; 303, 307 and 308 are Extended and need an implementation that supports them ([statusCode][gw-status]). Any other value fails the compile. A listener without `allowed_routes.namespaces_from` admits the namespaces of the routes the generator renders for it: `Same` when they all live in the Gateway's namespace, otherwise a `Selector` on `kubernetes.io/metadata.name` listing them. The upstream default is `Same` ([AllowedRoutes](https://gateway-api.sigs.k8s.io/reference/spec/#allowedroutes)); `All` would let any namespace attach routes to the listener's hostnames. Routes rendered elsewhere need `allowed_routes` set explicitly.
 
 ## Security defaults
 
@@ -156,7 +156,7 @@ For moving an Ingress from `ingresses.<name>` to `generators.kubernetes.gateways
 
 | Annotation | Gateway API 1.6.3 standard | Generator |
 |---|---|---|
-| [`ssl-redirect`, `force-ssl-redirect`][inx-ssl] | [`RequestRedirect`][gw-redirect] filter with `scheme: https` on a route attached to the HTTP listener | `gateways.<gw>.services.<svc>` (301, `http_redirect: false` drops it), or a `gateways.<gw>.routes` rule with `redirect.scheme` and `redirect.status_code` |
+| [`ssl-redirect`, `force-ssl-redirect`][inx-ssl] | [`RequestRedirect`][gw-redirect] filter with `scheme: https` on a route attached to the HTTP listener | `gateways.<gw>.services.<svc>` (301 or `redirect_status_code`, `http_redirect: false` drops it), or a `gateways.<gw>.routes` rule with `redirect.scheme` and `redirect.status_code` |
 | [`rewrite-target`][inx-rewrite] | [`URLRewrite`][gw-redirect] filter, `path.type` `ReplacePrefixMatch` or `ReplaceFullPath` | none |
 | [`backend-protocol`][inx-proto] | `GRPC`: [GRPCRoute][gw-grpc]; `HTTPS`: [BackendTLSPolicy][gw-btls]; `GRPCS`: both; `FCGI`: none | `type: grpc` on a `services` entry or route; `backend_tls_policies` |
 | [`canary`, `canary-weight`][inx-canary] | two `backendRefs` with [`weight`][gw-split] in one rule; `canary-by-header` is a [`headers` match][gw-routing] | none |
@@ -170,7 +170,7 @@ For moving an Ingress from `ingresses.<name>` to `generators.kubernetes.gateways
 
 A Gateway API field with "none" in the generator column is one the route keys cannot render: a route rule renders one backend, path (or gRPC method) matches and no filter other than `redirect`. That route goes in `generators.kubernetes.manifests` as `kind: HTTPRoute` with its spec under `body`, as do the implementation policies below. Experimental fields also need the experimental channel CRDs in the cluster.
 
-ingress-nginx redirects to HTTPS with 308 ([ssl-redirect][inx-ssl]). The `services` shorthand uses 301, which does not guarantee that the client keeps the request method; a route rule with `status_code: 308` (Extended support) behaves like ingress-nginx ([redirects][gw-redirect]). The redirect route does not depend on TLS on the Gateway, so `ssl-redirect` and `force-ssl-redirect` map to the same route, and `ssl-redirect: "false"` means no redirect route. ingress2gateway adds the 308 redirect only for hosts with TLS on the Ingress and does not convert `force-ssl-redirect`.
+ingress-nginx redirects to HTTPS with 308 ([ssl-redirect][inx-ssl]). The `services` shorthand defaults to 301, which does not guarantee that the client keeps the request method; `redirect_status_code: 308` on the service or `status_code: 308` on a route rule behaves like ingress-nginx ([redirects][gw-redirect]). The redirect route does not depend on TLS on the Gateway, so `ssl-redirect` and `force-ssl-redirect` map to the same route, and `ssl-redirect: "false"` means no redirect route. ingress2gateway adds the 308 redirect only for hosts with TLS on the Ingress and does not convert `force-ssl-redirect`.
 
 `ReplacePrefixMatch` with an empty `replacePrefixMatch` strips the matched prefix: `/foo/bar` with prefix `/foo` becomes `/bar` ([API spec][gw-prefix]). That covers the common `path: /something(/|$)(.*)` with `rewrite-target: /$2` ([rewrite example][inx-rewrite-example]). Other capture group references have no equivalent; ingress2gateway converts `rewrite-target` to `ReplaceFullPath` and flags them. Path rewrites are Extended support.
 
@@ -210,6 +210,7 @@ Body size, IP ranges, external auth, session affinity and snippets need an imple
 [gw-ext]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/getting-started/migrating-from-ingress.md#approach-to-extensibility
 [gw-redirect]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/http-redirect-rewrite.md
 [gw-prefix]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/apis/v1/httproute_types.go#L1188-L1200
+[gw-status]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/apis/v1/httproute_types.go#L1276-L1297
 [gw-grpc]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/grpc-routing.md
 [gw-btls]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/reference/api-types/policy/backendtlspolicy.md
 [gw-split]: https://github.com/kubernetes-sigs/gateway-api/blob/v1.6.3/site/content/en/guides/user-guides/traffic-splitting.md
