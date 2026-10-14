@@ -92,7 +92,10 @@ def not_regenerable(row, url):
 
 
 def crd_schemas(url):
-    """{<kind>_<version>.json: openAPIV3Schema} of the CRDs in the YAML files at or under a GitHub source."""
+    """({<kind>_<version>.json: openAPIV3Schema}, {(group, plural): (crds/<file>, content)}) of the CRDs in the YAML files at or under a GitHub source.
+
+    A CRD file is the upstream file if that holds only this CRD and fits 1 MiB, else the CRD as compact JSON (registry QA-12).
+    """
     repo, kind, ref, path = GITHUB.fullmatch(url).groups()
     files, dirs = ([path], []) if kind == "blob" else ([], [path])
     while dirs:
@@ -101,14 +104,21 @@ def crd_schemas(url):
                 dirs.append(e["path"])
             elif e["name"].endswith((".yaml", ".yml")):
                 files.append(e["path"])
-    schemas = {}
+    schemas, crds = {}, {}
     for f in sorted(files):
-        for doc in yaml.load_all(get(f"https://raw.githubusercontent.com/{repo}/{ref}/{f}"), Loader=Loader):
-            if isinstance(doc, dict) and doc.get("kind") == "CustomResourceDefinition":
-                for v in doc.get("spec", {}).get("versions", []):  # patches carry no versions
+        raw = get(f"https://raw.githubusercontent.com/{repo}/{ref}/{f}")
+        docs = [d for d in yaml.load_all(raw, Loader=Loader) if d is not None]
+        for doc in docs:
+            if isinstance(doc, dict) and doc.get("kind") == "CustomResourceDefinition" and doc.get("spec", {}).get("versions"):  # patches carry no versions
+                for v in doc["spec"]["versions"]:
                     if "openAPIV3Schema" in v.get("schema", {}):
                         schemas[f"{doc['spec']['names']['kind'].lower()}_{v['name']}.json"] = v["schema"]["openAPIV3Schema"]
-    return schemas
+                plural = doc["spec"]["names"]["plural"]
+                if len(docs) == 1 and len(raw) <= 1 << 20:
+                    crds[doc["spec"]["group"], plural] = (f"crds/{plural}.yaml", raw.decode())
+                else:
+                    crds[doc["spec"]["group"], plural] = (f"crds/{plural}.json", json.dumps(doc, separators=(",", ":")) + "\n")
+    return schemas, crds
 
 
 def inline(node, components, definitions):
@@ -177,12 +187,22 @@ def render(schema, committed):
     return json.dumps(schema, indent=len(lines[1]) - len(lines[1].lstrip(" ")), sort_keys=sort) + "\n"
 
 
-def regenerate(urls, committed):
-    """({file: content}, [missing files]) for a group's committed files {name: content} from the CRDs or OpenAPI documents at urls."""
-    schemas = {}
+def regenerate(urls, committed, group):
+    """({file: content}, [missing files]) for a group's committed files {name: content} from the CRDs or OpenAPI documents at urls.
+
+    A crds/<plural> file whose CRD has the other form (QA-12) at urls maps to None, next to the file in that form.
+    """
+    schemas, crds = {}, {}
     for url in urls:
-        schemas.update((openapi_schemas if url.endswith(".json") else crd_schemas)(url))
-    return {n: render(schemas[n], text) for n, text in committed.items() if n in schemas}, [n for n in committed if n not in schemas]
+        more, more_crds = (openapi_schemas(url), {}) if url.endswith(".json") else crd_schemas(url)
+        schemas.update(more)
+        crds.update(more_crds)
+    files = {n: render(schemas[n], text) for n, text in committed.items() if n in schemas}
+    for n in committed:
+        if n.startswith("crds/") and (crd := crds.get((group, Path(n).stem))):
+            files[n] = None
+            files[crd[0]] = crd[1]
+    return files, [n for n in committed if n not in files]
 
 
 def gate(directory, old_urls, new_urls):
@@ -190,11 +210,12 @@ def gate(directory, old_urls, new_urls):
     committed = {p.name: p.read_text() for p in sorted(directory.glob("*.json"))}
     if not committed:
         return None, f"no schema files in {directory.name}"
-    files, missing = regenerate(old_urls, committed)
-    differ = [f"no CRD for {n}" for n in missing] + [f"{n} differs" for n, text in files.items() if committed[n] != text]
+    committed |= {f"crds/{p.name}": p.read_bytes().decode() for p in sorted(directory.glob("crds/*")) if p.is_file()}
+    files, missing = regenerate(old_urls, committed, directory.name)
+    differ = [f"no CRD for {n}" for n in missing] + [f"{n} differs" for n, text in committed.items() if n in files and files[n] != text]
     if differ:
         return None, "does not reproduce: " + ", ".join(differ)
-    files, missing = regenerate(new_urls, committed)
+    files, missing = regenerate(new_urls, committed, directory.name)
     if missing:
         return None, "missing at the new release: " + ", ".join(missing)
     return files, None
@@ -312,7 +333,11 @@ def propose(gen, updates, pr, dry_run):
         return None
     for u in updates:
         for name, text in u["files"].items():
-            (ROOT / gen / "schemas" / u["group"] / name).write_text(text)
+            path = ROOT / gen / "schemas" / u["group"] / name
+            if text is None:
+                path.unlink()
+            else:
+                path.write_text(text)
     (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
     readme = ROOT / gen / "README.md"
     readme.write_text(bump_readme(readme.read_text(), updates))

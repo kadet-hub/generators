@@ -8,9 +8,12 @@ Verified against: main @ 313f1ca
 
 Each generator ships the JSON Schemas of the software it targets in
 `<generator>/schemas/`, and `schemas/sources.yaml` names the software,
-version and pinned upstream URL of each schema group. The catalog's "Built
-for" comes from these entries. Nothing notices when upstream releases a new
-version, so schemas and "Built for" fall behind until someone checks by hand.
+version and pinned upstream URL of each schema group. Some also ship the
+CRDs of their kinds in `schemas/<group>/crds/` under the same entry (QA-12
+of the registry's [gate spec](https://github.com/kadet-hub/registry/blob/main/docs/specs/gate.md)).
+The catalog's "Built for" comes from these entries. Nothing notices when
+upstream releases a new version, so schemas, CRDs and "Built for" fall
+behind until someone checks by hand.
 Renovate cannot close the gap: a version bump in `sources.yaml` without
 regenerated schema files is wrong, and the hosted Renovate app runs no
 post-upgrade commands.
@@ -57,8 +60,8 @@ and CHANGELOG entry before merging.
 ## Regeneration
 
 - UPD-2: The workflow MUST regenerate a schema group only if regenerating
-  it at the entry's current ref reproduces the committed schema files byte
-  for byte.
+  it at the entry's current ref reproduces the committed schema files and
+  CRD files byte for byte.
 
   The schemas of the existing generators were produced by several hands:
   most carry top-level `$id`, `$schema` and `title` annotations or a
@@ -91,14 +94,34 @@ and CHANGELOG entry before merging.
   each definition as above. A JSON document without components, such as
   k3d's JSON Schema source, yields no schema and does not reproduce.
 
-  Each file keeps the committed file's top-level `$id`, `$schema`, `title`
-  and `description`, where present, and its layout: the same indent, or
-  compact if the committed file is a single line. Keys are sorted if the
-  committed file's keys are sorted at every level; otherwise they keep the
-  upstream order, with the top level in the committed file's order.
+  Each schema file keeps the committed file's top-level `$id`, `$schema`,
+  `title` and `description`, where present, and its layout: the same
+  indent, or compact if the committed file is a single line. Keys are
+  sorted if the committed file's keys are sorted at every level; otherwise
+  they keep the upstream order, with the top level in the committed file's
+  order.
+
+  Each committed CRD file, `crds/<plural>.yaml` or `crds/<plural>.json`,
+  is regenerated from the CustomResourceDefinition with the group as
+  `spec.group` and that `spec.names.plural` in the YAML files under the
+  source path, in the form QA-12 decides: the upstream file byte for byte when it holds no other
+  document and is at most 1 MiB, otherwise the CRD as compact JSON with
+  keys in upstream order, non-ASCII characters escaped and a final newline.
+  Empty documents do not count, as in the gate. The form follows the
+  upstream file at each tag, so a CRD that grows past 1 MiB or moves into a
+  file with other documents replaces `<plural>.yaml` with `<plural>.json`,
+  and the other way round. Regeneration adds no CRD files; a CRD missing at
+  the new tag is an issue. An OpenAPI v3 source has no CRDs, so a CRD file
+  in its group does not reproduce.
+
+  The registry gate compares neither JSON Schemas nor CRD files with
+  upstream, so the reproduction is what ties a committed CRD file to its
+  source before a new release replaces it. CRDs that upstream keeps only
+  in Go code or Helm templates, such as CDI's and Linkerd's, have no file
+  to copy; their sources stay not regenerable (UPD-4).
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40, #43
+  - Since: #39, #40, #43, #61
 
 ## Pull requests and issues
 
@@ -106,16 +129,16 @@ and CHANGELOG entry before merging.
   open one pull request, or update its open one, on branch
   `upstream/<generator>`, if `./check` passes with them.
 
-  The pull request changes those groups' schema files, their `version` and
-  `source` in `sources.yaml`, and their versions in the README's "Built for"
-  line. It does not bump the generator version or edit the CHANGELOG. The
-  body lists each group's version before and after and the tail of
-  `./check`. An open pull request that already proposes these versions is
-  left alone; a newer release force-pushes the branch, replacing commits
-  pushed to it.
+  The pull request changes those groups' schema and CRD files, their
+  `version` and `source` in `sources.yaml`, and their versions in the
+  README's "Built for" line. It does not bump the generator version or
+  edit the CHANGELOG. The body lists each group's version before and after
+  and the tail of `./check`. An open pull request that already proposes
+  these versions is left alone; a newer release force-pushes the branch,
+  replacing commits pushed to it.
 
   - Test: `tools/test_upstream.py`; manual: dispatch the workflow
-  - Since: #39
+  - Since: #39, #61
 
 - UPD-4: For the groups of a generator whose newer release cannot be
   proposed in a pull request, the workflow MUST open one issue, or update
@@ -125,12 +148,12 @@ and CHANGELOG entry before merging.
   time. Several software versions in one title are joined with `, `. The
   causes are: the group does not reproduce (UPD-2), its source is not
   regenerable (Go code, Helm templates, Terraform extracts,
-  kubernetes-json-schema), a kind or version is missing at the new tag, or
-  `./check` fails with the regenerated groups. The body names the cause per
-  group and, for a failing check, its tail.
+  kubernetes-json-schema), a kind, version or CRD is missing at the new
+  tag, or `./check` fails with the regenerated groups. The body names the
+  cause per group and, for a failing check, its tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39
+  - Since: #39, #61
 
 ## Credentials
 
