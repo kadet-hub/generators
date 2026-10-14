@@ -5,7 +5,7 @@ Binding, User, Permission, Vhost, Federation, and Shovel resources.
 Also supports ConfigMaps and Secrets for RabbitMQ configuration.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import base64
 import hashlib

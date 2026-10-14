@@ -22,7 +22,7 @@ from kapitan.inputs.kadet import BaseObj, inventory
 from . import k8s
 
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 logger = logging.getLogger(__name__)
 
