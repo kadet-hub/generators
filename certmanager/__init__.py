@@ -11,7 +11,7 @@ using Kapitan's kadet input type. Supports Issuer, ClusterIssuer, Certificate,
 and trust-manager Bundle resources.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 from kapitan.inputs.kadet import BaseObj, inventory
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.
+
 ## 1.1.2
 
 Namespaced `projectcalico.org/v3` resources without their own `namespace` get the namespace of the target being compiled. Before, they could get the default namespace of another target compiled earlier in the same Kapitan worker, so the output depended on target order.
