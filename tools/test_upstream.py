@@ -17,13 +17,13 @@ GH = "https://api.github.com/"
 RAW = "https://raw.githubusercontent.com/"
 
 
-def crd(kind, versions):
+def crd(kind, versions, group="example.io"):
     spec = {"type": "object", "properties": {"replicas": {"type": "integer"}}}
     schema = {"type": "object", "properties": {"spec": spec}}
     return yaml.safe_dump({
         "apiVersion": "apiextensions.k8s.io/v1",
         "kind": "CustomResourceDefinition",
-        "spec": {"names": {"kind": kind}, "versions": [{"name": v, "schema": {"openAPIV3Schema": schema}} for v in versions]},
+        "spec": {"group": group, "names": {"kind": kind, "plural": kind.lower() + "s"}, "versions": [{"name": v, "schema": {"openAPIV3Schema": schema}} for v in versions]},
     })
 
 
@@ -277,6 +277,83 @@ class Gate(Repo):
         del self.web.pages[f"{GH}repos/example/widgets/contents/crds?ref=v1.1.0"]
         with self.assertRaises(OSError):
             upstream.gate(self.group, [OLD], [NEW])
+
+
+class Crds(Repo):
+    """example.io also ships the Widget CRD as crds/widgets.yaml, the upstream file at v1.0.0."""
+
+    def upstream(self, ref):
+        return f"{RAW}example/widgets/{ref}/crds/widgets.yaml"
+
+    def setUp(self):
+        super().setUp()
+        (self.group / "crds").mkdir()
+        self.commit()
+
+    def commit(self):
+        (self.group / "crds" / "widgets.yaml").write_bytes(self.web.pages[self.upstream("v1.0.0")].encode())
+
+    def test_reproduces_then_copies_the_upstream_file_byte_for_byte(self):
+        for ref in ("v1.0.0", "v1.1.0"):
+            self.web.pages[self.upstream(ref)] = ("# Generated.\n---\n" + self.web.pages[self.upstream(ref)] + "---\n").replace("\n", "\r\n")
+        self.commit()
+        files, cause = upstream.gate(self.group, [OLD], [NEW])
+        self.assertIsNone(cause)
+        self.assertEqual(files["crds/widgets.yaml"], self.web.pages[self.upstream("v1.1.0")])
+
+    def test_crd_of_another_group_with_the_same_plural_is_not_used(self):
+        for ref in ("v1.0.0", "v1.1.0"):
+            self.web.pages[f"{GH}repos/example/widgets/contents/crds?ref={ref}"].append({"type": "file", "name": "zz.yaml", "path": "crds/zz.yaml"})
+            self.web.pages[f"{RAW}example/widgets/{ref}/crds/zz.yaml"] = crd("Widget", ("v1",), group="legacy.example.io")
+        files, cause = upstream.gate(self.group, [OLD], [NEW])
+        self.assertIsNone(cause)
+        self.assertEqual(files["crds/widgets.yaml"], self.web.pages[self.upstream("v1.1.0")])
+
+    def test_edited_file_does_not_reproduce(self):
+        path = self.group / "crds" / "widgets.yaml"
+        path.write_text(path.read_text().replace("integer", "string"))
+        self.assertEqual(upstream.gate(self.group, [OLD], [NEW]), (None, "does not reproduce: crds/widgets.yaml differs"))
+
+    def test_file_in_the_other_form_does_not_reproduce(self):
+        self.web.pages[self.upstream("v1.0.0")] += "---\n" + crd("Gadget", ("v1",))
+        self.assertEqual(upstream.gate(self.group, [OLD], [NEW]), (None, "does not reproduce: crds/widgets.yaml differs"))
+
+    def test_crd_missing_at_the_new_tag_is_an_issue_cause(self):
+        self.web.pages[self.upstream("v1.1.0")] = self.web.pages[self.upstream("v1.1.0")].replace("plural: widgets", "plural: things")
+        self.assertEqual(upstream.gate(self.group, [OLD], [NEW]), (None, "missing at the new release: crds/widgets.yaml"))
+
+    def test_file_with_other_documents_becomes_compact_json_in_upstream_order(self):
+        text = self.web.pages[self.upstream("v1.1.0")].replace("kind: CustomResourceDefinition\n", "")
+        widgets = "kind: CustomResourceDefinition\nmetadata:\n  annotations:\n    note: größer\n" + text
+        self.web.pages[self.upstream("v1.1.0")] = widgets + "---\n" + crd("Gadget", ("v1",))
+        files, cause = upstream.gate(self.group, [OLD], [NEW])
+        self.assertIsNone(cause)
+        self.assertEqual(list(files), ["widget_v1alpha1.json", "crds/widgets.yaml", "crds/widgets.json"])
+        self.assertIsNone(files["crds/widgets.yaml"])
+        out = files["crds/widgets.json"]
+        self.assertTrue(out.startswith('{"kind":"CustomResourceDefinition","metadata":{"annotations":{"note":"gr\\u00f6\\u00dfer"}},"apiVersion":'), out[:120])
+        self.assertTrue(out.endswith("}\n") and out.count("\n") == 1)
+        self.assertEqual(json.loads(out), yaml.safe_load(widgets))
+
+    def test_file_above_1_mib_becomes_compact_json(self):
+        text = self.web.pages[self.upstream("v1.1.0")]
+        self.web.pages[self.upstream("v1.1.0")] = text + "#" * (2**20 - len(text) - 1) + "\n"
+        files, _ = upstream.gate(self.group, [OLD], [NEW])
+        self.assertEqual(files["crds/widgets.yaml"], self.web.pages[self.upstream("v1.1.0")])
+        self.web.pages[self.upstream("v1.1.0")] += "\n"
+        files, _ = upstream.gate(self.group, [OLD], [NEW])
+        self.assertIsNone(files["crds/widgets.yaml"])
+        self.assertEqual(json.loads(files["crds/widgets.json"]), yaml.safe_load(text))
+
+    def test_pull_request_replaces_a_file_whose_form_changes(self):
+        self.web.pages[self.upstream("v1.1.0")] += "---\n" + crd("Gadget", ("v1",))
+        with contextlib.redirect_stdout(io.StringIO()):
+            updates = upstream.outdated("gen")
+        check = subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n")
+        with mock.patch.object(upstream, "run", lambda *cmd: None), mock.patch.object(subprocess, "run", return_value=check), contextlib.redirect_stdout(io.StringIO()):
+            upstream.act("gen", updates, {}, [], False)
+        self.assertEqual([p.name for p in (self.group / "crds").iterdir()], ["widgets.json"])
+        self.assertIn('"replicas":{"type":"number"}', (self.group / "crds" / "widgets.json").read_text())
 
 
 def openapi(replicas="integer", kind="Gizmo"):
