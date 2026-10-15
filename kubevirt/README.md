@@ -182,7 +182,7 @@ Upstream publishes the driver only as `quay.io/kubevirt/kubevirt-csi-driver:late
 quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
 ```
 
-the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only), into a registry both clusters can pull from, and set `image` to the mirror by digest. The fixtures use the quay.io reference above, which works only while it is `latest`. The sidecars are pinned by tag and digest as upstream pins them at 3a1a099.
+the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only), into a registry both clusters can pull from, and set `image` to the mirror by digest. The fixtures use the quay.io reference above, which works only while it is `latest`. The sidecars are pinned by tag and digest as upstream pins them at 3a1a099, except csi-snapshotter (see Defaults).
 
 #### Storage class enforcement
 
@@ -208,7 +208,7 @@ The cluster's admin kubeconfig, which Cluster API Provider KubeVirt stores in th
 
 #### Prerequisites
 
-Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which the generator does not render. The pinned csi-snapshotter v4.2.1 works with the v7 CRDs only: the v8 CRDs reject its updates of VolumeSnapshotContents ([kubevirt/csi-driver#395](https://github.com/kubevirt/csi-driver/issues/395)).
+Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which the generator does not render.
 
 #### Defaults
 
@@ -216,13 +216,14 @@ Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annota
 |---|---|---|
 | non-root UID and GID 1001, RuntimeDefault seccomp, no privilege escalation, read-only root filesystem, all capabilities dropped | controller | Pod Security restricted; upstream sets the same since commit 1522252. |
 | `privileged` and UID 0 for the `csi-driver` container, namespace label `pod-security.kubernetes.io/enforce: privileged` | node plugin | Bidirectional mount propagation into `/var/lib/kubelet` and access to the hotplugged disks in `/dev` need it. The registrar and livenessprobe sidecars run without capabilities and with a read-only root filesystem. |
+| csi-snapshotter v8.7.0 instead of upstream's v4.2.1 | controller | v4.2.1 predates `sourceVolumeMode`, so the external-snapshotter v8 CRDs reject its VolumeSnapshotContent updates and no snapshot becomes ready ([kubevirt/csi-driver#395](https://github.com/kubevirt/csi-driver/issues/395)). v8.7.0 is the current external-snapshotter release. |
 | `strategy: Recreate` | controller | One replica and no leader election in the sidecars; a rolling update would run two controllers. |
 | `--enable-vmi-hotplug-fallback=false` | controller | KubeVirt 1.9 deprecates `HotplugVolumes` for `DeclarativeHotplugVolumes`, on by default, under which virt-api rejects the fallback's removevolume call on a VM-owned VMI; upstream's README prescribes the flag for it. |
 | liveness probe on the `csi-driver` container | controller | Upstream runs the livenessprobe sidecar, but no probe calls it. |
 | settings as flags and environment instead of upstream's `driver-config` ConfigMap | controller | The generator knows the values at compile time, and a changed value rolls the pod. |
 | no nodeSelector, tolerations or priority class | controller | Upstream pins it to control-plane nodes with `system-cluster-critical`, taken over from the tenant-side deployment, but tolerates the `node-role.kubernetes.io/master` taint removed in Kubernetes 1.25 instead of `node-role.kubernetes.io/control-plane`. In the infra cluster it is a tenant's workload. |
 | `datavolumes/source` create in the Role | infra | CDI admits a DataVolume with a snapshot source only if its creator holds this right in the source namespace; without it, restoring a snapshot fails. Volume clones use `dataSourceRef` and do not need it. |
-| ClusterRole `kubevirt-csi-controller` | tenant | Upstream's `kubevirt-csi-controller-cr` cut to the rules the four sidecars' own RBAC lists at their pinned tags, plus `volumesnapshotcontents/status` update for csi-snapshotter, which upstream grants only to a ServiceAccount no pod uses. Dropped: the OpenShift SCC rule, `volumesnapshots/status` and the `update` verbs on PersistentVolumes, VolumeAttachments and status subresources. |
+| ClusterRole `kubevirt-csi-controller` | tenant | Upstream's `kubevirt-csi-controller-cr` cut to the rules the four sidecars' own RBAC lists at their pinned tags, plus `volumesnapshotcontents/status` for csi-snapshotter, which upstream grants only to a ServiceAccount no pod uses. Dropped: the OpenShift SCC rule, `volumesnapshots/status`, create and delete on VolumeSnapshotContents, and the `update` verbs on PersistentVolumes, VolumeAttachments and the status subresources. Without rules for `groupsnapshot.storage.k8s.io` csi-snapshotter turns VolumeGroupSnapshot off at start, which the driver does not implement. |
 | ClusterRole `kubevirt-csi-node`: `get` nodes and the OpenShift `privileged` SCC | tenant | The node service reads only its own Node; upstream also grants writes on PersistentVolumes, claims, VolumeAttachments and Nodes. |
 | no preStop hook | registrar | Upstream's hook runs `/bin/sh`, which the distroless image lacks; the registrar removes its socket on SIGTERM. |
 | `allowVolumeExpansion: true` | StorageClass | The driver and its resizer sidecar expand volumes, and KubeVirt 1.9 grows the disk of a running VM (`ExpandDisks` is GA); upstream's test setup sets it too. The infra storage class has to allow expansion as well. |

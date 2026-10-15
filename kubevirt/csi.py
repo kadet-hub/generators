@@ -23,7 +23,9 @@ APP = {"app": "kubevirt-csi-driver"}
 SIG_STORAGE = "registry.k8s.io/sig-storage/"
 PROVISIONER = SIG_STORAGE + "csi-provisioner:v6.0.2@sha256:80f0225e1b2beeade5734fef6b10ab459e02ac3816570660651b45bd50f178bf"
 ATTACHER = SIG_STORAGE + "csi-attacher:v4.10.0@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d"
-SNAPSHOTTER = SIG_STORAGE + "csi-snapshotter:v4.2.1@sha256:818f35653f2e214db81d655063e81995de9073328a3430498624c140881026a3"
+# Upstream pins v4.2.1, whose VolumeSnapshotContent updates the v8 snapshot
+# CRDs reject (kubevirt/csi-driver#395).
+SNAPSHOTTER = SIG_STORAGE + "csi-snapshotter:v8.7.0@sha256:b03d3334f8035fa42660b166f6eb819a659a14774da020eb1b6c52cd422eaadb"
 RESIZER = SIG_STORAGE + "csi-resizer:v1.13.1@sha256:2a0b297cc7c4cd376ac7413df339ff2fdaa1ec9d099aed92b5ea1f031ef7f639"
 LIVENESSPROBE = SIG_STORAGE + "livenessprobe:v2.17.0@sha256:9b75b9ade162136291d5e8f13a1dfc3dec71ee61419b1bfc112e0796ff8a6aa9"
 REGISTRAR = SIG_STORAGE + "csi-node-driver-registrar:v2.15.0@sha256:11f199f6bec47403b03cb49c79a41f445884b213b382582a60710b8c6fdc316a"
@@ -69,9 +71,11 @@ INFRA_RULES = [
 INFRA_CLUSTER_RULES = [{"apiGroups": [""], "resources": ["persistentvolumes"], "verbs": ["get"]}]
 # kubevirt-csi-controller-cr for the identity of the tenant kubeconfig, cut to
 # the rules of external-provisioner v6.0.2, external-attacher v4.10.0,
-# external-resizer v1.13.1 (no in-use handling) and the csi-snapshotter v4.2.1
+# external-resizer v1.13.1 (no in-use handling) and the csi-snapshotter v8.7.0
 # sidecar, whose volumesnapshotcontents/status upstream grants only to a
-# ServiceAccount no pod uses. The driver itself lists volumesnapshotclasses.
+# ServiceAccount no pod uses. Without the groupsnapshot.storage.k8s.io rules
+# the sidecar's probe list fails and it disables VolumeGroupSnapshot, which
+# the driver does not implement. The driver itself lists volumesnapshotclasses.
 CONTROLLER_RULES = [
     {"apiGroups": [""], "resources": ["persistentvolumes"], "verbs": ["create", "delete", "get", "list", "watch", "patch"]},
     {"apiGroups": [""], "resources": ["persistentvolumeclaims"], "verbs": ["get", "list", "watch", "update"]},
@@ -81,12 +85,8 @@ CONTROLLER_RULES = [
     {"apiGroups": ["storage.k8s.io"], "resources": ["storageclasses"], "verbs": ["get", "list", "watch"]},
     {"apiGroups": [""], "resources": ["events"], "verbs": ["list", "watch", "create", "update", "patch"]},
     {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotclasses"], "verbs": ["get", "list", "watch"]},
-    {
-        "apiGroups": ["snapshot.storage.k8s.io"],
-        "resources": ["volumesnapshotcontents"],
-        "verbs": ["create", "get", "list", "watch", "update", "delete"],
-    },
-    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotcontents/status"], "verbs": ["update"]},
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotcontents"], "verbs": ["get", "list", "watch", "update", "patch"]},
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotcontents/status"], "verbs": ["update", "patch"]},
     {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshots"], "verbs": ["get", "list", "watch", "update"]},
     {"apiGroups": ["storage.k8s.io"], "resources": ["volumeattachments/status"], "verbs": ["patch"]},
     {"apiGroups": ["storage.k8s.io"], "resources": ["csinodes"], "verbs": ["get", "list", "watch"]},

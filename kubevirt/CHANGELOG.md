@@ -2,7 +2,7 @@
 
 ## 1.1.0
 
-Adds `csi`, the KubeVirt CSI driver in its split deployment at upstream commit 3a1a099: `role: infra` renders the controller with its RBAC into the namespace of a tenant cluster's VMs, optionally restricted to `allowed_storage_classes` with `snapshot_classes`; `role: tenant` renders the node plugin, CSIDriver, StorageClasses, VolumeSnapshotClasses, and the ServiceAccount, RBAC and token Secret for the controller's tenant kubeconfig. `csi.image` is required, because upstream publishes only a moving `latest` tag; the README names the digest to mirror. The sidecars are pinned by tag and digest. The README's CSI defaults list where the output differs from upstream's manifests and why.
+Adds `csi`, the KubeVirt CSI driver in its split deployment at upstream commit 3a1a099: `role: infra` renders the controller with its RBAC into the namespace of a tenant cluster's VMs, optionally restricted to `allowed_storage_classes` with `snapshot_classes`; `role: tenant` renders the node plugin, CSIDriver, StorageClasses, VolumeSnapshotClasses, and the ServiceAccount, RBAC and token Secret for the controller's tenant kubeconfig. `csi.image` is required, because upstream publishes only a moving `latest` tag; the README names the digest to mirror. The sidecars are pinned by tag and digest, csi-snapshotter at v8.7.0 instead of upstream's v4.2.1, which cannot create snapshots with the external-snapshotter v8 CRDs. The README's CSI defaults list where the output differs from upstream's manifests and why.
 
 Ships the VolumeSnapshotClass CRD and schema of the CSI driver and the Kubernetes 1.37.1 schemas of the built-in kinds it renders.
 
