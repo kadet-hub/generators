@@ -1,0 +1,22 @@
+# CSI driver, infra side: the controller in the namespace of tenant-a's VMs,
+# which it takes from the generator namespace
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: csi-infra
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubevirt
+        output_path: manifests/
+
+  generators:
+    kubevirt:
+      namespace: tenant-a
+      csi:
+        role: infra
+        tenant_kubeconfig_secret: tenant-a-kubeconfig
+        infra_cluster_labels:
+          csi-driver/cluster: tenant-a

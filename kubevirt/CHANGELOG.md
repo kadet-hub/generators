@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+Adds `csi`, the KubeVirt CSI driver in its split deployment at upstream commit 3a1a099, with images pinned by digest: `role: infra` renders the controller with its RBAC into the namespace of a tenant cluster's VMs, `role: tenant` the node plugin, CSIDriver, StorageClasses, VolumeSnapshotClasses and the RBAC of the controller's tenant kubeconfig. The README's CSI defaults list where the output differs from upstream's manifests and why.
+
+Ships the VolumeSnapshotClass CRD and schema of the CSI driver and the Kubernetes 1.37.1 schemas of the built-in kinds it renders.
+
 ## 1.0.1
 
 Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.

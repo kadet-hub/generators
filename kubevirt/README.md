@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/kubevirt/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/kubevirt/) page.
 
-Kapitan kadet generator for [KubeVirt](https://kubevirt.io/) and its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)). Built for KubeVirt 1.9.0 and CDI 1.66.1. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
+Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.0, CDI 1.66.1 and KubeVirt CSI driver main@3a1a099. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
 
 A VirtualMachine entry with `image`, `disks` and `cloudinit` expands into matching disks, volumes, `dataVolumeTemplates` and a pod network, so a short block yields a VM that KubeVirt admits. The other kinds take reference shorthands. Secrets for `cloudinit_secret_ref` belong in the `kubernetes` generator.
 
@@ -44,6 +44,7 @@ All keys live under `parameters.generators.kubevirt`.
 | `data_volumes.<name>` | DataVolume `cdi.kubevirt.io/v1beta1` | `<namespace>/<name>-dv` |
 | `data_sources.<name>` | DataSource `cdi.kubevirt.io/v1beta1` | `<namespace>/<name>-ds` |
 | `object_transfers.<name>` | ObjectTransfer `cdi.kubevirt.io/v1beta1` | `<name>-ot` |
+| `csi` | KubeVirt CSI driver, infra or tenant side | see [CSI driver](#csi-driver) |
 
 Every resource accepts `namespace`, `labels`, `annotations` and `spec`; on the cluster-scoped ObjectTransfer, `namespace` only sets the default source namespace. Precedence is generator defaults < `spec` < flat keys: `spec` is deep-merged over the defaults, the flat keys are merged on top, and a flat key that overrides a `spec` value logs a warning. `spec_strategy: replace` keeps `spec` and the flat keys but drops the generator defaults.
 
@@ -148,6 +149,74 @@ parameters:
                 - LiveMigrate
 ```
 
+### CSI driver
+
+`csi` renders the KubeVirt CSI driver in its split deployment, after `deploy/` at commit [3a1a099](https://github.com/kubevirt/csi-driver/tree/3a1a099330045754011803e3d53cd8276ff21723/deploy). The controller runs in the infra cluster, in the namespace of the tenant cluster's VMs: it creates DataVolumes there and hotplugs them into the VMs with its own ServiceAccount, and its CSI sidecars reach the tenant cluster API through a kubeconfig Secret. The node plugin runs in the tenant cluster. A target renders one side, chosen by `role`.
+
+| Key | Role | Default | Meaning |
+|---|---|---|---|
+| `role` | | required | `infra` or `tenant` |
+| `namespace` | both | infra: the generator `namespace` fallback chain; tenant: `kubevirt-csi-driver` | |
+| `image` | both | the pinned driver image | driver image of the controller and the node plugin |
+| `tenant_kubeconfig_secret` | infra | required | name of the Secret in `namespace` whose key `value` holds the tenant kubeconfig, the layout of Cluster API's `<cluster>-kubeconfig` Secrets; the generator never renders its content |
+| `infra_cluster_labels` | infra | required | map of labels the controller puts on this tenant cluster's DataVolumes (`--infra-cluster-labels`) |
+| `service_account` | infra | `kubevirt-csi` | name of the controller's ServiceAccount, Role and RoleBinding |
+| `storage_classes.<name>` | tenant | none | StorageClass; `default: true` marks it default, `infra_storage_class` sets the infra class of its DataVolumes (`infraStorageClassName`, unset: the infra default) |
+| `volume_snapshot_classes.<name>` | tenant | none | VolumeSnapshotClass; `default` and `deletion_policy` (`Delete`) |
+
+Unknown keys fail the compile.
+
+| Role | Output keys |
+|---|---|
+| infra | `<namespace>/<service_account>-sa`, `-role`, `-rolebinding`; `<namespace>-<service_account>-clusterrole`, `-clusterrolebinding` (read PersistentVolumes); `<namespace>/kubevirt-csi-controller-deployment` |
+| tenant | `<namespace>-namespace`; `csi.kubevirt.io-csidriver`; `<namespace>/kubevirt-csi-node-daemonset`; per component `node` and `controller`: `<namespace>/kubevirt-csi-<component>-sa`, `kubevirt-csi-<component>-clusterrole`, `-clusterrolebinding`; `<name>-storageclass`, `<name>-volumesnapshotclass` |
+
+The tenant kubeconfig can be the cluster's admin kubeconfig, as Cluster API Provider KubeVirt creates it, or one for the ServiceAccount `kubevirt-csi-controller-sa`, which holds only what the sidecars need; its token comes from `kubectl create token` or a `kubernetes.io/service-account-token` Secret, which the generator does not render. Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which the generator does not render, and the infra cluster a default VolumeSnapshotClass for the driver of each infra storage class: without `infraStorageClassEnforcement` the controller always takes the infra default.
+
+| Default | Where | Reason |
+|---|---|---|
+| driver image by digest, sidecars by tag and digest as upstream pins them | both | Upstream deploys `:latest` with `imagePullPolicy: Always`. quay.io has no tag per commit; the digest is the `latest` build of 3a1a099 (image label `multi.GIT_SHA`), linux/amd64 only. quay.io removes a digest once `latest` moves on (the previous one already returns 404), so mirror the image and set `image`. |
+| non-root UID and GID 1001, RuntimeDefault seccomp, no privilege escalation, read-only root filesystem, all capabilities dropped | controller | Pod Security restricted; upstream sets the same since commit 1522252. |
+| `privileged` and UID 0 for the `csi-driver` container, namespace label `pod-security.kubernetes.io/enforce: privileged` | node plugin | Bidirectional mount propagation into `/var/lib/kubelet` and access to the hotplugged disks in `/dev` need it. The registrar and livenessprobe sidecars run without capabilities and with a read-only root filesystem. |
+| `strategy: Recreate` | controller | One replica and no leader election in the sidecars; a rolling update would run two controllers. |
+| `--enable-vmi-hotplug-fallback=false` | controller | KubeVirt 1.9 deprecates `HotplugVolumes` for `DeclarativeHotplugVolumes`, on by default, under which virt-api rejects the fallback's removevolume call on a VM-owned VMI; upstream's README prescribes the flag for it. |
+| liveness probe on the `csi-driver` container | controller | Upstream runs the livenessprobe sidecar, but no probe calls it. |
+| no nodeSelector, tolerations or priority class | controller | Upstream pins it to control-plane nodes with `system-cluster-critical`, taken over from the tenant-side deployment, but tolerates the `node-role.kubernetes.io/master` taint removed in Kubernetes 1.25 instead of `node-role.kubernetes.io/control-plane`. In the infra cluster it is a tenant's workload. |
+| `datavolumes/source` create in the Role | infra | CDI admits a DataVolume with a snapshot source only if its creator holds this right in the source namespace; without it, restoring a snapshot fails. Volume clones use `dataSourceRef` and do not need it. |
+| ClusterRole `kubevirt-csi-controller` | tenant | Upstream's `kubevirt-csi-controller-cr` cut to the rules the four sidecars' own RBAC lists at their pinned tags, plus `volumesnapshotcontents/status` update for csi-snapshotter, which upstream grants only to a ServiceAccount no pod uses. Dropped: the OpenShift SCC rule, `volumesnapshots/status` and the `update` verbs on PersistentVolumes, VolumeAttachments and status subresources. |
+| ClusterRole `kubevirt-csi-node`: `get` nodes and the OpenShift `privileged` SCC | tenant | The node service reads only its own Node; upstream also grants writes on PersistentVolumes, claims, VolumeAttachments and Nodes. |
+| no preStop hook | registrar | Upstream's hook runs `/bin/sh`, which the distroless image lacks; the registrar removes its socket on SIGTERM. |
+| `allowVolumeExpansion: true` | StorageClass | The driver and its resizer sidecar expand volumes, and KubeVirt 1.9 grows the disk of a running VM (`ExpandDisks` is GA); upstream's test setup sets it too. The infra storage class has to allow expansion as well. |
+| default class only with `default: true` | StorageClass, VolumeSnapshotClass | Upstream marks its StorageClass default, which takes over PVCs without `storageClassName` when the tenant has another default. |
+
+The controller takes its settings as flags instead of upstream's `driver-config` ConfigMap. `infraStorageClassEnforcement` is not supported, so the tenant can request any infra storage class in its StorageClasses.
+
+```yaml
+# infra cluster target
+parameters:
+  generators:
+    kubevirt:
+      namespace: tenant-a
+      csi:
+        role: infra
+        tenant_kubeconfig_secret: tenant-a-kubeconfig
+        infra_cluster_labels:
+          csi-driver/cluster: tenant-a
+---
+# tenant cluster target
+parameters:
+  generators:
+    kubevirt:
+      csi:
+        role: tenant
+        storage_classes:
+          kubevirt:
+            default: true
+            infra_storage_class: rook-ceph-block
+        volume_snapshot_classes:
+          kubevirt: {}
+```
+
 ## Schemas
 
-`schemas/` holds the CRD schemas of KubeVirt 1.9.0 and CDI 1.66.1 (Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
+`schemas/` holds the CRD schemas of KubeVirt 1.9.0 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at 3a1a099, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.

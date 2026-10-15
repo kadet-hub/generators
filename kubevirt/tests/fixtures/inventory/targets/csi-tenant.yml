@@ -1,0 +1,25 @@
+# CSI driver, tenant side: node plugin, a default StorageClass on an infra
+# storage class and a VolumeSnapshotClass
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: csi-tenant
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/kubevirt
+        output_path: manifests/
+
+  generators:
+    kubevirt:
+      csi:
+        role: tenant
+        storage_classes:
+          kubevirt:
+            default: true
+            infra_storage_class: rook-ceph-block
+        volume_snapshot_classes:
+          kubevirt:
+            default: true

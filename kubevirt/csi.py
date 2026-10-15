@@ -1,0 +1,389 @@
+"""KubeVirt CSI driver (github.com/kubevirt/csi-driver) in its split deployment.
+
+``csi.role: infra`` renders the controller into the namespace of a tenant
+cluster's VMs in the infra cluster, ``csi.role: tenant`` the node plugin,
+CSIDriver, storage classes and the RBAC of the controller's tenant
+kubeconfig into the tenant cluster. The manifests follow deploy/ at commit
+3a1a099330045754011803e3d53cd8276ff21723; the README's CSI defaults list
+where they differ and why.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from . import k8s
+
+DRIVER = "csi.kubevirt.io"
+APP = {"app": "kubevirt-csi-driver"}
+# quay.io has no tag per commit, only a moving latest; this is the latest
+# build of that commit (image label multi.GIT_SHA), linux/amd64 only.
+IMAGE = "quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409"
+SIG_STORAGE = "registry.k8s.io/sig-storage/"
+PROVISIONER = SIG_STORAGE + "csi-provisioner:v6.0.2@sha256:80f0225e1b2beeade5734fef6b10ab459e02ac3816570660651b45bd50f178bf"
+ATTACHER = SIG_STORAGE + "csi-attacher:v4.10.0@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d"
+SNAPSHOTTER = SIG_STORAGE + "csi-snapshotter:v4.2.1@sha256:818f35653f2e214db81d655063e81995de9073328a3430498624c140881026a3"
+RESIZER = SIG_STORAGE + "csi-resizer:v1.13.1@sha256:2a0b297cc7c4cd376ac7413df339ff2fdaa1ec9d099aed92b5ea1f031ef7f639"
+LIVENESSPROBE = SIG_STORAGE + "livenessprobe:v2.17.0@sha256:9b75b9ade162136291d5e8f13a1dfc3dec71ee61419b1bfc112e0796ff8a6aa9"
+REGISTRAR = SIG_STORAGE + "csi-node-driver-registrar:v2.15.0@sha256:11f199f6bec47403b03cb49c79a41f445884b213b382582a60710b8c6fdc316a"
+
+RBAC = "rbac.authorization.k8s.io/v1"
+TENANT_KUBECONFIG = "/var/run/secrets/tenantcluster/value"
+HARDENED = {
+    "allowPrivilegeEscalation": False,
+    "readOnlyRootFilesystem": True,
+    "capabilities": {"drop": ["ALL"]},
+}
+# Served by the livenessprobe sidecar on the healthz port of csi-driver.
+LIVENESS = {
+    "httpGet": {"path": "/healthz", "port": "healthz"},
+    "initialDelaySeconds": 10,
+    "timeoutSeconds": 3,
+    "periodSeconds": 10,
+    "failureThreshold": 5,
+}
+KEYS = {
+    "infra": {"role", "namespace", "image", "service_account", "tenant_kubeconfig_secret", "infra_cluster_labels"},
+    "tenant": {"role", "namespace", "image", "storage_classes", "volume_snapshot_classes"},
+}
+
+# deploy/infra-cluster-service-account.yaml, plus datavolumes/source: CDI
+# admits a DataVolume with a snapshot source (snapshot restore) only if its
+# creator may create that subresource in the source namespace.
+INFRA_RULES = [
+    {"apiGroups": ["cdi.kubevirt.io"], "resources": ["datavolumes"], "verbs": ["get", "create", "delete"]},
+    {"apiGroups": ["cdi.kubevirt.io"], "resources": ["datavolumes/source"], "verbs": ["create"]},
+    {"apiGroups": ["kubevirt.io"], "resources": ["virtualmachineinstances", "virtualmachines"], "verbs": ["list", "get"]},
+    {
+        "apiGroups": ["subresources.kubevirt.io"],
+        "resources": ["virtualmachines/addvolume", "virtualmachines/removevolume", "virtualmachineinstances/removevolume"],
+        "verbs": ["update"],
+    },
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshots"], "verbs": ["get", "create", "delete"]},
+    {"apiGroups": [""], "resources": ["persistentvolumeclaims"], "verbs": ["get", "patch"]},
+]
+INFRA_CLUSTER_RULES = [{"apiGroups": [""], "resources": ["persistentvolumes"], "verbs": ["get"]}]
+# kubevirt-csi-controller-cr for the identity of the tenant kubeconfig, cut to
+# the rules of external-provisioner v6.0.2, external-attacher v4.10.0,
+# external-resizer v1.13.1 (no in-use handling) and the csi-snapshotter v4.2.1
+# sidecar, whose volumesnapshotcontents/status upstream grants only to a
+# ServiceAccount no pod uses. The driver itself lists volumesnapshotclasses.
+CONTROLLER_RULES = [
+    {"apiGroups": [""], "resources": ["persistentvolumes"], "verbs": ["create", "delete", "get", "list", "watch", "patch"]},
+    {"apiGroups": [""], "resources": ["persistentvolumeclaims"], "verbs": ["get", "list", "watch", "update"]},
+    {"apiGroups": [""], "resources": ["persistentvolumeclaims/status"], "verbs": ["patch"]},
+    {"apiGroups": [""], "resources": ["nodes"], "verbs": ["get", "list", "watch"]},
+    {"apiGroups": ["storage.k8s.io"], "resources": ["volumeattachments"], "verbs": ["get", "list", "watch", "patch"]},
+    {"apiGroups": ["storage.k8s.io"], "resources": ["storageclasses"], "verbs": ["get", "list", "watch"]},
+    {"apiGroups": [""], "resources": ["events"], "verbs": ["list", "watch", "create", "update", "patch"]},
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotclasses"], "verbs": ["get", "list", "watch"]},
+    {
+        "apiGroups": ["snapshot.storage.k8s.io"],
+        "resources": ["volumesnapshotcontents"],
+        "verbs": ["create", "get", "list", "watch", "update", "delete"],
+    },
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshotcontents/status"], "verbs": ["update"]},
+    {"apiGroups": ["snapshot.storage.k8s.io"], "resources": ["volumesnapshots"], "verbs": ["get", "list", "watch", "update"]},
+    {"apiGroups": ["storage.k8s.io"], "resources": ["volumeattachments/status"], "verbs": ["patch"]},
+    {"apiGroups": ["storage.k8s.io"], "resources": ["csinodes"], "verbs": ["get", "list", "watch"]},
+]
+# The node service reads only its own Node (node ID from providerID or
+# annotations); the registrar and livenessprobe do not call the API.
+NODE_RULES = [
+    {"apiGroups": [""], "resources": ["nodes"], "verbs": ["get"]},
+    {
+        "apiGroups": ["security.openshift.io"],
+        "resources": ["securitycontextconstraints"],
+        "verbs": ["use"],
+        "resourceNames": ["privileged"],
+    },
+]
+
+
+def _check_keys(where: str, config: dict, allowed: set[str]) -> None:
+    unknown = sorted(set(config) - allowed)
+    if unknown:
+        raise ValueError(f"kubevirt {where}: unknown keys {unknown}; allowed: {sorted(allowed)}")
+
+
+def _resource(api_version: str, kind: str, name: str, namespace: str | None = None, *,
+              labels: dict | None = None, annotations: dict | None = None, **fields: Any) -> k8s.Base:
+    resource = k8s.Base(apiVersion=api_version, kind=kind, name=name)
+    if namespace:
+        resource.add_namespace(namespace)
+    resource.add_labels({**APP, **(labels or {})})
+    if annotations:
+        resource.add_annotations(annotations)
+    for key, value in fields.items():
+        resource.root[key] = value
+    return resource
+
+
+def _rbac(obj: Any, key: str, kind: str, name: str, namespace: str | None, rules: list,
+          sa: str, sa_namespace: str) -> None:
+    """Emit a Role or ClusterRole and its binding to one ServiceAccount."""
+    obj.root[f"{key}-{kind.lower()}"] = _resource(RBAC, kind, name, namespace, rules=rules)
+    obj.root[f"{key}-{kind.lower()}binding"] = _resource(
+        RBAC,
+        f"{kind}Binding",
+        name,
+        namespace,
+        roleRef={"apiGroup": "rbac.authorization.k8s.io", "kind": kind, "name": name},
+        subjects=[{"kind": "ServiceAccount", "name": sa, "namespace": sa_namespace}],
+    )
+
+
+def _infra(obj: Any, config: dict, namespace: str) -> None:
+    labels = config.get("infra_cluster_labels")
+    secret = config.get("tenant_kubeconfig_secret")
+    if not labels or not secret:
+        raise ValueError(
+            "kubevirt csi role infra: set infra_cluster_labels, the labels the controller puts on this"
+            " tenant cluster's DataVolumes, and tenant_kubeconfig_secret, the Secret in the same"
+            " namespace whose key 'value' holds the tenant cluster kubeconfig"
+        )
+    labels = ",".join(f"{key}={value}" for key, value in labels.items())
+    sa = config.get("service_account", "kubevirt-csi")
+    obj.root[f"{namespace}/{sa}-sa"] = _resource("v1", "ServiceAccount", sa, namespace)
+    _rbac(obj, f"{namespace}/{sa}", "Role", sa, namespace, INFRA_RULES, sa, namespace)
+    # Cluster-scoped: one per tenant namespace, like prometheus-operator.
+    _rbac(obj, f"{namespace}-{sa}", "ClusterRole", f"{namespace}-{sa}", None, INFRA_CLUSTER_RULES, sa, namespace)
+
+    pluginproxy = {"name": "socket-dir", "mountPath": "/var/lib/csi/sockets/pluginproxy/"}
+    csi = {"name": "socket-dir", "mountPath": "/csi"}
+    tenant = {"name": "tenantcluster", "mountPath": "/var/run/secrets/tenantcluster", "readOnly": True}
+    kubeconfig = f"--kubeconfig={TENANT_KUBECONFIG}"
+    containers = [
+        {
+            "name": "csi-driver",
+            "image": config.get("image", IMAGE),
+            "args": [
+                "--endpoint=unix:///var/lib/csi/sockets/pluginproxy/csi.sock",
+                f"--infra-cluster-namespace={namespace}",
+                f"--infra-cluster-labels={labels}",
+                f"--tenant-cluster-kubeconfig={TENANT_KUBECONFIG}",
+                "--run-node-service=false",
+                "--run-controller-service=true",
+                # KubeVirt 1.9 replaces HotplugVolumes with DeclarativeHotplugVolumes,
+                # under which virt-api rejects removevolume on a VM-owned VMI.
+                "--enable-vmi-hotplug-fallback=false",
+                "--v=5",
+            ],
+            "ports": [{"name": "healthz", "containerPort": 10301, "protocol": "TCP"}],
+            "livenessProbe": LIVENESS,
+            "volumeMounts": [pluginproxy, tenant],
+            "resources": {"requests": {"memory": "50Mi", "cpu": "10m"}},
+        },
+        {
+            "name": "csi-provisioner",
+            "image": PROVISIONER,
+            "args": [
+                "--csi-address=/var/lib/csi/sockets/pluginproxy/csi.sock",
+                "--default-fstype=ext4",
+                kubeconfig,
+                "--v=5",
+                "--timeout=3m",
+                "--retry-interval-max=1m",
+            ],
+            "volumeMounts": [pluginproxy, tenant],
+        },
+        {
+            "name": "csi-attacher",
+            "image": ATTACHER,
+            "args": [
+                "--csi-address=/var/lib/csi/sockets/pluginproxy/csi.sock",
+                kubeconfig,
+                "--v=5",
+                "--timeout=3m",
+                "--retry-interval-max=1m",
+            ],
+            "volumeMounts": [pluginproxy, tenant],
+            "resources": {"requests": {"memory": "50Mi", "cpu": "10m"}},
+        },
+        {
+            "name": "csi-liveness-probe",
+            "image": LIVENESSPROBE,
+            "args": ["--csi-address=/csi/csi.sock", "--probe-timeout=3s", "--health-port=10301"],
+            "volumeMounts": [csi],
+            "resources": {"requests": {"memory": "50Mi", "cpu": "10m"}},
+        },
+        {
+            "name": "csi-snapshotter",
+            "image": SNAPSHOTTER,
+            "args": ["--v=5", "--csi-address=/csi/csi.sock", kubeconfig, "--timeout=3m"],
+            "volumeMounts": [csi, tenant],
+            "resources": {"requests": {"memory": "20Mi", "cpu": "10m"}},
+        },
+        {
+            "name": "csi-resizer",
+            "image": RESIZER,
+            "args": [
+                "-csi-address=/csi/csi.sock",
+                f"-kubeconfig={TENANT_KUBECONFIG}",
+                "-v=5",
+                "-timeout=3m",
+                "-handle-volume-inuse-error=false",
+            ],
+            "volumeMounts": [csi, tenant],
+            "resources": {"requests": {"cpu": "10m", "memory": "20Mi"}},
+        },
+    ]
+    for container in containers:
+        container["securityContext"] = HARDENED
+    obj.root[f"{namespace}/kubevirt-csi-controller-deployment"] = _resource(
+        "apps/v1",
+        "Deployment",
+        "kubevirt-csi-controller",
+        namespace,
+        spec={
+            "replicas": 1,
+            # The sidecars run without leader election: never two controllers.
+            "strategy": {"type": "Recreate"},
+            "selector": {"matchLabels": APP},
+            "template": {
+                "metadata": {"labels": APP},
+                "spec": {
+                    "enableServiceLinks": False,
+                    "serviceAccountName": sa,
+                    "securityContext": {
+                        "runAsNonRoot": True,
+                        "runAsUser": 1001,
+                        "runAsGroup": 1001,
+                        "seccompProfile": {"type": "RuntimeDefault"},
+                    },
+                    "containers": containers,
+                    "volumes": [
+                        {"name": "socket-dir", "emptyDir": {}},
+                        {"name": "tenantcluster", "secret": {"secretName": secret}},
+                    ],
+                },
+            },
+        },
+    )
+
+
+def _node_daemon_set(namespace: str, image: str) -> k8s.Base:
+    plugin = {"name": "plugin-dir", "mountPath": "/csi"}
+    sidecar_resources = {"requests": {"memory": "20Mi", "cpu": "5m"}}
+    return _resource(
+        "apps/v1",
+        "DaemonSet",
+        "kubevirt-csi-node",
+        namespace,
+        spec={
+            "selector": {"matchLabels": APP},
+            "updateStrategy": {"type": "RollingUpdate"},
+            "template": {
+                "metadata": {"labels": APP},
+                "spec": {
+                    "serviceAccountName": "kubevirt-csi-node-sa",
+                    "priorityClassName": "system-node-critical",
+                    "tolerations": [{"operator": "Exists"}],
+                    "securityContext": {"seccompProfile": {"type": "RuntimeDefault"}},
+                    "containers": [
+                        {
+                            "name": "csi-driver",
+                            # Privileged for Bidirectional mount propagation into the
+                            # kubelet directory and for the hotplugged block devices in /dev.
+                            "securityContext": {"privileged": True, "runAsUser": 0, "allowPrivilegeEscalation": True},
+                            "image": image,
+                            "args": [
+                                "--endpoint=unix:/csi/csi.sock",
+                                "--node-name=$(KUBE_NODE_NAME)",
+                                "--run-node-service=true",
+                                "--run-controller-service=false",
+                                "--v=5",
+                            ],
+                            "env": [{"name": "KUBE_NODE_NAME", "valueFrom": {"fieldRef": {"fieldPath": "spec.nodeName"}}}],
+                            "volumeMounts": [
+                                {"name": "kubelet-dir", "mountPath": "/var/lib/kubelet", "mountPropagation": "Bidirectional"},
+                                plugin,
+                                {"name": "device-dir", "mountPath": "/dev"},
+                                {"name": "udev", "mountPath": "/run/udev"},
+                            ],
+                            "ports": [{"name": "healthz", "containerPort": 10300, "protocol": "TCP"}],
+                            "livenessProbe": LIVENESS,
+                            "resources": {"requests": {"memory": "50Mi", "cpu": "10m"}},
+                        },
+                        {
+                            # No preStop hook: the image has no shell, and the registrar
+                            # removes its socket on SIGTERM, the driver a stale csi.sock on start.
+                            "name": "csi-node-driver-registrar",
+                            "image": REGISTRAR,
+                            "args": [
+                                "--csi-address=/csi/csi.sock",
+                                f"--kubelet-registration-path=/var/lib/kubelet/plugins/{DRIVER}/csi.sock",
+                                "--v=5",
+                            ],
+                            "volumeMounts": [plugin, {"name": "registration-dir", "mountPath": "/registration"}],
+                            "resources": sidecar_resources,
+                            "securityContext": HARDENED,
+                        },
+                        {
+                            "name": "csi-liveness-probe",
+                            "image": LIVENESSPROBE,
+                            "args": ["--csi-address=/csi/csi.sock", "--probe-timeout=3s", "--health-port=10300"],
+                            "volumeMounts": [plugin],
+                            "resources": sidecar_resources,
+                            "securityContext": HARDENED,
+                        },
+                    ],
+                    "volumes": [
+                        {"name": "kubelet-dir", "hostPath": {"path": "/var/lib/kubelet", "type": "Directory"}},
+                        {"name": "plugin-dir", "hostPath": {"path": f"/var/lib/kubelet/plugins/{DRIVER}/", "type": "DirectoryOrCreate"}},
+                        {"name": "registration-dir", "hostPath": {"path": "/var/lib/kubelet/plugins_registry/", "type": "Directory"}},
+                        {"name": "device-dir", "hostPath": {"path": "/dev", "type": "Directory"}},
+                        {"name": "udev", "hostPath": {"path": "/run/udev"}},
+                    ],
+                },
+            },
+        },
+    )
+
+
+def _tenant(obj: Any, config: dict, namespace: str) -> None:
+    # The node plugin is privileged, which PodSecurity baseline and restricted reject.
+    obj.root[f"{namespace}-namespace"] = _resource(
+        "v1", "Namespace", namespace, labels={"pod-security.kubernetes.io/enforce": "privileged"}
+    )
+    obj.root[f"{DRIVER}-csidriver"] = _resource(
+        "storage.k8s.io/v1",
+        "CSIDriver",
+        DRIVER,
+        spec={"attachRequired": True, "podInfoOnMount": True, "fsGroupPolicy": "ReadWriteOnceWithFSType"},
+    )
+    for component, rules in (("node", NODE_RULES), ("controller", CONTROLLER_RULES)):
+        sa = f"kubevirt-csi-{component}-sa"
+        obj.root[f"{namespace}/{sa}"] = _resource("v1", "ServiceAccount", sa, namespace)
+        _rbac(obj, f"kubevirt-csi-{component}", "ClusterRole", f"kubevirt-csi-{component}", None, rules, sa, namespace)
+    obj.root[f"{namespace}/kubevirt-csi-node-daemonset"] = _node_daemon_set(namespace, config.get("image", IMAGE))
+
+    for name, sc in (config.get("storage_classes") or {}).items():
+        sc = sc or {}
+        _check_keys(f"csi.storage_classes.{name}", sc, {"default", "infra_storage_class"})
+        fields: dict[str, Any] = {"provisioner": DRIVER, "allowVolumeExpansion": True}
+        if sc.get("infra_storage_class"):
+            fields["parameters"] = {"infraStorageClassName": sc["infra_storage_class"]}
+        default = {"storageclass.kubernetes.io/is-default-class": "true"} if sc.get("default") else None
+        obj.root[f"{name}-storageclass"] = _resource("storage.k8s.io/v1", "StorageClass", name, annotations=default, **fields)
+
+    for name, vsc in (config.get("volume_snapshot_classes") or {}).items():
+        vsc = vsc or {}
+        _check_keys(f"csi.volume_snapshot_classes.{name}", vsc, {"default", "deletion_policy"})
+        fields = {"driver": DRIVER, "deletionPolicy": vsc.get("deletion_policy", "Delete")}
+        default = {"snapshot.storage.kubernetes.io/is-default-class": "true"} if vsc.get("default") else None
+        obj.root[f"{name}-volumesnapshotclass"] = _resource(
+            "snapshot.storage.k8s.io/v1", "VolumeSnapshotClass", name, annotations=default, **fields
+        )
+
+
+def render(obj: Any, config: dict, default_namespace: str) -> None:
+    """Add the CSI driver resources of ``generators.kubevirt.csi`` to obj."""
+    role = config.get("role")
+    if role not in KEYS:
+        raise ValueError(f"kubevirt csi: role must be one of {sorted(KEYS)}, got {role!r}")
+    _check_keys(f"csi (role {role})", config, KEYS[role])
+    if role == "infra":
+        _infra(obj, config, config.get("namespace", default_namespace))
+    else:
+        _tenant(obj, config, config.get("namespace", "kubevirt-csi-driver"))
