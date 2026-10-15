@@ -16,6 +16,7 @@ Inventory contract:
     data_volumes:                  → DataVolume (cdi.kubevirt.io/v1beta1)
     data_sources:                  → DataSource (cdi.kubevirt.io/v1beta1)
     object_transfers:              → ObjectTransfer (cdi.kubevirt.io/v1beta1)
+    csi:                           → KubeVirt CSI driver, infra or tenant side (csi.py)
 
 Smart defaults for VM-like resources:
   - ``image: quay.io/...`` → auto-builds containerDisk volume + virtio disk
@@ -37,13 +38,13 @@ from typing import Any, cast
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-from . import k8s
+from . import csi, k8s
 
 
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 
 # ---------------------------------------------------------------------------
@@ -1168,5 +1169,7 @@ def main(input_params: dict | None = None) -> BaseObj:
                 obj.root[f"{namespace}/{name}-{suffix}"] = resource_cls(
                     name=name, config=config
                 )
+    if "csi" in generator_config:
+        csi.render(obj, generator_config["csi"] or {}, default_namespace)
 
     return obj
