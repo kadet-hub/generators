@@ -1,5 +1,6 @@
-# CSI driver, tenant side: node plugin, a default StorageClass on an infra
-# storage class and a VolumeSnapshotClass
+# CSI driver, tenant side: node plugin, the token Secret for the controller's
+# kubeconfig, a default StorageClass and a VolumeSnapshotClass on the infra
+# classes csi-infra allows
 classes: []
 
 parameters:
@@ -16,6 +17,7 @@ parameters:
     kubevirt:
       csi:
         role: tenant
+        image: quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
         storage_classes:
           kubevirt:
             default: true
@@ -23,3 +25,4 @@ parameters:
         volume_snapshot_classes:
           kubevirt:
             default: true
+            infra_snapshot_class: csi-rbdplugin-snapclass

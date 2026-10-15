@@ -1,5 +1,6 @@
 # CSI driver, infra side: the controller in the namespace of tenant-a's VMs,
-# which it takes from the generator namespace
+# which it takes from the generator namespace, restricted to one infra
+# storage class with its snapshot class
 classes: []
 
 parameters:
@@ -17,6 +18,12 @@ parameters:
       namespace: tenant-a
       csi:
         role: infra
+        image: quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
         tenant_kubeconfig_secret: tenant-a-kubeconfig
         infra_cluster_labels:
           csi-driver/cluster: tenant-a
+        allowed_storage_classes:
+          - rook-ceph-block
+        snapshot_classes:
+          rook-ceph-block:
+            - csi-rbdplugin-snapclass

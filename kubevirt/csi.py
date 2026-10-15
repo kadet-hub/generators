@@ -12,13 +12,14 @@ from __future__ import annotations
 
 from typing import Any
 
+import yaml
+
 from . import k8s
 
 DRIVER = "csi.kubevirt.io"
 APP = {"app": "kubevirt-csi-driver"}
-# quay.io has no tag per commit, only a moving latest; this is the latest
-# build of that commit (image label multi.GIT_SHA), linux/amd64 only.
-IMAGE = "quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409"
+# quay.io has only a moving latest tag and deletes replaced digests, so the
+# driver image has no default: the README names the digest to mirror.
 SIG_STORAGE = "registry.k8s.io/sig-storage/"
 PROVISIONER = SIG_STORAGE + "csi-provisioner:v6.0.2@sha256:80f0225e1b2beeade5734fef6b10ab459e02ac3816570660651b45bd50f178bf"
 ATTACHER = SIG_STORAGE + "csi-attacher:v4.10.0@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d"
@@ -43,7 +44,10 @@ LIVENESS = {
     "failureThreshold": 5,
 }
 KEYS = {
-    "infra": {"role", "namespace", "image", "service_account", "tenant_kubeconfig_secret", "infra_cluster_labels"},
+    "infra": {
+        "role", "namespace", "image", "service_account", "tenant_kubeconfig_secret", "infra_cluster_labels",
+        "allowed_storage_classes", "allow_default_storage_class", "snapshot_classes",
+    },
     "tenant": {"role", "namespace", "image", "storage_classes", "volume_snapshot_classes"},
 }
 
@@ -133,6 +137,34 @@ def _rbac(obj: Any, key: str, kind: str, name: str, namespace: str | None, rules
     )
 
 
+def _enforcement(config: dict) -> str | None:
+    """infraStorageClassEnforcement (pkg/util StorageClassEnforcement) as YAML, None for upstream's allow-all."""
+    allowed = config.get("allowed_storage_classes")
+    snapshots = config.get("snapshot_classes") or {}
+    if allowed is None:
+        if "allow_default_storage_class" in config or snapshots:
+            raise ValueError(
+                "kubevirt csi: allow_default_storage_class and snapshot_classes need allowed_storage_classes"
+            )
+        return None
+    unknown = sorted(set(snapshots) - set(allowed))
+    if unknown:
+        raise ValueError(f"kubevirt csi: snapshot_classes names storage classes not in allowed_storage_classes: {unknown}")
+    allow_default = bool(config.get("allow_default_storage_class", False))
+    if allow_default and snapshots:
+        raise ValueError(
+            "kubevirt csi: snapshot_classes has no effect with allow_default_storage_class, under which the"
+            " driver always takes the infra default VolumeSnapshotClass"
+        )
+    enforcement: dict[str, Any] = {"allowAll": False, "allowDefault": allow_default, "allowList": list(allowed)}
+    if snapshots:
+        enforcement["storageSnapshotMapping"] = [
+            {"storageClasses": [storage_class], "volumeSnapshotClasses": list(snapshot_classes)}
+            for storage_class, snapshot_classes in snapshots.items()
+        ]
+    return yaml.safe_dump(enforcement, sort_keys=False)
+
+
 def _infra(obj: Any, config: dict, namespace: str) -> None:
     labels = config.get("infra_cluster_labels")
     secret = config.get("tenant_kubeconfig_secret")
@@ -156,7 +188,7 @@ def _infra(obj: Any, config: dict, namespace: str) -> None:
     containers = [
         {
             "name": "csi-driver",
-            "image": config.get("image", IMAGE),
+            "image": config["image"],
             "args": [
                 "--endpoint=unix:///var/lib/csi/sockets/pluginproxy/csi.sock",
                 f"--infra-cluster-namespace={namespace}",
@@ -228,6 +260,9 @@ def _infra(obj: Any, config: dict, namespace: str) -> None:
             "resources": {"requests": {"cpu": "10m", "memory": "20Mi"}},
         },
     ]
+    enforcement = _enforcement(config)
+    if enforcement:
+        containers[0]["env"] = [{"name": "INFRA_STORAGE_CLASS_ENFORCEMENT", "value": enforcement}]
     for container in containers:
         container["securityContext"] = HARDENED
     obj.root[f"{namespace}/kubevirt-csi-controller-deployment"] = _resource(
@@ -356,7 +391,17 @@ def _tenant(obj: Any, config: dict, namespace: str) -> None:
         sa = f"kubevirt-csi-{component}-sa"
         obj.root[f"{namespace}/{sa}"] = _resource("v1", "ServiceAccount", sa, namespace)
         _rbac(obj, f"kubevirt-csi-{component}", "ClusterRole", f"kubevirt-csi-{component}", None, rules, sa, namespace)
-    obj.root[f"{namespace}/kubevirt-csi-node-daemonset"] = _node_daemon_set(namespace, config.get("image", IMAGE))
+    # Long-lived token for the infra controller's tenant kubeconfig; the token
+    # controller fills it in the cluster, the output carries no token.
+    obj.root[f"{namespace}/kubevirt-csi-controller-sa-token-secret"] = _resource(
+        "v1",
+        "Secret",
+        "kubevirt-csi-controller-sa-token",
+        namespace,
+        annotations={"kubernetes.io/service-account.name": "kubevirt-csi-controller-sa"},
+        type="kubernetes.io/service-account-token",
+    )
+    obj.root[f"{namespace}/kubevirt-csi-node-daemonset"] = _node_daemon_set(namespace, config["image"])
 
     for name, sc in (config.get("storage_classes") or {}).items():
         sc = sc or {}
@@ -369,8 +414,10 @@ def _tenant(obj: Any, config: dict, namespace: str) -> None:
 
     for name, vsc in (config.get("volume_snapshot_classes") or {}).items():
         vsc = vsc or {}
-        _check_keys(f"csi.volume_snapshot_classes.{name}", vsc, {"default", "deletion_policy"})
+        _check_keys(f"csi.volume_snapshot_classes.{name}", vsc, {"default", "infra_snapshot_class", "deletion_policy"})
         fields = {"driver": DRIVER, "deletionPolicy": vsc.get("deletion_policy", "Delete")}
+        if vsc.get("infra_snapshot_class"):
+            fields["parameters"] = {"infraSnapshotClassName": vsc["infra_snapshot_class"]}
         default = {"snapshot.storage.kubernetes.io/is-default-class": "true"} if vsc.get("default") else None
         obj.root[f"{name}-volumesnapshotclass"] = _resource(
             "snapshot.storage.k8s.io/v1", "VolumeSnapshotClass", name, annotations=default, **fields
@@ -383,6 +430,13 @@ def render(obj: Any, config: dict, default_namespace: str) -> None:
     if role not in KEYS:
         raise ValueError(f"kubevirt csi: role must be one of {sorted(KEYS)}, got {role!r}")
     _check_keys(f"csi (role {role})", config, KEYS[role])
+    if not config.get("image"):
+        raise ValueError(
+            "kubevirt csi: set image, the KubeVirt CSI driver image to pull. Upstream publishes only a moving"
+            " quay.io latest tag and deletes replaced digests; mirror"
+            " quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409"
+            " (built from 3a1a099, see the README) and reference the mirror by digest"
+        )
     if role == "infra":
         _infra(obj, config, config.get("namespace", default_namespace))
     else:
