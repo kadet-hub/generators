@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/terraform-google/) page.
 
-Kapitan kadet generator that renders Terraform JSON for Google Cloud with the `hashicorp/google` provider, pinned to **8.6.0**:
+Kapitan kadet generator that renders Terraform JSON for Google Cloud with the `hashicorp/google` provider, pinned to **8.7.0**:
 
 - **network**: a custom-mode VPC network, its subnets with flow logs, Private Google Access and optional GKE secondary ranges, one Cloud Router and Cloud NAT per subnet region, and ingress firewall rules for IAP SSH, load balancer health checks and internal traffic
 - **buckets**: Cloud Storage buckets with uniform bucket-level access, public access prevention, versioning, soft delete, lifecycle rules and IAM members
@@ -143,7 +143,7 @@ The provider drops a lifecycle condition whose value is `0` unless the matching 
 
 | File | Content |
 |---|---|
-| `providers.tf.json` | `terraform` block (`required_version >= 1.5.0`, `hashicorp/google` `8.6.0`) and the `provider "google"` block. |
+| `providers.tf.json` | `terraform` block (`required_version >= 1.5.0`, `hashicorp/google` `8.7.0`) and the `provider "google"` block. |
 | `network-<name>.tf.json` | Network, subnets, routers, NATs and firewall rules; outputs `network_<name>_id`, `network_<name>_self_link`, `network_<name>_subnet_ids` (map subnet to id). |
 | `bucket-<key>.tf.json` | Bucket and IAM members; outputs `bucket_<key>_name`, `bucket_<key>_url`. |
 
@@ -153,13 +153,13 @@ Terraform resource and output names are the inventory keys lowercased with every
 
 | Resource | Registry docs |
 |---|---|
-| `google_compute_network` | [compute_network](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/compute_network) |
-| `google_compute_subnetwork` | [compute_subnetwork](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/compute_subnetwork) |
-| `google_compute_router` | [compute_router](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/compute_router) |
-| `google_compute_router_nat` | [compute_router_nat](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/compute_router_nat) |
-| `google_compute_firewall` | [compute_firewall](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/compute_firewall) |
-| `google_storage_bucket` | [storage_bucket](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/storage_bucket) |
-| `google_storage_bucket_iam_member` | [storage_bucket_iam](https://registry.terraform.io/providers/hashicorp/google/8.6.0/docs/resources/storage_bucket_iam) |
+| `google_compute_network` | [compute_network](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/compute_network) |
+| `google_compute_subnetwork` | [compute_subnetwork](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/compute_subnetwork) |
+| `google_compute_router` | [compute_router](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/compute_router) |
+| `google_compute_router_nat` | [compute_router_nat](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/compute_router_nat) |
+| `google_compute_firewall` | [compute_firewall](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/compute_firewall) |
+| `google_storage_bucket` | [storage_bucket](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/storage_bucket) |
+| `google_storage_bucket_iam_member` | [storage_bucket_iam](https://registry.terraform.io/providers/hashicorp/google/8.7.0/docs/resources/storage_bucket_iam) |
 
 The network bundle follows the layout of [terraform-google-modules/network](https://github.com/terraform-google-modules/terraform-google-network) and [terraform-google-modules/cloud-nat](https://github.com/terraform-google-modules/terraform-google-cloud-nat), with Private Google Access on by default as in Cloud Foundation Fabric [net-vpc](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/net-vpc); custom-mode networks and per-subnet Private Google Access are what Google's [VPC design guide](https://docs.cloud.google.com/architecture/best-practices-vpc-design) recommends. The bucket defaults follow Google's guidance on [uniform bucket-level access](https://docs.cloud.google.com/storage/docs/uniform-bucket-level-access) and [public access prevention](https://docs.cloud.google.com/storage/docs/public-access-prevention).
 
