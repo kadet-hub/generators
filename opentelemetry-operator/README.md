@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/opentelemetry-operator/) page.
 
-Kapitan kadet generator for [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) resources (`opentelemetry.io`). Built for OpenTelemetry Operator 0.160.0.
+Kapitan kadet generator for [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) resources (`opentelemetry.io`). Built for OpenTelemetry Operator 0.161.0.
 
 - **OpenTelemetryCollector** (`v1beta1`): a managed collector as Deployment, DaemonSet, StatefulSet or sidecar
 - **Instrumentation** (`v1alpha1`): auto-instrumentation injection settings
