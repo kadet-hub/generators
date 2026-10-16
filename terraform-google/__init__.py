@@ -9,7 +9,7 @@ import re
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-PROVIDER = {"source": "hashicorp/google", "version": "8.6.0"}
+PROVIDER = {"source": "hashicorp/google", "version": "8.7.0"}
 IAP_RANGE = "35.235.240.0/20"
 HEALTH_CHECK_RANGE = "35.191.0.0/16"
 FLOW_LOGS = {
