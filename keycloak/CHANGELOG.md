@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for Keycloak Operator 26.8.1. The CRDs and their JSON Schemas are unchanged from 26.8.0, as is the operator code the generator's defaults rely on. Rendered output is unchanged.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.
