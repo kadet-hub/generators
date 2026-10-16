@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+Ships the Kubernetes 1.37.1 ServiceAccount, ClusterRole and ClusterRoleBinding schemas instead of 1.35.0, matching the kube-apiserver v1.37.1 the gate dry-runs against (QA-10). Apart from descriptions, the only schema change is that ClusterRoleBinding `roleRef.apiGroup` is no longer required; the generator still sets it. Rendered output is unchanged.
+
 ## 1.1.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.
