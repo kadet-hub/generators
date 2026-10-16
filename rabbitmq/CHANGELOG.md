@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for RabbitMQ Cluster Operator 2.23.1 and Messaging Topology Operator 1.20.4. The Federation schema and CRD gain the upstream default `reconnectDelay: 1`; the other `rabbitmq.com` schemas and CRDs are unchanged. ConfigMaps and Secrets are checked against the Kubernetes 1.37.1 schemas instead of 1.35.0, which differ only in a ConfigMap description. Rendered output is unchanged.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.

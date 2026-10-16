@@ -9,14 +9,14 @@
 # Kubernetes release, unchanged.
 rabbitmq.com:
   software: RabbitMQ Cluster Operator / Messaging Topology Operator
-  version: 2.23.0 / 1.20.3
-  source: https://github.com/rabbitmq/cluster-operator/tree/v2.23.0/config/crd/bases https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.3/config/crd/bases
+  version: 2.23.1 / 1.20.4
+  source: https://github.com/rabbitmq/cluster-operator/tree/v2.23.1/config/crd/bases https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.4/config/crd/bases
   license: MPL-2.0
   copyright:
     - Copyright 2020 VMware, Inc. All Rights Reserved.
     - Copyright 2021-2022 VMware, Inc.
 core:
   software: Kubernetes
-  version: 1.35.0
-  source: https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
   license: Apache-2.0
