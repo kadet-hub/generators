@@ -25,7 +25,7 @@ RULES for inventory access:
      pass that check but behave differently.
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 from kapitan.inputs.kadet import BaseObj, inventory, topics
 
