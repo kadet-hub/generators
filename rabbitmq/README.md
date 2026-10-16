@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/rabbitmq/) page.
 
-Built for RabbitMQ Cluster Operator 2.23.1 and Messaging Topology Operator 1.20.4 (`rabbitmq.com/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled `rabbitmq.com` JSON Schemas are MPL-2.0, derived from the upstream CRDs of both operators (see `schemas/rabbitmq.com/NOTICE`); the generator code is Apache-2.0. ConfigMaps and Secrets are checked against the Kubernetes 1.35.0 schemas.
+Built for RabbitMQ Cluster Operator 2.23.1 and Messaging Topology Operator 1.20.4 (`rabbitmq.com/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled `rabbitmq.com` JSON Schemas are MPL-2.0, derived from the upstream CRDs of both operators (see `schemas/rabbitmq.com/NOTICE`); the generator code is Apache-2.0. ConfigMaps and Secrets are checked against the Kubernetes 1.37.1 schemas.
 
 Kapitan kadet generator for RabbitMQ on Kubernetes:
 
@@ -53,11 +53,11 @@ Precedence, lowest first: generator defaults, `spec`, flat keys and shorthands; 
 | entry key of Queue, Exchange, Policy, Vhost, Federation, Shovel | `spec.name` |
 | `cluster_reference: <name>` on an entry or generator-wide | `spec.rabbitmqClusterReference: {name: <name>}` |
 
-`spec.name` is the object's name inside RabbitMQ and [required by the CRD](https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.3/api/v1beta1). The webhook [forbids changing it](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.3/internal/webhook/v1beta1/queue_webhook.go) after creation, so set `spec.name` when the RabbitMQ name differs from the entry key, for example a queue named `analytics.reports`.
+`spec.name` is the object's name inside RabbitMQ and [required by the CRD](https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.4/api/v1beta1). The webhook [forbids changing it](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/internal/webhook/v1beta1/queue_webhook.go) after creation, so set `spec.name` when the RabbitMQ name differs from the entry key, for example a queue named `analytics.reports`.
 
-`rabbitmqClusterReference` is [required on every topology kind](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.3/api/v1beta1/rabbitmq_cluster_reference.go). A dict passes through, for example `{name: production, namespace: messaging}` for a cluster in another namespace, which the cluster has to allow with the annotation `rabbitmq.com/topology-allowed-namespaces`.
+`rabbitmqClusterReference` is [required on every topology kind](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/api/v1beta1/rabbitmq_cluster_reference.go). A dict passes through, for example `{name: production, namespace: messaging}` for a cluster in another namespace, which the cluster has to allow with the annotation `rabbitmq.com/topology-allowed-namespaces`.
 
-The generator leaves operator defaults out: RabbitmqCluster `replicas: 1`, `persistence.storage: 10Gi` and the resource requests and limits ([CRD defaults](https://github.com/rabbitmq/cluster-operator/blob/v2.23.0/api/v1beta1/rabbitmqcluster_types.go)); Queue `durable: true`, set by the [defaulting webhook](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.3/internal/webhook/v1beta1/queue_defaulter_webhook.go); `vhost: /` and `deletionPolicy: delete`. It sets no default that grants access: Permission `vhost` and `permissions`, User `tags` and the Federation and Shovel `uriSecret` stay unset unless the inventory names them, and a resource without them fails QA-7 at compile time and the API server at apply time.
+The generator leaves operator defaults out: RabbitmqCluster `replicas: 1`, `persistence.storage: 10Gi` and the resource requests and limits ([CRD defaults](https://github.com/rabbitmq/cluster-operator/blob/v2.23.1/api/v1beta1/rabbitmqcluster_types.go)); Queue `durable: true`, set by the [defaulting webhook](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/internal/webhook/v1beta1/queue_defaulter_webhook.go); Federation `reconnectDelay: 1` ([CRD default](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/api/v1beta1/federation_types.go) since 1.20.4); `vhost: /` and `deletionPolicy: delete`. It sets no default that grants access: Permission `vhost` and `permissions`, User `tags` and the Federation and Shovel `uriSecret` stay unset unless the inventory names them, and a resource without them fails QA-7 at compile time and the API server at apply time.
 
 ### `rabbitmq_resources`
 
@@ -69,7 +69,7 @@ The generator leaves operator defaults out: RabbitmqCluster `replicas: 1`, `pers
 | `users.<name>.permissions.<permission>` | Permission with `userReference: {name: <name>}` (or `user`/`user_reference` from the entry), `vhost` and `read_permission`, `write_permission`, `configure_permission` as `permissions.read`, `.write`, `.configure` |
 | `vhosts.<name>.cluster_reference` | `rabbitmqClusterReference`; string or dict |
 
-A Permission references the User emitted from its entry by `userReference`, because without `secret_name` the operator [generates a random username](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.3/internal/controller/user_controller.go); `user: <RabbitMQ username>` or `user_reference` on the permission entry wins. Credentials Secrets for `secret_name` come from External Secrets or a Kapitan ref, not from this generator.
+A Permission references the User emitted from its entry by `userReference`, because without `secret_name` the operator [generates a random username](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/internal/controller/user_controller.go); `user: <RabbitMQ username>` or `user_reference` on the permission entry wins. Credentials Secrets for `secret_name` come from External Secrets or a Kapitan ref, not from this generator.
 
 ### `secrets` and `configs`
 
