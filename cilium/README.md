@@ -2,14 +2,14 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/cilium/) page.
 
-Kapitan kadet generator for [Cilium](https://cilium.io/) policy and load balancer resources. Built for Cilium 1.20.2.
+Kapitan kadet generator for [Cilium](https://cilium.io/) policy and load balancer resources. Built for Cilium 1.20.3.
 
 - **CiliumNetworkPolicy** (`cilium.io/v2`): namespaced L3-L7 policy
 - **CiliumClusterwideNetworkPolicy** (`cilium.io/v2`): cluster-scoped L3-L7 policy, also for nodes (host policies)
 - **CiliumLoadBalancerIPPool** (`cilium.io/v2`): IP pool for LB-IPAM
 - **CiliumL2AnnouncementPolicy** (`cilium.io/v2alpha1`): which nodes answer ARP/NDP for which Service IPs
 
-Each kind is emitted in its storage version at Cilium 1.20.2. CiliumLoadBalancerIPPool `v2alpha1` is still served but deprecated; CiliumL2AnnouncementPolicy exists only as `v2alpha1`. The Cilium install belongs in the `helm` input with the upstream `cilium` chart.
+Each kind is emitted in its storage version at Cilium 1.20.3. CiliumLoadBalancerIPPool `v2alpha1` is still served but deprecated; CiliumL2AnnouncementPolicy exists only as `v2alpha1`. The Cilium install belongs in the `helm` input with the upstream `cilium` chart.
 
 ## Usage
 
@@ -71,9 +71,9 @@ Selectors accept `match_labels` and `match_expressions` as well as the camelCase
 | pool block `"198.51.100.10-198.51.100.20"` | `{start: 198.51.100.10, stop: 198.51.100.20}` |
 | L2 policy without `external_ips`, `load_balancer_ips` or the same fields in `spec` | `loadBalancerIPs: true` |
 
-The CRD types `port` as a string, so an unquoted `port: 53` in a hand-written `toPorts` fails validation; the shorthand converts numbers. A missing protocol is not emitted, Cilium reads it as `ANY` ([PortProtocol](https://github.com/cilium/cilium/blob/v1.20.2/pkg/k8s/apis/cilium.io/client/crds/v2/ciliumnetworkpolicies.yaml)).
+The CRD types `port` as a string, so an unquoted `port: 53` in a hand-written `toPorts` fails validation; the shorthand converts numbers. A missing protocol is not emitted, Cilium reads it as `ANY` ([PortProtocol](https://github.com/cilium/cilium/blob/v1.20.3/pkg/k8s/apis/cilium.io/client/crds/v2/ciliumnetworkpolicies.yaml)).
 
-`toFQDNs` rules only learn IPs from DNS answers that pass Cilium's DNS proxy, which needs an L7 DNS rule on the DNS traffic ([DNS based](https://docs.cilium.io/en/v1.20/security/policy/layer3/#dns-based)). `allow_dns` renders the rule from the upstream [FQDN example](https://github.com/cilium/cilium/blob/v1.20.2/examples/policies/l3/fqdn/fqdn.yaml): `toEndpoints` with `k8s:io.kubernetes.pod.namespace: kube-system` and `k8s:k8s-app: kube-dns`. It is opt-in because it adds allowed egress, and the DNS rule may already live in another policy for the same endpoints. Clusters whose DNS pods carry other labels write the rule in `egress` instead. Like every egress rule it turns on default deny for egress unless `enable_default_deny.egress` is `false`.
+`toFQDNs` rules only learn IPs from DNS answers that pass Cilium's DNS proxy, which needs an L7 DNS rule on the DNS traffic ([DNS based](https://docs.cilium.io/en/v1.20/security/policy/layer3/#dns-based)). `allow_dns` renders the rule from the upstream [FQDN example](https://github.com/cilium/cilium/blob/v1.20.3/examples/policies/l3/fqdn/fqdn.yaml): `toEndpoints` with `k8s:io.kubernetes.pod.namespace: kube-system` and `k8s:k8s-app: kube-dns`. It is opt-in because it adds allowed egress, and the DNS rule may already live in another policy for the same endpoints. Clusters whose DNS pods carry other labels write the rule in `egress` instead. Like every egress rule it turns on default deny for egress unless `enable_default_deny.egress` is `false`.
 
 Both L2 announcement flags default to `false` upstream, so a policy without either announces nothing ([IP types](https://docs.cilium.io/en/v1.20/network/l2-announcements/#ip-types)). The generator sets `loadBalancerIPs: true`, the IPs that LB-IPAM assigns; `externalIPs` also needs the `externalIPs.enable` Helm value and stays off unless set. Pool block notation follows [LB-IPAM](https://docs.cilium.io/en/v1.20/network/lb-ipam/).
 
@@ -138,4 +138,4 @@ This renders `shop/web-cnp`, `payments/payments-egress-cnp`, `node-health-check-
 
 ## Schemas
 
-`schemas/cilium.io/` holds the closed JSON Schemas of the four kinds from the Cilium 1.20.2 CRDs (Apache-2.0). The policy schemas restrict `spec.log.value` with the pattern `^\PC*$`, which Python's `re` cannot compile; validate output that sets `log` with a validator that supports Unicode property classes.
+`schemas/cilium.io/` holds the closed JSON Schemas of the four kinds from the Cilium 1.20.3 CRDs (Apache-2.0). The policy schemas restrict `spec.log.value` with the pattern `^\PC*$`, which Python's `re` cannot compile; validate output that sets `log` with a validator that supports Unicode property classes.
