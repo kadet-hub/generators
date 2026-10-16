@@ -9,7 +9,7 @@ import re
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-PROVIDER = {"source": "hashicorp/aws", "version": "6.68.0"}
+PROVIDER = {"source": "hashicorp/aws", "version": "6.69.1"}
 NAT_MODES = ("none", "single", "per_az", "regional")
 
 VPC_DEFAULTS = {
