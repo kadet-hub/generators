@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/keycloak/) page.
 
-Built for Keycloak Operator 26.8.0. Keycloak and KeycloakRealmImport are emitted as `k8s.keycloak.org/v2beta1`, their storage version; `v2alpha1` of these kinds is still served but deprecated. KeycloakOIDCClient and KeycloakSAMLClient exist only as `v2alpha1` (served, storage, not deprecated) and are an upstream alpha (preview) API. The bundled JSON Schemas are Apache-2.0, derived from the [upstream CRDs](https://github.com/keycloak/keycloak-k8s-resources/tree/26.8.0/kubernetes).
+Built for Keycloak Operator 26.8.1. Keycloak and KeycloakRealmImport are emitted as `k8s.keycloak.org/v2beta1`, their storage version; `v2alpha1` of these kinds is still served but deprecated. KeycloakOIDCClient and KeycloakSAMLClient exist only as `v2alpha1` (served, storage, not deprecated) and are an upstream alpha (preview) API. The bundled JSON Schemas are Apache-2.0, derived from the [upstream CRDs](https://github.com/keycloak/keycloak-k8s-resources/tree/26.8.1/kubernetes).
 
 Kapitan kadet generator for the Keycloak Operator:
 
