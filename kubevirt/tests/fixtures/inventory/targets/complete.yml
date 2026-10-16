@@ -66,11 +66,11 @@ parameters:
                 volumes:
                   - name: containerdisk
                     containerDisk:
-                      image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+                      image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.1
       virtual_machine_instances:
         standalone-vmi:
           memory: 256Mi
-          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.1
       virtual_machine_instance_migrations:
         migrate-vm:
           vmi_name: complete-vm
@@ -81,7 +81,7 @@ parameters:
             matchLabels:
               app: vm-rs
           memory: 256Mi
-          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.1
           disks:
             - name: scratch
               blank: 5Gi

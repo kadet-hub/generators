@@ -14,23 +14,23 @@
 # unchanged.
 kubevirt.io:
   software: KubeVirt
-  version: 1.9.0
-  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  version: 1.9.1
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/virt-operator/resource/generate/components/validations_generated.go
   license: Apache-2.0
 pool.kubevirt.io:
   software: KubeVirt
-  version: 1.9.0
-  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  version: 1.9.1
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/virt-operator/resource/generate/components/validations_generated.go
   license: Apache-2.0
 clone.kubevirt.io:
   software: KubeVirt
-  version: 1.9.0
-  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  version: 1.9.1
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/virt-operator/resource/generate/components/validations_generated.go
   license: Apache-2.0
 snapshot.kubevirt.io:
   software: KubeVirt
-  version: 1.9.0
-  source: https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go
+  version: 1.9.1
+  source: https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/virt-operator/resource/generate/components/validations_generated.go
   license: Apache-2.0
 cdi.kubevirt.io:
   software: KubeVirt Containerized Data Importer (CDI)
