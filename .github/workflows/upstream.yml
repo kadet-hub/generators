@@ -13,6 +13,7 @@ concurrency: upstream
 jobs:
   upstream:
     runs-on: ubuntu-24.04
+    environment: upstream # UPD-6: the App key, for main only
     timeout-minutes: 90
     steps:
       # Without owner and repositories the token is limited to this repository.
