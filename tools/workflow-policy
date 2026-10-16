@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# UPD-6: a job that reads a secret other than GITHUB_TOKEN, or holds contents,
+# packages, id-token, attestations or pages write, names an environment that
+# admits only main and is not part of a pull_request_target workflow.
+#
+# Usage: tools/workflow-policy
+# Needs: gh (GH_TOKEN in CI), yq, jq. Prints violations; exits 1 on any.
+set -euo pipefail
+cd -- "$(dirname -- "$0")/.."
+status=0
+fail() { echo "$1"; status=1; }
+
+# shellcheck disable=SC2016 # $w, $j, ... are jq variables
+jobs='. as $w | ($w.on | if type == "object" then keys elif type == "array" then . else [.] end) as $events
+  | (.jobs // {}) | to_entries[] | .key as $job | .value as $j
+  | ($j.permissions // $w.permissions // {}) as $p
+  | ([if ($p | type) == "string" then ($p | select(. == "write-all"))
+      else ($p | to_entries[] | select(.value == "write" and (.key | IN("contents", "packages", "id-token", "attestations", "pages"))) | .key + ": write") end]
+    + [$j | .. | strings | match("secrets *(\\.|\\[) *[\"'\'']?([A-Za-z0-9_-]+)"; "g") | .captures[1].string | select(. != "GITHUB_TOKEN") | "secrets." + .]
+    + [$j.secrets | strings | "secrets: " + .])
+  | unique | select(length > 0)
+  | [$f, $job, ($j.environment | if type == "object" then .name else . end // ""), join(", "),
+     (if $events | index("pull_request_target") then "pull_request_target" else "" end)] | join("\u001f")'
+repo=${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}
+declare -A policy=()
+while IFS=$'\x1f' read -r file job env why event; do
+  if [[ -n $event ]]; then
+    fail "UPD-6: $file job $job holds $why in a $event workflow"
+  elif [[ -z $env ]]; then
+    fail "UPD-6: $file job $job holds $why without an environment"
+  else
+    if [[ ! -v policy[$env] ]]; then
+      policy[$env]=$(gh api "repos/$repo/environments/$env/deployment-branch-policies" \
+        --jq '[.branch_policies[] | .type + " " + .name] | join(", ")') || policy[$env]="unknown branches"
+    fi
+    [[ ${policy[$env]} == "branch main" ]] \
+      || fail "UPD-6: $file job $job holds $why in environment $env, which admits ${policy[$env]:-every branch}, not only main"
+  fi
+done < <(for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+  [[ -e $f ]] && yq -o json "$f" | jq -r --arg f "${f##*/}" "$jobs"
+done)
+
+exit "$status"
