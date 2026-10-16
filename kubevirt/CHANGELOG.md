@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Built for KubeVirt 1.9.1. Its CRD validations are unchanged from 1.9.0, so the shipped schemas and the rendered output stay the same. The fixtures use the `cirros-container-disk-demo:v1.9.1` image, the same digest as `v1.9.0`.
+
 ## 1.1.0
 
 Adds `csi`, the KubeVirt CSI driver in its split deployment at upstream commit 3a1a099: `role: infra` renders the controller with its RBAC into the namespace of a tenant cluster's VMs, optionally restricted to `allowed_storage_classes` with `snapshot_classes`; `role: tenant` renders the node plugin, CSIDriver, StorageClasses, VolumeSnapshotClasses, and the ServiceAccount, RBAC and token Secret for the controller's tenant kubeconfig. `csi.image` is required, because upstream publishes only a moving `latest` tag; the README names the digest to mirror. The sidecars are pinned by tag and digest, csi-snapshotter at v8.7.0 instead of upstream's v4.2.1, which cannot create snapshots with the external-snapshotter v8 CRDs. The README's CSI defaults list where the output differs from upstream's manifests and why.

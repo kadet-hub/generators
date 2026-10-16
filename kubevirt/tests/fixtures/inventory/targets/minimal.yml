@@ -18,7 +18,7 @@ parameters:
         minimal-vm:
           run_strategy: Always
           memory: 256Mi
-          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.0
+          image: quay.io/kubevirt/cirros-container-disk-demo:v1.9.1
       data_volumes:
         minimal-dv:
           size: 1Gi

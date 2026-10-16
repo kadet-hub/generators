@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/kubevirt/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/kubevirt/) page.
 
-Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.0, CDI 1.66.1 and KubeVirt CSI driver main@3a1a099. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
+Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.1, CDI 1.66.1 and KubeVirt CSI driver main@3a1a099. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
 
 A VirtualMachine entry with `image`, `disks` and `cloudinit` expands into matching disks, volumes, `dataVolumeTemplates` and a pod network, so a short block yields a VM that KubeVirt admits. The other kinds take reference shorthands. Secrets for `cloudinit_secret_ref` belong in the `kubernetes` generator.
 
@@ -84,13 +84,13 @@ A disk `size` on a VMI or VMIRS is ignored with a warning, because only VirtualM
 
 | Default | Where | Reason |
 |---|---|---|
-| none for the run strategy | VM, pool template | The compile fails without `run_strategy` (`Always`, `RerunOnFailure`, `Once`, `Manual`, `Halted`), `spec.runStrategy` or the deprecated `running`, which passes through. KubeVirt [rejects a VM without one](https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-api/webhooks/validating-webhook/admitters/vms-admitter.go), and the generator does not start VMs implicitly. |
-| disk bus `virtio` | generated disks, pool disks and LUNs | KubeVirt [defaults to SATA](https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/defaults/amd64.go). CD-ROMs keep KubeVirt's default, it [rejects virtio](https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/storage/admitters/disks.go) for them. |
+| none for the run strategy | VM, pool template | The compile fails without `run_strategy` (`Always`, `RerunOnFailure`, `Once`, `Manual`, `Halted`), `spec.runStrategy` or the deprecated `running`, which passes through. KubeVirt [rejects a VM without one](https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/virt-api/webhooks/validating-webhook/admitters/vms-admitter.go), and the generator does not start VMs implicitly. |
+| disk bus `virtio` | generated disks, pool disks and LUNs | KubeVirt [defaults to SATA](https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/defaults/amd64.go). CD-ROMs keep KubeVirt's default, it [rejects virtio](https://github.com/kubevirt/kubevirt/blob/v1.9.1/pkg/storage/admitters/disks.go) for them. |
 | interface `default` with `masquerade`, network `default` on the pod network | VM, VMI, VMIRS, pool | Each list only when unset. KubeVirt's own default binding is `bridge`; masquerade is the [documented](https://kubevirt.io/user-guide/network/interfaces_and_networks/) binding for the pod network and keeps live migration possible. |
 | `replicas: 1`, 2 cores, 2Gi guest memory, `app.kubernetes.io/instance` and `managed-by` template labels, soft pod anti-affinity on the instance label | pool | CPU and memory are skipped when an `instancetype` is set, which KubeVirt rejects in combination. |
 | selector `app.kubernetes.io/instance: <name>` copied into the template labels | VMIRS, pool | KubeVirt rejects a selector that does not match the template labels. |
 | `source.pvc.namespace` = the DataSource namespace | DataSource | Required by the CDI CRD. |
-| `metadata.namespace: kubevirt` | KubeVirt | The namespace of the upstream [kubevirt-cr.yaml](https://github.com/kubevirt/kubevirt/releases/tag/v1.9.0); virt-operator only reconciles the CR in its own namespace. Override with `namespace`. |
+| `metadata.namespace: kubevirt` | KubeVirt | The namespace of the upstream [kubevirt-cr.yaml](https://github.com/kubevirt/kubevirt/releases/tag/v1.9.1); virt-operator only reconciles the CR in its own namespace. Override with `namespace`. |
 
 The machine type is not set; KubeVirt takes it from its cluster configuration per architecture.
 
@@ -267,4 +267,4 @@ parameters:
 
 ## Schemas
 
-`schemas/` holds the CRD schemas of KubeVirt 1.9.0 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at 3a1a099, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
+`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at 3a1a099, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
