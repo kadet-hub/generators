@@ -4,7 +4,7 @@ Talos Machine Configuration Generator.
 Generates Talos (v1alpha1) machine configuration files from Kapitan inventory.
 Supports controlplane, worker, and init node types.
 
-Targets Talos v1.14.2. The inventory keeps the v1alpha1 shape; each node
+Targets Talos v1.14.3. The inventory keeps the v1alpha1 shape; each node
 output is the v1alpha1 document reduced to its non-deprecated fields plus
 the multi-document kinds that replace the rest (see multidoc.py).
 
@@ -78,13 +78,13 @@ except ImportError:
     # For testing outside Kapitan context
     inv = None  # type: ignore[assignment]
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = ["TalosNodeConfig", "generate_talos_config", "main", "inv"]
 
 logger = logging.getLogger(__name__)
 
 
-TALOS_VERSION = "v1.14.2"
+TALOS_VERSION = "v1.14.3"
 # What `talosctl gen config` uses at this release: the Image Factory metal
 # installer with the empty schematic (images.InstallerImage("metal")); the
 # ghcr.io/siderolabs/installer image is no longer published from v1.14.
