@@ -6,7 +6,12 @@ from kapitan.inputs.kadet import BaseObj, CompileError
 
 from .base import Workload
 from .config import ComponentConfig, ComponentSecret
-from .manifests import POLICY_SECTIONS, Manifest, policy_manifest
+from .manifests import (
+    POLICY_SECTIONS,
+    Manifest,
+    rbac_manifests,
+    policy_manifest,
+)
 from .networking import (
     BackendConfig,
     BackendTLSPolicy,
@@ -194,6 +199,10 @@ def generate_resource_manifests(input_params):
                     section, name, namespace if namespaced else None, config
                 ),
             )
+
+    for name, _, config in _iter_section("rbac"):
+        for key, manifest in rbac_manifests(name, config):
+            _put(obj, key, manifest)
 
     # The scope of an arbitrary kind is unknown: namespace only when set.
     for name, _, config in _iter_section("manifests"):

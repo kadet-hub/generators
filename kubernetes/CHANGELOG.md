@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0
+
+New standalone sections for Namespaces and RBAC without a workload, so they no longer go through `manifests` with `api_version`, `kind` and `body`:
+
+- `namespaces.<name>`: a Namespace with `labels` and `annotations`.
+- `rbac.<name>`: one role with its bindings. `rules` make a ClusterRole, or a Role with `namespace`; `cluster_role` or `role` bind an existing one instead. A ClusterRole is bound by a RoleBinding in each of `namespaces` and by a ClusterRoleBinding with `cluster_wide`; subjects come from `service_accounts` (`<namespace>/<name>`), `groups`, `users` and `subjects`. Contradicting keys fail the compile.
+
+Output file names match what `manifests` wrote for the same kinds, so moving an entry over keeps its file. Existing output is unchanged.
+
 ## 1.1.1
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.

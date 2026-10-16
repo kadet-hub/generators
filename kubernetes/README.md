@@ -82,6 +82,8 @@ This renders `shop/web-deploy.yml` (Deployment with the ConfigMap volume, mount 
 | `generators.kubernetes.gateway_classes`, `gateways`, `backend_tls_policies`, `reference_grants` | Gateway API GatewayClass, Gateway with HTTPRoute, GRPCRoute, TCPRoute, TLSRoute and UDPRoute, BackendTLSPolicy, ReferenceGrant |
 | `generators.kubernetes.configs`, `secrets`, `service_accounts`, `persistent_volumes`, `persistent_volume_claims` | standalone ConfigMap, Secret, ServiceAccount, PersistentVolume, PersistentVolumeClaim |
 | `generators.kubernetes.storage_classes`, `ingress_classes`, `runtime_classes`, `priority_classes`, `limit_ranges`, `resource_quotas` | the matching kind; flat keys are the snake_case spec fields, `default: true` sets the default-class annotation on StorageClass and IngressClass |
+| `generators.kubernetes.namespaces` | Namespace (`labels`, `annotations`) |
+| `generators.kubernetes.rbac.<name>` | one role and its bindings, see below |
 | `generators.kubernetes.manifests.<name>` | any kind: `api_version`, `kind`, `name`, `namespace`, `labels`, `annotations` and the remaining fields under `body` |
 | `generators.kubernetes.namespace`, `namespace` | default namespace (Gateway API resources check `generators.kubernetes.namespace` first), else `default` |
 
@@ -110,6 +112,21 @@ A Service needs at least one container port with a `service_port`, except `headl
 For PersistentVolumes and PersistentVolumeClaims, `spec` is merged over the generator defaults first, then the flat keys are applied; a flat key that overrides a `spec` value logs a warning.
 
 The Gateway `services` shorthand turns `hostname`, `namespace`, `tls_secret`, `backend` and optional `cluster_issuer`/`issuer` into an HTTPS listener, an HTTP to HTTPS redirect route (not for `type: grpc`) and the backend route. `redirect_status_code` sets the redirect's `statusCode`, default 301. 301 and 302 are Core support; 303, 307 and 308 are Extended and need an implementation that supports them ([statusCode][gw-status]). Any other value fails the compile. A listener without `allowed_routes.namespaces_from` admits the namespaces of the routes the generator renders for it: `Same` when they all live in the Gateway's namespace, otherwise a `Selector` on `kubernetes.io/metadata.name` listing them. The upstream default is `Same` ([AllowedRoutes](https://gateway-api.sigs.k8s.io/reference/spec/#allowedroutes)); `All` would let any namespace attach routes to the listener's hostnames. Routes rendered elsewhere need `allowed_routes` set explicitly.
+
+## RBAC
+
+One `rbac` entry is one role with its bindings; role and binding take the entry's name.
+
+| Keys | Renders |
+|---|---|
+| `rules` (and `aggregation_rule`) without `namespace` | ClusterRole |
+| `rules` with `namespace` | Role in that namespace |
+| `cluster_role` or `role` instead of `rules` | no role; binds that existing ClusterRole or Role |
+| `namespaces` | a RoleBinding to the ClusterRole in each namespace |
+| `cluster_wide: true` | a ClusterRoleBinding |
+| `namespace` with subjects | a RoleBinding to the Role in its namespace |
+
+Subjects come from `service_accounts` (`<namespace>/<name>`, or `<name>` in the binding's namespace), `groups`, `users` and `subjects` (passed through). Without subjects only the role is rendered. Contradictions fail the compile, naming the entry: subjects without `namespace`, `namespaces` or `cluster_wide`, a binding scope without subjects, `rules` together with `role` or `cluster_role`, `role` and `cluster_role` together, `role` without `namespace`, `cluster_role` with `namespace` (bind it with `namespaces`), a Role with `namespaces` or `cluster_wide`, and `aggregation_rule` on a Role.
 
 ## Security defaults
 
@@ -142,6 +159,8 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 | standalone `persistent_volumes`, PVs from `create_pv` | `<name>-pv`, no namespace directory |
 | `storage_classes`, `ingress_classes`, `runtime_classes`, `priority_classes` | `<name>-sc`, `-ingressclass`, `-runtimeclass`, `-pc` |
 | `limit_ranges`, `resource_quotas` | `limits`, `quota` |
+| `namespaces` | `<name>-namespace`, no namespace directory |
+| `rbac` | `<name>-clusterrole`, `<name>-clusterrolebinding` without namespace directory; `role`, `rolebinding` in the namespace |
 | `manifests` | `<kind lowercased>`; no namespace directory without `namespace` |
 
 ## API versions and schemas
