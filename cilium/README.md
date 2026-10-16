@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/cilium/) page.
 
-Kapitan kadet generator for [Cilium](https://cilium.io/) policy and load balancer resources. Built for Cilium 1.20.2.
+Kapitan kadet generator for [Cilium](https://cilium.io/) policy and load balancer resources. Built for Cilium 1.20.3.
 
 - **CiliumNetworkPolicy** (`cilium.io/v2`): namespaced L3-L7 policy
 - **CiliumClusterwideNetworkPolicy** (`cilium.io/v2`): cluster-scoped L3-L7 policy, also for nodes (host policies)
