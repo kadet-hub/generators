@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/keycloak/) page.
 
-Built for Keycloak Operator 26.8.0. Keycloak and KeycloakRealmImport are emitted as `k8s.keycloak.org/v2beta1`, their storage version; `v2alpha1` of these kinds is still served but deprecated. KeycloakOIDCClient and KeycloakSAMLClient exist only as `v2alpha1` (served, storage, not deprecated) and are an upstream alpha (preview) API. The bundled JSON Schemas are Apache-2.0, derived from the [upstream CRDs](https://github.com/keycloak/keycloak-k8s-resources/tree/26.8.0/kubernetes).
+Built for Keycloak Operator 26.8.1. Keycloak and KeycloakRealmImport are emitted as `k8s.keycloak.org/v2beta1`, their storage version; `v2alpha1` of these kinds is still served but deprecated. KeycloakOIDCClient and KeycloakSAMLClient exist only as `v2alpha1` (served, storage, not deprecated) and are an upstream alpha (preview) API. The bundled JSON Schemas are Apache-2.0, derived from the [upstream CRDs](https://github.com/keycloak/keycloak-k8s-resources/tree/26.8.1/kubernetes).
 
 Kapitan kadet generator for the Keycloak Operator:
 
@@ -80,7 +80,7 @@ The maps are keyed by the entry's identifier and merge across Kapitan classes, s
 | `groups` | `realm_roles`, `client_roles`, `sub_groups` (a map of nested groups) |
 | `identity_providers` | `display_name`, `first_broker_login_flow_alias`, `hide_on_login`, `link_only`, `post_broker_login_flow_alias`, `provider_id`, `store_token`, `trust_email` |
 
-`secret_ref` on a client and `client_secret_ref` on an identity provider take a Secret key reference. They render `secret: ${CLIENT_SECRET_<clientId>}` or `config.clientSecret: ${IDP_CLIENT_SECRET_<alias>}` and add the matching [`spec.placeholders`](https://github.com/keycloak/keycloak/blob/26.8.0/docs/guides/operator/realm-import.adoc) entry, so the secret reaches neither the inventory nor the compiled manifest. Names are upper-cased with other characters as `_`; two refs that resolve to the same name with different Secrets fail the compile. Users are not modelled; user credentials or client secrets written into `realm` log a warning.
+`secret_ref` on a client and `client_secret_ref` on an identity provider take a Secret key reference. They render `secret: ${CLIENT_SECRET_<clientId>}` or `config.clientSecret: ${IDP_CLIENT_SECRET_<alias>}` and add the matching [`spec.placeholders`](https://github.com/keycloak/keycloak/blob/26.8.1/docs/guides/operator/realm-import.adoc) entry, so the secret reaches neither the inventory nor the compiled manifest. Names are upper-cased with other characters as `_`; two refs that resolve to the same name with different Secrets fail the compile. Users are not modelled; user credentials or client secrets written into `realm` log a warning.
 
 The operator only creates realms that do not exist yet; it never updates or deletes them.
 
@@ -92,7 +92,7 @@ The operator only creates realms that do not exist yet; it never updates or dele
 | `realm` | `realm`, the realm the client lives in |
 | `client` | `client`, verbatim: the Admin API v2 client representation, for example `loginFlows`, `redirectUris`, `webOrigins` and `auth` (OIDC) or `nameIdFormat`, `signDocuments`, `signAssertions` (SAML) |
 
-The entry key becomes `metadata.name`, which the operator uses as `clientId`. `clientId`, `realm` and `keycloakCRName` [cannot change after creation](https://github.com/keycloak/keycloak/blob/26.8.0/docs/guides/operator/managing-clients.adoc). `client` replaces `spec.client` as a whole, it is not merged.
+The entry key becomes `metadata.name`, which the operator uses as `clientId`. `clientId`, `realm` and `keycloakCRName` [cannot change after creation](https://github.com/keycloak/keycloak/blob/26.8.1/docs/guides/operator/managing-clients.adoc). `client` replaces `spec.client` as a whole, it is not merged.
 
 The generator adds nothing to `client`: no secret, no `loginFlows`, no redirect URIs or web origins, so public clients, wildcard redirects and direct access grants exist only when the inventory writes them. A confidential client references its secret with `client.auth.secretRef`; that Secret needs the label `operator.keycloak.org/kind: KeycloakOIDCClient` and comes from elsewhere.
 
@@ -102,15 +102,15 @@ The guide's prerequisites are not defaulted either: the referenced Keycloak need
 
 | Input | Result | Source |
 |---|---|---|
-| `db.credentials_secret: <name>` | `usernameSecret: {name: <name>, key: username}`, `passwordSecret: {name: <name>, key: password}` | the keys of a [`kubernetes.io/basic-auth`](https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret) Secret, as in the operator's [basic deployment](https://github.com/keycloak/keycloak/blob/26.8.0/docs/guides/operator/basic-deployment.adoc); `username_secret` and `password_secret` win |
-| realm import without `realm.realm` | `realm.realm: <entry key>` | the operator [names the import Secret after it](https://github.com/keycloak/keycloak/blob/26.8.0/operator/src/main/java/org/keycloak/operator/controllers/KeycloakRealmImportSecretDependentResource.java) |
-| realm import or client without `keycloak_cr_name` | `keycloakCRName` of the only Keycloak in `instances` with the same namespace | required by all three CRDs; the operator [looks it up in the resource's namespace](https://github.com/keycloak/keycloak/blob/26.8.0/operator/src/main/java/org/keycloak/operator/controllers/KeycloakRealmImportController.java) |
+| `db.credentials_secret: <name>` | `usernameSecret: {name: <name>, key: username}`, `passwordSecret: {name: <name>, key: password}` | the keys of a [`kubernetes.io/basic-auth`](https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret) Secret, as in the operator's [basic deployment](https://github.com/keycloak/keycloak/blob/26.8.1/docs/guides/operator/basic-deployment.adoc); `username_secret` and `password_secret` win |
+| realm import without `realm.realm` | `realm.realm: <entry key>` | the operator [names the import Secret after it](https://github.com/keycloak/keycloak/blob/26.8.1/operator/src/main/java/org/keycloak/operator/controllers/KeycloakRealmImportSecretDependentResource.java) |
+| realm import or client without `keycloak_cr_name` | `keycloakCRName` of the only Keycloak in `instances` with the same namespace | required by all three CRDs; the operator [looks it up in the resource's namespace](https://github.com/keycloak/keycloak/blob/26.8.1/operator/src/main/java/org/keycloak/operator/controllers/KeycloakRealmImportController.java) |
 
 With zero or several instances in the namespace, `keycloak_cr_name` stays unset and the resource fails QA-7 at compile time until the inventory names one. A client's `realm` has no default: QA-7 fails without it.
 
 The operator's basic deployment guide lists a database, a hostname and a TLS certificate as prerequisites. The generator defaults none of them, sets no admin password, and never turns off `hostname.strict` or turns on `http.http_enabled`: each of these weakens or bypasses authentication, so the inventory has to opt in. The CRD marks none of them required, so QA-7 does not catch a missing one. `proxy.headers` is not defaulted either; the guide warns that forwarded headers can be spoofed unless network policies restrict the HTTP port. The operator creates the initial admin in the Secret `<name>-initial-admin` with a generated password.
 
-`instances` is emitted only when set. The [operator default](https://github.com/keycloak/keycloak/blob/26.8.0/operator/src/main/java/org/keycloak/operator/crds/v2beta1/deployment/KeycloakSpec.java) is 1, and leaving it out lets `kubectl scale` or an HPA own the replica count.
+`instances` is emitted only when set. The [operator default](https://github.com/keycloak/keycloak/blob/26.8.1/operator/src/main/java/org/keycloak/operator/crds/v2beta1/deployment/KeycloakSpec.java) is 1, and leaving it out lets `kubectl scale` or an HPA own the replica count.
 
 ## Example
 
