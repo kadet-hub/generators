@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+Built for Linkerd `edge-26.10.1`. The `linkerd-crds` chart is unchanged since `edge-26.6.3`, so the shipped schemas and the rendered output stay the same.
+
 ## 1.0.1
 
 Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.

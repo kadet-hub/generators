@@ -6,11 +6,11 @@
 # the implicit apiVersion, kind and metadata fields are added where the CRD omits them.
 linkerd.io:
   software: Linkerd
-  version: edge-26.6.3
-  source: https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates
+  version: edge-26.10.1
+  source: https://github.com/linkerd/linkerd2/tree/edge-26.10.1/charts/linkerd-crds/templates
   license: Apache-2.0
 policy.linkerd.io:
   software: Linkerd
-  version: edge-26.6.3
-  source: https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates/policy
+  version: edge-26.10.1
+  source: https://github.com/linkerd/linkerd2/tree/edge-26.10.1/charts/linkerd-crds/templates/policy
   license: Apache-2.0
