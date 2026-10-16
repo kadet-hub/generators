@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/linkerd/) page.
 
-Kapitan kadet generator for [Linkerd](https://linkerd.io/) policy resources. Built for Linkerd 2.20 (`edge-26.6.3`).
+Kapitan kadet generator for [Linkerd](https://linkerd.io/) policy resources. Built for Linkerd `edge-26.10.1`. Its CRDs are unchanged from `edge-26.6.3`, the edge release of Linkerd 2.20.
 
 - **Server** (`policy.linkerd.io/v1beta3`): a port on a set of pods that policy applies to
 - **ServerAuthorization** (`policy.linkerd.io/v1beta1`): clients allowed to reach a Server
@@ -14,7 +14,7 @@ Kapitan kadet generator for [Linkerd](https://linkerd.io/) policy resources. Bui
 
 The Linkerd install belongs in the `helm` input with the upstream `linkerd-crds` and `linkerd-control-plane` charts. Gateway API routes (`gateway.networking.k8s.io`) are not rendered.
 
-Server and HTTPRoute are emitted as `v1beta3`, the storage versions; Linkerd 2.20 marks `v1beta1` deprecated ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/charts/linkerd-crds/templates/policy/server.yaml#L73-L77)). The Linkerd docs describe AuthorizationPolicy as the replacement for ServerAuthorization.
+Server and HTTPRoute are emitted as `v1beta3`, the storage versions; Linkerd marks `v1beta1` deprecated ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/charts/linkerd-crds/templates/policy/server.yaml#L73-L77)). The Linkerd docs describe AuthorizationPolicy as the replacement for ServerAuthorization.
 
 ## Usage
 
@@ -80,9 +80,9 @@ A Server needs `selector_labels` or `spec.podSelector`; the compile fails otherw
 
 Dicts pass through, for example `target_ref: {group: policy.linkerd.io, kind: HTTPRoute, name: x}`, `target_ref: {kind: Namespace, name: <namespace>}` or a `{kind: ServiceAccount, name: x}` authentication. A string in `required_authentication_refs` that matches no entry, or entries in both sections, fails the compile with `ValueError`.
 
-The group default exists because Linkerd reads a missing `group` as the core API group ([`targets_kind`](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/policy-controller/k8s/api/src/policy.rs#L31-L48)). A `targetRef` of `{kind: Server, name: x}` then names no supported kind ([accepted kinds](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/policy-controller/k8s/index/src/inbound/authorization_policy.rs#L64-L108)), and the policy admission webhook rejects the AuthorizationPolicy ([admission](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/policy-controller/runtime/src/admission.rs#L243-L303)). The three kinds exist only in `policy.linkerd.io`; `HTTPRoute` also exists in `gateway.networking.k8s.io` and gets no group. The ServiceAccount reference resolves to the namespace of the MeshTLSAuthentication when `namespace` is unset ([identityRefs](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/policy-controller/k8s/index/src/inbound/meshtls_authentication.rs#L29)). The expanded forms are those of the [authorization policy reference](https://linkerd.io/2.20/reference/authorization-policy/).
+The group default exists because Linkerd reads a missing `group` as the core API group ([`targets_kind`](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/policy-controller/k8s/api/src/policy.rs#L31-L48)). A `targetRef` of `{kind: Server, name: x}` then names no supported kind ([accepted kinds](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/policy-controller/k8s/index/src/inbound/authorization_policy.rs#L64-L108)), and the policy admission webhook rejects the AuthorizationPolicy ([admission](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/policy-controller/runtime/src/admission.rs#L248-L308)). The three kinds exist only in `policy.linkerd.io`; `HTTPRoute` also exists in `gateway.networking.k8s.io` and gets no group. The ServiceAccount reference resolves to the namespace of the MeshTLSAuthentication when `namespace` is unset ([identityRefs](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/policy-controller/k8s/index/src/inbound/meshtls_authentication.rs#L29)). The expanded forms are those of the [authorization policy reference](https://linkerd.io/2.20/reference/authorization-policy/).
 
-Values the CRD or the controller already default are not emitted: Server `proxyProtocol` (`unknown`) and `accessPolicy` (`deny`), and the HTTPRoute `parentRefs` group, which the CRD defaults to `policy.linkerd.io` ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.6.3/charts/linkerd-crds/templates/policy/httproute.yaml#L2675)).
+Values the CRD or the controller already default are not emitted: Server `proxyProtocol` (`unknown`) and `accessPolicy` (`deny`), and the HTTPRoute `parentRefs` group, which the CRD defaults to `policy.linkerd.io` ([CRD](https://github.com/linkerd/linkerd2/blob/edge-26.10.1/charts/linkerd-crds/templates/policy/httproute.yaml#L2675)).
 
 ### Example
 
