@@ -9,7 +9,7 @@ import re
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-PROVIDER_VERSION = "5.9.0"
+PROVIDER_VERSION = "5.10.0"
 
 # azurerm_network_security_group.security_rule is an attribute in JSON
 # syntax, so every rule needs every key; absent ones are sent as null.
