@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/terraform-azurerm/) page.
 
-Kapitan kadet generator that renders Terraform JSON (`*.tf.json`) for the Azure provider [`hashicorp/azurerm`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs), pinned to **5.9.0**:
+Kapitan kadet generator that renders Terraform JSON (`*.tf.json`) for the Azure provider [`hashicorp/azurerm`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs), pinned to **5.10.0**:
 
 - **network**: a resource group, a virtual network, one subnet per entry with its prefix derived from the address space, and per subnet a network security group with its association.
 - **storage**: a storage account locked down to Microsoft Entra ID and private access, plus private blob containers.
@@ -32,7 +32,7 @@ parameters:
 
 ### Provider and authentication
 
-`providers.tf.json` holds the only `terraform` block (`required_version >= 1.5.0`, `hashicorp/azurerm` `5.9.0`) and the `provider "azurerm"` block with an empty `features` block. It sets `storage_use_azuread = true` when any storage account keeps `shared_access_key_enabled: false`, because the provider otherwise uses Shared Key for storage data plane requests.
+`providers.tf.json` holds the only `terraform` block (`required_version >= 1.5.0`, `hashicorp/azurerm` `5.10.0`) and the `provider "azurerm"` block with an empty `features` block. It sets `storage_use_azuread = true` when any storage account keeps `shared_access_key_enabled: false`, because the provider otherwise uses Shared Key for storage data plane requests.
 
 The output contains no `subscription_id` and no credentials. Since provider 4.0 the subscription is required for `plan` and `apply`; set `ARM_SUBSCRIPTION_ID` (or select a default subscription in the `az` CLI) and authenticate the way the provider documents. `terraform validate` does not need it.
 
@@ -60,7 +60,7 @@ All keys live under `parameters.generators.terraform-azurerm`. `network` and `st
 | `newbits` | required unless `prefix` | Bits added to the address space prefix length; `newbits: 8` on a `/16` gives a `/24` |
 | `prefix` | `null` | Explicit CIDR; overrides `newbits` |
 | `nsg` | `true` | Create a network security group and associate it with the subnet |
-| `security_rules` | `[]` | [`security_rule`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/network_security_group#security_rule) objects with the provider's argument names; `name`, `priority`, `direction`, `access` and `protocol` are required, omitted arguments are sent as `null`. Needs `nsg: true` |
+| `security_rules` | `[]` | [`security_rule`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/network_security_group#security_rule) objects with the provider's argument names; `name`, `priority`, `direction`, `access` and `protocol` are required, omitted arguments are sent as `null`. Needs `nsg: true` |
 | `default_outbound_access_enabled` | `false` | `false` makes the subnet private |
 | `private_endpoint_network_policies` | `"Enabled"` | `Disabled`, `Enabled`, `NetworkSecurityGroupEnabled` or `RouteTableEnabled` |
 
@@ -166,18 +166,18 @@ The subnet defaults (private subnets, `private_endpoint_network_policies = "Enab
 
 - **Private subnets**: Microsoft recommends disabling [default outbound access](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access). Virtual machines in a private subnet need an explicit egress method to reach the internet, typically a NAT gateway; this version does not render one.
 - **No public network access**: with `public_network_access: Disabled` the account is reachable only through a private endpoint or by trusted Azure services. This version renders no private endpoints.
-- **Containers through Azure Resource Manager**: containers reference the account by `storage_account_id`, which the provider (5.9.0 source) creates, updates and deletes through the Resource Manager API instead of the storage data plane, so this should work while public network access is disabled. Not verified by an apply.
+- **Containers through Azure Resource Manager**: containers reference the account by `storage_account_id`, which the provider (5.10.0 source) creates, updates and deletes through the Resource Manager API instead of the storage data plane, so this should work while public network access is disabled. Not verified by an apply.
 
 ## Terraform resources
 
 Resource arguments follow the provider documentation (MPL-2.0); the examples here are written for this generator.
 
-- [`azurerm_resource_group`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/resource_group)
-- [`azurerm_virtual_network`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/virtual_network)
-- [`azurerm_subnet`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/subnet)
-- [`azurerm_network_security_group`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/network_security_group)
-- [`azurerm_subnet_network_security_group_association`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/subnet_network_security_group_association)
-- [`azurerm_storage_account`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/storage_account)
-- [`azurerm_storage_container`](https://registry.terraform.io/providers/hashicorp/azurerm/5.9.0/docs/resources/storage_container)
+- [`azurerm_resource_group`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/resource_group)
+- [`azurerm_virtual_network`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/virtual_network)
+- [`azurerm_subnet`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/subnet)
+- [`azurerm_network_security_group`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/network_security_group)
+- [`azurerm_subnet_network_security_group_association`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/subnet_network_security_group_association)
+- [`azurerm_storage_account`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/storage_account)
+- [`azurerm_storage_container`](https://registry.terraform.io/providers/hashicorp/azurerm/5.10.0/docs/resources/storage_container)
 
 Subnets are standalone `azurerm_subnet` resources; the virtual network never carries inline `subnet` blocks, which would conflict with them.
