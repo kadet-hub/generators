@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/rabbitmq/) page.
 
-Built for RabbitMQ Cluster Operator 2.23.0 and Messaging Topology Operator 1.20.3 (`rabbitmq.com/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled `rabbitmq.com` JSON Schemas are MPL-2.0, derived from the upstream CRDs of both operators (see `schemas/rabbitmq.com/NOTICE`); the generator code is Apache-2.0. ConfigMaps and Secrets are checked against the Kubernetes 1.35.0 schemas.
+Built for RabbitMQ Cluster Operator 2.23.1 and Messaging Topology Operator 1.20.4 (`rabbitmq.com/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled `rabbitmq.com` JSON Schemas are MPL-2.0, derived from the upstream CRDs of both operators (see `schemas/rabbitmq.com/NOTICE`); the generator code is Apache-2.0. ConfigMaps and Secrets are checked against the Kubernetes 1.35.0 schemas.
 
 Kapitan kadet generator for RabbitMQ on Kubernetes:
 
