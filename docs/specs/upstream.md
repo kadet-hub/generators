@@ -1,7 +1,7 @@
 # Upstream schema updates
 
 Status: Draft
-Code: `tools/upstream.py`, `.github/workflows/upstream.yml`
+Code: `tools/upstream.py`, `tools/workflow-policy`, `.github/workflows/upstream.yml`, `.github/ruleset-*.json`
 Verified against: main @ 313f1ca
 
 ## Problem and decision
@@ -165,12 +165,61 @@ and CHANGELOG entry before merging.
   allows it also lets Actions approve pull requests, which would satisfy the
   one-approval rule of the `main` ruleset. Pull requests opened with
   `GITHUB_TOKEN` also do not trigger the `check` workflow; App tokens do.
-  The App's client ID and private key are the repository secrets
-  `APP_CLIENT_ID` and `APP_PRIVATE_KEY`; the token action's `app-id` input
-  is deprecated in favour of `client-id`.
+  The App's client ID and private key are the secrets `APP_CLIENT_ID` and
+  `APP_PRIVATE_KEY` of the environment `upstream` (UPD-6); the token
+  action's `app-id` input is deprecated in favour of `client-id`.
 
   - Test: manual: dispatch the workflow and confirm the pull request runs `check`
   - Since: #39
+
+- UPD-6: The `upstream` job MUST name the environment `upstream`, whose
+  deployment branch policy admits only the branch `main`, and the App's
+  client ID and private key MUST be secrets of that environment, not of
+  the repository.
+
+  A repository secret reaches a workflow on any branch, and the maintainer
+  and Renovate can push workflows. An environment secret reaches only a
+  job that names the environment, and GitHub sends such a job to a runner
+  only when its ref matches the policy. With the key, anyone holds the
+  App's contents, pull request and issue write until the key is rotated.
+
+  `tools/workflow-policy` fails the `check` workflow when a job that reads
+  a secret other than `GITHUB_TOKEN`, or holds `contents`, `packages`,
+  `id-token`, `attestations` or `pages` write, names no environment, names
+  one whose policy admits anything but `main`, or is part of a
+  `pull_request_target` workflow, where GitHub evaluates the policy
+  against the default branch. Where a secret is stored the check cannot
+  see: listing secrets needs a permission `GITHUB_TOKEN` cannot hold.
+
+  - Test: `tools/workflow-policy` in the `check` workflow; manual:
+    `gh api repos/kadet-hub/generators/actions/secrets` lists neither secret
+  - Since: this change
+
+## Branches and tags
+
+- UPD-7: Rulesets MUST restrict creating, updating and deleting branches
+  other than `main` to the admin role, branches under `upstream/` to the
+  `kadet-hub-upstream` App and the admin role, and creating tags to the
+  admin role.
+
+  Renovate holds `contents` and `workflows` write on every repository of
+  the organization but has no configuration here, so no ruleset admits it
+  and it can push no branch. The App holds `contents` write without
+  `workflows`; without the tag rule its key could create a release tag
+  `<generator>-v<semver>` on any commit the repository holds, such as an
+  unmerged branch, and the registry's Renovate would propose that tag as
+  an entry bump. The maintainer creates the release tags. The `release
+  tags` ruleset, which blocks updating and deleting `*-v*` tags with no
+  bypass, stays as it is, and so does the `main` ruleset.
+
+  The rulesets do not limit the maintainer, and they do not stop the App
+  from pushing what it likes to `upstream/` branches; the `main` ruleset's
+  review is the control there.
+
+  - Test: manual: `gh api repos/kadet-hub/generators/rulesets` matches
+    `.github/ruleset-branches.json`, `.github/ruleset-upstream.json` and
+    `.github/ruleset-tags.json`
+  - Since: this change
 
 ## Open questions
 
@@ -184,4 +233,6 @@ None.
 | Workflow | `.github/workflows/upstream.yml`, cron weekly Monday 03:00 UTC, `workflow_dispatch` |
 | Branch | `upstream/<generator>` |
 | Issue title | `[upstream] <generator>: <software> <version>` |
-| Secrets | `APP_CLIENT_ID`, `APP_PRIVATE_KEY` (GitHub App, repository-scoped) |
+| Secrets | `APP_CLIENT_ID`, `APP_PRIVATE_KEY` (GitHub App) in the environment `upstream`, deployment branch `main` only |
+| Rulesets | `.github/ruleset-branches.json`, `.github/ruleset-upstream.json`, `.github/ruleset-tags.json`, applied with `gh api` |
+| Workflow policy | `tools/workflow-policy`, run by the `check` workflow |
