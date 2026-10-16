@@ -104,6 +104,77 @@ parameters:
           hard:
             requests.cpu: "8"
             limits.memory: 16Gi
+      namespaces:
+        payments:
+          labels:
+            pod-security.kubernetes.io/enforce: restricted
+      rbac:
+        # ClusterRole, ClusterRoleBinding
+        namespace-reader:
+          cluster_wide: true
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+              verbs:
+                - get
+                - list
+          service_accounts:
+            - shop/ci-deployer
+          groups:
+            - developers
+        # ClusterRole, RoleBinding in each namespace
+        app-deployer:
+          namespaces:
+            - shop
+            - payments
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+          service_accounts:
+            - shop/ci-deployer
+        # Role and its RoleBinding
+        config-reader:
+          namespace: payments
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+          users:
+            - jane@example.com
+        # Role only
+        secret-reader:
+          namespace: payments
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - get
+                - list
+        # bind an existing Role and an existing ClusterRole
+        payments-secrets:
+          namespace: payments
+          role: secret-reader
+          service_accounts:
+            - deployer
+        payments-edit:
+          cluster_role: edit
+          namespaces:
+            - payments
+          groups:
+            - payments-team
       manifests:
         shop:
           api_version: v1

@@ -81,6 +81,7 @@ POLICY_SECTIONS = {
         },
     ),
     "limit_ranges": ("v1", "LimitRange", "limits", True, {"limits": "spec.limits"}),
+    "namespaces": ("v1", "Namespace", "namespace", False, {}),
     "resource_quotas": (
         "v1",
         "ResourceQuota",
@@ -128,3 +129,106 @@ def policy_manifest(section, name, namespace, config):
     if section in DEFAULT_CLASS_ANNOTATIONS and config.get("default"):
         manifest.add_annotation(DEFAULT_CLASS_ANNOTATIONS[section], "true")
     return manifest
+
+
+RBAC_GROUP = "rbac.authorization.k8s.io"
+
+
+def _rbac_manifest(kind, name, namespace, config, body):
+    return Manifest(
+        name=name,
+        namespace=namespace,
+        config={
+            "api_version": f"{RBAC_GROUP}/v1",
+            "kind": kind,
+            "labels": config.get("labels"),
+            "annotations": config.get("annotations"),
+            "body": body,
+        },
+    )
+
+
+def _subjects(name, namespace, config):
+    subjects = list(_convert_to_dict(config.get("subjects")) or [])
+    for account in config.get("service_accounts") or []:
+        account_namespace, _, account_name = account.rpartition("/")
+        account_namespace = account_namespace or namespace
+        if not account_namespace:
+            raise ValueError(
+                f"rbac.{name}: service account {account} needs <namespace>/<name>"
+            )
+        subjects.append(
+            {"kind": "ServiceAccount", "name": account_name, "namespace": account_namespace}
+        )
+    for kind, key in (("Group", "groups"), ("User", "users")):
+        for subject in config.get(key) or []:
+            subjects.append({"apiGroup": RBAC_GROUP, "kind": kind, "name": subject})
+    return subjects
+
+
+def rbac_manifests(name, config):
+    """One role and its bindings: yields (output key, manifest).
+
+    With `namespace` the role is a Role in that namespace; without, a
+    ClusterRole. `role` or `cluster_role` names an existing role to bind
+    instead of creating one. A Role is bound in its namespace; a ClusterRole
+    by a RoleBinding in each of `namespaces` and by a ClusterRoleBinding with
+    `cluster_wide`. Without subjects only the role is rendered.
+    """
+    namespace = config.get("namespace")
+    namespaces = list(config.get("namespaces") or [])
+    cluster_wide = bool(config.get("cluster_wide"))
+    role, cluster_role = config.get("role"), config.get("cluster_role")
+    defines = config.get("rules") is not None or config.get("aggregation_rule") is not None
+
+    if role and cluster_role:
+        raise ValueError(f"rbac.{name}: set role or cluster_role, not both")
+    if (role or cluster_role) and defines:
+        raise ValueError(f"rbac.{name}: role and cluster_role bind an existing role; drop rules")
+    if not (role or cluster_role or defines):
+        raise ValueError(f"rbac.{name}: set rules, aggregation_rule, role or cluster_role")
+    if role and not namespace:
+        raise ValueError(f"rbac.{name}: role needs the namespace of that Role")
+    if namespace and (namespaces or cluster_wide):
+        raise ValueError(f"rbac.{name}: a Role is bound in its namespace only; drop namespaces and cluster_wide")
+    if namespace and cluster_role:
+        raise ValueError(f"rbac.{name}: bind a ClusterRole with namespaces, not namespace")
+    if config.get("aggregation_rule") is not None and namespace:
+        raise ValueError(f"rbac.{name}: aggregation_rule needs a ClusterRole; drop namespace")
+
+    subjects = _subjects(name, namespace, config)
+    scopes = [namespace] if namespace else namespaces
+    if subjects and not (scopes or cluster_wide):
+        raise ValueError(f"rbac.{name}: subjects need namespace, namespaces or cluster_wide")
+    if (namespaces or cluster_wide or role or cluster_role) and not subjects:
+        raise ValueError(f"rbac.{name}: set service_accounts, groups, users or subjects")
+
+    if defines and namespace:
+        yield f"{namespace}/{name}-role", _rbac_manifest(
+            "Role", name, namespace, config, {"rules": _convert_to_dict(config.get("rules")) or []}
+        )
+    elif defines:
+        body = {"rules": _convert_to_dict(config.get("rules")) or []}
+        if config.get("aggregation_rule") is not None:
+            body["aggregationRule"] = _convert_to_dict(config.get("aggregation_rule"))
+        yield f"{name}-clusterrole", _rbac_manifest("ClusterRole", name, None, config, body)
+    if not subjects:
+        return
+
+    role_ref = {
+        "apiGroup": RBAC_GROUP,
+        "kind": "Role" if namespace else "ClusterRole",
+        "name": role or cluster_role or name,
+    }
+    for scope in scopes:
+        yield f"{scope}/{name}-rolebinding", _rbac_manifest(
+            "RoleBinding",
+            name,
+            scope,
+            config,
+            {"roleRef": role_ref, "subjects": _subjects(name, scope, config)},
+        )
+    if cluster_wide:
+        yield f"{name}-clusterrolebinding", _rbac_manifest(
+            "ClusterRoleBinding", name, None, config, {"roleRef": role_ref, "subjects": subjects}
+        )
