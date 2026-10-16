@@ -2,7 +2,7 @@
 
 Published on kadet-hub ([catalog](https://kadet-hub.org/generators/terraform-aws/)): pin a released version by digest from its catalog page.
 
-Kapitan kadet generator that renders a Terraform root module in [JSON syntax](https://developer.hashicorp.com/terraform/language/syntax/json) for AWS, pinned to `hashicorp/aws` **6.68.0**:
+Kapitan kadet generator that renders a Terraform root module in [JSON syntax](https://developer.hashicorp.com/terraform/language/syntax/json) for AWS, pinned to `hashicorp/aws` **6.69.1**:
 
 - **`vpc`**: a VPC with a public and a private subnet per Availability Zone, route tables, an internet gateway, optional NAT gateways and a default security group without rules. Subnet CIDRs are computed at compile time, so the compiled files and the plan show concrete ranges.
 - **`s3_bucket`**: a bucket with Block Public Access, ACLs disabled, default encryption, versioning and a bucket policy that denies requests without TLS.
@@ -113,7 +113,7 @@ Changing `versioning` from `true` to `false` on an existing bucket destroys the 
 
 | File | Content |
 |---|---|
-| `providers.tf.json` | the only `terraform` block: `required_version = ">= 1.5.0"`, `hashicorp/aws` pinned to `6.68.0`; the `aws` provider block |
+| `providers.tf.json` | the only `terraform` block: `required_version = ">= 1.5.0"`, `hashicorp/aws` pinned to `6.69.1`; the `aws` provider block |
 | `network-<name>.tf.json` | resources of `vpc.<name>`; outputs `<n>_vpc_id`, `<n>_public_subnet_ids`, `<n>_private_subnet_ids` |
 | `bucket-<name>.tf.json` | resources of `s3_bucket.<name>`; outputs `<n>_bucket_id`, `<n>_bucket_arn` |
 
@@ -121,26 +121,26 @@ Resources of a `vpc` bundle; `<i>` is the index in `azs`. `single` uses index 0,
 
 | Resource | Terraform name | Emitted |
 |---|---|---|
-| [aws_vpc](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/vpc) | `<n>` | always |
-| [aws_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/internet_gateway) | `<n>` | `public_subnets: true` or `nat: regional` |
-| [aws_subnet](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/subnet) | `<n>_public_<i>`, `<n>_private_<i>` | per AZ; public ones with `public_subnets: true` |
-| [aws_route_table](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/route_table) | `<n>_public`, `<n>_private` or `<n>_private_<i>` | per AZ for `nat: per_az`, otherwise one private table |
-| [aws_route](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/route) | `<n>_public_internet`, `<n>_private_nat`, `<n>_private_nat_<i>` | 0.0.0.0/0 to the internet gateway or NAT gateway |
-| [aws_route_table_association](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/route_table_association) | `<n>_public_<i>`, `<n>_private_<i>` | one per subnet |
-| [aws_eip](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/eip) | `<n>_nat_<i>` | `nat: single` or `per_az` |
-| [aws_nat_gateway](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/nat_gateway) | `<n>_<i>`, `<n>_regional` | `nat` other than `none` |
-| [aws_default_security_group](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/default_security_group) | `<n>` | `lock_default_sg: true` |
+| [aws_vpc](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/vpc) | `<n>` | always |
+| [aws_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/internet_gateway) | `<n>` | `public_subnets: true` or `nat: regional` |
+| [aws_subnet](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/subnet) | `<n>_public_<i>`, `<n>_private_<i>` | per AZ; public ones with `public_subnets: true` |
+| [aws_route_table](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/route_table) | `<n>_public`, `<n>_private` or `<n>_private_<i>` | per AZ for `nat: per_az`, otherwise one private table |
+| [aws_route](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/route) | `<n>_public_internet`, `<n>_private_nat`, `<n>_private_nat_<i>` | 0.0.0.0/0 to the internet gateway or NAT gateway |
+| [aws_route_table_association](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/route_table_association) | `<n>_public_<i>`, `<n>_private_<i>` | one per subnet |
+| [aws_eip](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/eip) | `<n>_nat_<i>` | `nat: single` or `per_az` |
+| [aws_nat_gateway](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/nat_gateway) | `<n>_<i>`, `<n>_regional` | `nat` other than `none` |
+| [aws_default_security_group](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/default_security_group) | `<n>` | `lock_default_sg: true` |
 
 Resources of an `s3_bucket` bundle, all named `<n>`:
 
 | Resource | Emitted |
 |---|---|
-| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket) | always |
-| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket_public_access_block) | always, all four settings `true` |
-| [aws_s3_bucket_ownership_controls](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket_ownership_controls) | always, `BucketOwnerEnforced` |
-| [aws_s3_bucket_versioning](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket_versioning) | `versioning: true` |
-| [aws_s3_bucket_server_side_encryption_configuration](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket_server_side_encryption_configuration) | always |
-| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/6.68.0/docs/resources/s3_bucket_policy) | `deny_insecure_transport: true`, after the public access block |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket) | always |
+| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket_public_access_block) | always, all four settings `true` |
+| [aws_s3_bucket_ownership_controls](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket_ownership_controls) | always, `BucketOwnerEnforced` |
+| [aws_s3_bucket_versioning](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket_versioning) | `versioning: true` |
+| [aws_s3_bucket_server_side_encryption_configuration](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket_server_side_encryption_configuration) | always |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/6.69.1/docs/resources/s3_bucket_policy) | `deny_insecure_transport: true`, after the public access block |
 
 ## Defaults
 
