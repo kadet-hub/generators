@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for Argo CD 3.5.5, a bug fix release whose Application, ApplicationSet and AppProject CRDs are unchanged from 3.5.4. Rendered output is unchanged.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.
