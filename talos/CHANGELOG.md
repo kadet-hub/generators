@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+Built for Talos 1.14.3.
+
+- The default installer image moves to `factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba:v1.14.3`, the one `talosctl gen config` 1.14.3 writes. The default Kubernetes images stay at 1.37.1, the default of Talos 1.14.3.
+- `machine.time.servers` that are all PTP devices (`/dev/...`) become `TimeSyncConfig` `ptp.devices` instead of `ntp.servers`, which Talos 1.14.3 rejects for them. `machine.time` with both NTP servers and PTP devices stays in the `v1alpha1` document with a warning, because `TimeSyncConfig` takes either `ntp` or `ptp`.
+- Ships the Talos 1.14.3 schemas and the Kubernetes 1.37.1 Secret schema. Upstream `config.schema.json` and the Secret schema are unchanged against Talos 1.14.2 and Kubernetes 1.35.0, so validation is unchanged.
+
 ## 1.0.0
 
 First release on kadet-hub, migrated from kapitan-generators.

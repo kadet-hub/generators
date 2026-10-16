@@ -2,7 +2,7 @@
 
 Each translator pops the legacy keys it handles from the v1alpha1 machine
 and cluster sections and returns the replacement documents. The mapping
-follows the legacy bridges of Talos v1.14.2
+follows the legacy bridges of Talos v1.14.3
 (pkg/machinery/config/types/v1alpha1/v1alpha1_*_bridge.go) and the
 documents `talosctl gen config` writes at that release, so a translated
 config behaves like the legacy one. Values the legacy path defaulted
@@ -22,7 +22,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-K8S_VERSION = "v1.37.1"  # constants.DefaultKubernetesVersion at Talos v1.14.2
+K8S_VERSION = "v1.37.1"  # constants.DefaultKubernetesVersion at Talos v1.14.3
 IMAGES = {
     "kubelet": f"ghcr.io/siderolabs/kubelet:{K8S_VERSION}",
     "apiServer": f"registry.k8s.io/kube-apiserver:{K8S_VERSION}",
@@ -301,7 +301,7 @@ def _cel_string(value: str) -> str:
 
 
 def _disk_match(install: dict) -> str:
-    """CEL expression of v1alpha1 InstallConfig.DiskMatchExpression at v1.14.2."""
+    """CEL expression of v1alpha1 InstallConfig.DiskMatchExpression at v1.14.3."""
     disk = install.get("disk")
     if disk:
         if disk.startswith("/dev/disk/"):
@@ -447,14 +447,20 @@ def _machine_docs(node: str, machine: dict, features: dict, node_cfg: dict) -> l
     if machine.get("env"):
         docs.append(_doc("EnvironmentConfig", variables=machine["env"]))
     machine.pop("env", None)
-    time = machine.pop("time", None)
-    if time:
+    servers = (machine.get("time") or {}).get("servers") or []
+    # Legacy servers mix NTP hosts and PTP devices (/dev/...); TimeSyncConfig takes
+    # either ntp or ptp, and Talos v1.14.3 rejects PTP devices in ntp.servers.
+    ptp = [s for s in servers if str(s).startswith("/dev/")]
+    if ptp and len(ptp) < len(servers):
+        _keep(node, "machine.time (NTP servers and PTP devices together)")
+    elif time := machine.pop("time", None):
         docs.append(
             _doc(
                 "TimeSyncConfig",
                 enabled=(not time["disabled"]) if "disabled" in time else None,
                 bootTimeout=time.get("bootTimeout"),
-                ntp={"servers": time["servers"]} if time.get("servers") else None,
+                ntp={"servers": servers} if servers and not ptp else None,
+                ptp={"devices": ptp} if ptp else None,
             )
         )
     for key, kind in (("sysctls", "SysctlConfig"), ("sysfs", "SysfsConfig")):

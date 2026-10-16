@@ -131,7 +131,11 @@ parameters:
             install:
               disk: /dev/vda
               # A KubeVirt VM boots the nocloud platform image.
-              image: factory.talos.dev/nocloud-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba:v1.14.2
+              image: factory.talos.dev/nocloud-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba:v1.14.3
+            # The KVM PTP clock; becomes TimeSyncConfig ptp.devices.
+            time:
+              servers:
+                - /dev/ptp_kvm
       patches:
         patch-time:
           apiVersion: v1alpha1
