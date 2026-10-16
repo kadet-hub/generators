@@ -19,7 +19,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 
 API_GROUP = "opentelemetry.io"
 TARGET_ALLOCATOR_LABEL = "opentelemetry.io/target-allocator"
@@ -107,13 +107,14 @@ def _flat_keys(crd_fields: str) -> dict[str, str]:
 # Pod-level fields shared by the collector and the target allocator.
 _POD_FIELDS = """
     additionalContainers affinity args dnsPolicy enableServiceLinks env envFrom
-    hostAliases hostNetwork hostPID hostUsers image imagePullPolicy initContainers
-    ipFamilies ipFamilyPolicy lifecycle livenessProbe managementState networkPolicy
-    nodeSelector observability podAnnotations podDisruptionBudget podDnsConfig
-    podSecurityContext ports priorityClassName readinessProbe replicas resizePolicy
-    resources securityContext serviceAccount sessionAffinity sessionAffinityConfig
-    shareProcessNamespace terminationGracePeriodSeconds tolerations
-    topologySpreadConstraints trafficDistribution volumeMounts volumes
+    hostAliases hostNetwork hostPID hostUsers image imagePullPolicy imagePullSecrets
+    initContainers ipFamilies ipFamilyPolicy lifecycle livenessProbe managementState
+    networkPolicy nodeSelector observability podAnnotations podDisruptionBudget
+    podDnsConfig podSecurityContext ports priorityClassName readinessProbe replicas
+    resizePolicy resources revisionHistoryLimit securityContext serviceAccount
+    sessionAffinity sessionAffinityConfig shareProcessNamespace
+    terminationGracePeriodSeconds tolerations topologySpreadConstraints
+    trafficDistribution volumeMounts volumes
 """
 
 

@@ -23,7 +23,10 @@ parameters:
         gateway:
           mode: deployment
           image: otel/opentelemetry-collector-contrib:0.160.0
+          image_pull_secrets:
+            - name: registry-credentials
           replicas: 2
+          revision_history_limit: 3
           labels:
             team: platform
           annotations:

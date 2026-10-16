@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+Built for OpenTelemetry Operator 0.161.0. The OpenTelemetryCollector and TargetAllocator schemas and CRDs gain `imagePullSecrets` and `revisionHistoryLimit`, also in the collector's embedded `targetAllocator`. New flat keys `image_pull_secrets` and `revision_history_limit` on collectors and TargetAllocators set them. Rendered output of existing inventories is unchanged.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.
