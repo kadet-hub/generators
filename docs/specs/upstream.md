@@ -193,7 +193,7 @@ and CHANGELOG entry before merging.
 
   - Test: `tools/workflow-policy` in the `check` workflow; manual:
     `gh api repos/kadet-hub/generators/actions/secrets` lists neither secret
-  - Since: this change
+  - Since: #87
 
 ## Branches and tags
 
@@ -219,7 +219,7 @@ and CHANGELOG entry before merging.
   - Test: manual: `gh api repos/kadet-hub/generators/rulesets` matches
     `.github/ruleset-branches.json`, `.github/ruleset-upstream.json` and
     `.github/ruleset-tags.json`
-  - Since: this change
+  - Since: #87
 
 ## Open questions
 
