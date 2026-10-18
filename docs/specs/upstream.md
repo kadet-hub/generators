@@ -1,7 +1,7 @@
 # Upstream schema updates
 
 Status: Draft
-Code: `tools/upstream.py`, `tools/workflow-policy`, `.github/workflows/upstream.yml`, `.github/ruleset-*.json`
+Code: `tools/upstream.py`, `tools/workflow-policy`, `.github/workflows/upstream.yml`
 Verified against: main @ 313f1ca
 
 ## Problem and decision
@@ -216,9 +216,8 @@ and CHANGELOG entry before merging.
   from pushing what it likes to `upstream/` branches; the `main` ruleset's
   review is the control there.
 
-  - Test: manual: `gh api repos/kadet-hub/generators/rulesets` matches
-    `.github/ruleset-branches.json`, `.github/ruleset-upstream.json` and
-    `.github/ruleset-tags.json`
+  - Test: manual: `gh api repos/kadet-hub/generators/rulesets` lists
+    `branches`, `upstream branches` and `tag creation`
   - Since: #87
 
 ## Open questions
@@ -234,5 +233,5 @@ None.
 | Branch | `upstream/<generator>` |
 | Issue title | `[upstream] <generator>: <software> <version>` |
 | Secrets | `APP_CLIENT_ID`, `APP_PRIVATE_KEY` (GitHub App) in the environment `upstream`, deployment branch `main` only |
-| Rulesets | `.github/ruleset-branches.json`, `.github/ruleset-upstream.json`, `.github/ruleset-tags.json`, applied with `gh api` |
+| Rulesets, environment | `branches`, `upstream branches`, `tag creation` and the environment `upstream`, declared in the organisation's Terraform configuration |
 | Workflow policy | `tools/workflow-policy`, run by the `check` workflow |
