@@ -1,0 +1,65 @@
+---
+# Source: podinfo/templates/redis/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo-redis
+  labels:
+    app: podinfo-redis
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: podinfo-redis
+  template:
+    metadata:
+      labels:
+        app: podinfo-redis
+      annotations:
+        checksum/config: "34c601c9d39797bbf53d1c7a278976609301f637ec11dc0253563729dfad4f8e"
+    spec:
+      containers:
+        - name: redis
+          image: "docker.io/redis:8.8.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - redis-server
+            - "/redis-master/redis.conf"
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: redis
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /var/lib/redis
+              name: data
+            - mountPath: /redis-master
+              name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: podinfo-redis
+            items:
+              - key: redis.conf
+                path: redis.conf

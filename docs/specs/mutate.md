@@ -63,16 +63,17 @@ sandbox image carries no `kustomize` binary, and a binary would need
   - Since: this change
 
 - MUT-2: `mutate` MUST return a file under its relative path, and only when
-  at least one mutation matched a document in it; the documents keep their
+  a mutation changed or deleted a document in it; the documents keep their
   order and are written with `---` between them.
 
-  Files no mutation touched are not returned, so Kapitan leaves the earlier
-  entry's bytes in place. Returned files are serialized again with
+  Other files are not returned, so Kapitan leaves the earlier entry's bytes
+  in place, also for documents a mutation matched without changing them,
+  such as a `json6902` `test` or `images` on a ConfigMap. Returned files are serialized again with
   `yaml.safe_dump_all`, keys in their original order and multi-line strings
-  as literal blocks, so a touched file changes its formatting, not its
-  content.
+  as literal blocks, so a returned file changes its formatting, not its
+  content, and loses the comments Helm writes (`# Source: ...`).
 
-  - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`; fixture targets `minimal`, `complete`
+  - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`, `::test_matched_but_unchanged_files_are_not_returned`; fixture targets `minimal`, `complete`
   - Since: this change
 
 - MUT-3: A file whose documents are all deleted MUST be returned as the

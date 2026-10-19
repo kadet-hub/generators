@@ -1,0 +1,14 @@
+name: mutate
+description: Patches the YAML an earlier compile entry wrote, such as a rendered Helm chart, in place with mutations keyed by id that match objects exactly and merge, keyed-list merge, JSON Patch, delete or retag images, failing when a mutation matches nothing.
+tags: [kubernetes]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures
+schemas: schemas

@@ -1,0 +1,13 @@
+# QA-7: the kubernetes-json-schema standalone-strict files of this Kubernetes
+# release, unchanged, for the kinds the fixture output holds. mutate emits
+# whatever the earlier compile entry rendered; these cover the podinfo fixture.
+core:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
+apps:
+  software: Kubernetes
+  version: 1.37.1
+  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  license: Apache-2.0
