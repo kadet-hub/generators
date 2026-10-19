@@ -228,7 +228,7 @@ def pointer(path, mid, file):
     return [t.replace("~1", "/").replace("~0", "~") for t in path[1:].split("/")]
 
 
-def resolve(holder, tokens, mid, file, path):
+def locate(holder, tokens, mid, file, path):
     """The container and key the last token names; holder is [document], tokens start with 0."""
     node, key = holder, tokens[0]
     for token in tokens[1:]:
@@ -299,7 +299,7 @@ def json6902(doc, ops, mid, file):
     holder = [doc]
     for op in ops:
         path = op["path"]
-        node, key = resolve(holder, [0, *pointer(path, mid, file)], mid, file, path)
+        node, key = locate(holder, [0, *pointer(path, mid, file)], mid, file, path)
         name = op["op"]
         if name == "add":
             add(node, key, copy.deepcopy(op["value"]), mid, file, path)
@@ -318,12 +318,12 @@ def json6902(doc, ops, mid, file):
             source = op["from"]
             if name == "move" and path.startswith(source + "/"):
                 fail(mid, f"json6902 move from {source!r} into itself", file)
-            snode, skey = resolve(holder, [0, *pointer(source, mid, file)], mid, file, source)
+            snode, skey = locate(holder, [0, *pointer(source, mid, file)], mid, file, source)
             if name == "move":
                 value = remove(snode, skey, mid, file, source)
             else:
                 value = copy.deepcopy(get(snode, skey, mid, file, source))
-            node, key = resolve(holder, [0, *pointer(path, mid, file)], mid, file, path)
+            node, key = locate(holder, [0, *pointer(path, mid, file)], mid, file, path)
             add(node, key, value, mid, file, path)
     if not holder:
         fail(mid, "json6902 removed the document", file)
