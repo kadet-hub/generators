@@ -1,0 +1,12 @@
+---
+# Source: podinfo/templates/redis/config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: podinfo-redis
+data:
+  redis.conf: |
+    maxmemory 64mb
+    maxmemory-policy allkeys-lru
+    save ""
+    appendonly no

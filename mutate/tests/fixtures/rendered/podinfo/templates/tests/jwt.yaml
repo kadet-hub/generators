@@ -1,0 +1,32 @@
+---
+# Source: podinfo/templates/tests/jwt.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podinfo-jwt-test-7slm5
+  namespace: apps
+  labels:
+    helm.sh/chart: podinfo-6.15.0
+    app.kubernetes.io/name: podinfo
+    app.kubernetes.io/version: "6.15.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    sidecar.istio.io/inject: "false"
+    linkerd.io/inject: disabled
+    appmesh.k8s.aws/sidecarInjectorWebhook: disabled
+spec:
+  containers:
+    - name: tools
+      image: giantswarm/tiny-tools
+      command:
+        - sh
+        - -c
+        - |
+          TOKEN=$(curl -sd 'test' ${PODINFO_SVC}/token | jq -r .token) &&
+          curl -sH "Authorization: Bearer ${TOKEN}" ${PODINFO_SVC}/token/validate | grep test
+      env:
+      - name: PODINFO_SVC
+        value: "podinfo.apps:9898"
+  restartPolicy: Never

@@ -1,0 +1,18 @@
+---
+# Source: podinfo/templates/redis/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: podinfo-redis
+  labels:
+    app: podinfo-redis
+spec:
+  type: ClusterIP
+  selector:
+    app: podinfo-redis
+  ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+      targetPort: redis
+      appProtocol: redis
