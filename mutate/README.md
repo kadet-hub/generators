@@ -164,4 +164,4 @@ Templating, regular expressions on the rendered text, Python hooks, rendering ch
 
 ## Output
 
-The files of the earlier entry, the changed ones rewritten. The manifest carries the `kubernetes` tag; `schemas/` holds the Kubernetes 1.37.1 schemas of the kinds in the fixture output (Deployment, Service, ConfigMap, Pod).
+The files of the earlier entry, the changed ones rewritten. The manifest carries the `kubernetes` tag; `schemas/` holds the Kubernetes 1.37.1 schemas of the kinds in the fixture output (Deployment, Service, ConfigMap, Pod, HorizontalPodAutoscaler).

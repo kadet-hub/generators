@@ -1,4 +1,4 @@
-"""Unit tests of mutate (docs/specs/mutate.md). Run: cd mutate && python3 -m pytest -q tests"""
+"""Unit tests of mutate (docs/specs/mutate.md); command in the spec's implementation inventory."""
 
 import os
 import tempfile

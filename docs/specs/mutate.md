@@ -247,7 +247,7 @@ not load Kadet module: mutate`.
 | Item | Value |
 |---|---|
 | Code | `mutate/__init__.py` (files, inventory check), `mutate/mutations.py` (matching and actions, no Kapitan import) |
-| Unit tests | `mutate/tests/test_mutations.py`, run with `cd mutate && uv run --with pytest --with pyyaml python3 -m pytest -q tests` |
+| Unit tests | `mutate/tests/test_mutations.py`, run with `cd mutate && PYTHONDONTWRITEBYTECODE=1 uv run --with pytest --with pyyaml python3 -m pytest -q -p no:cacheprovider tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `mutate/tests/fixtures`, targets `minimal` and `complete`, vendored render in `rendered/podinfo/` |
 | Schemas | `mutate/schemas/`, kubernetes-json-schema v1.37.1-standalone-strict, as in `kubernetes/schemas/` |
 | Input | `input_params.mutations`, compile entry `output_type: plain` |
