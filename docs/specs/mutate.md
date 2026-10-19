@@ -60,7 +60,7 @@ sandbox image carries no `kustomize` binary, and a binary would need
   fails the compile, naming the file.
 
   - Test: `mutate/tests/test_mutations.py::test_reads_yaml_files_only`, `::test_equals_sign_is_a_string`
-  - Since: this change
+  - Since: #91
 
 - MUT-2: `mutate` MUST return a file under its relative path, and only when
   a mutation changed or deleted a document in it; the documents keep their
@@ -74,7 +74,7 @@ sandbox image carries no `kustomize` binary, and a binary would need
   content, and loses the comments Helm writes (`# Source: ...`).
 
   - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`, `::test_matched_but_unchanged_files_are_not_returned`; fixture targets `minimal`, `complete`
-  - Since: this change
+  - Since: #91
 
 - MUT-3: A file whose documents are all deleted MUST be returned as the
   single line `# all objects removed by mutation <ids>`, with the ids of the
@@ -85,7 +85,7 @@ sandbox image carries no `kustomize` binary, and a binary would need
   file that holds only a comment.
 
   - Test: `mutate/tests/test_mutations.py::test_file_emptied_by_delete_is_a_comment`; fixture target `complete` (`podinfo/templates/hpa.yaml`)
-  - Since: this change
+  - Since: #91
 
 - MUT-4: The compile entry that runs `mutate` MUST have
   `output_type: plain`; `mutate` MUST fail the compile when an entry of the
@@ -99,7 +99,7 @@ sandbox image carries no `kustomize` binary, and a binary would need
   inventory.
 
   - Test: `mutate/tests/test_mutations.py::test_output_type_must_be_plain`
-  - Since: this change
+  - Since: #91
 
 ## Mutations
 
@@ -115,7 +115,7 @@ lists. `input_params` takes no other key besides Kapitan's `compile_path`.
   no mutation's match count depends on an object a delete removed before.
 
   - Test: `mutate/tests/test_mutations.py::test_order_sorted_deletes_last`
-  - Since: this change
+  - Since: #91
 
 - MUT-6: A mutation MUST have a non-empty `match` and exactly one action
   of `merge`, `json6902`, `delete` and `images`, and MAY have `expects`
@@ -123,13 +123,13 @@ lists. `input_params` takes no other key besides Kapitan's `compile_path`.
   `match`, `images` entries and `json6902` operations, MUST fail the
   compile, naming the mutation id.
   - Test: `mutate/tests/test_mutations.py::test_invalid_mutations_fail`
-  - Since: this change
+  - Since: #91
 
 - MUT-7: Every document a mutation changed MUST still have string
   `apiVersion`, `kind` and `metadata.name`; otherwise the compile fails,
   naming the mutation id and the file.
   - Test: `mutate/tests/test_mutations.py::test_result_keeps_identity`
-  - Since: this change
+  - Since: #91
 
 Every error message starts with `mutate: mutation <id>:` and names the file
 where one document is concerned. Kapitan reports it as the cause of `Could
@@ -149,7 +149,7 @@ not load Kadet module: mutate`.
   not searched.
 
   - Test: `mutate/tests/test_mutations.py::test_match_is_exact_and_anded`
-  - Since: this change
+  - Since: #91
 
 - MUT-9: The number of documents a mutation matched MUST satisfy
   `expects`, else the compile fails with the mutation id, `expects` and the
@@ -161,14 +161,14 @@ not load Kadet module: mutate`.
   across targets whose charts do not all render the object.
 
   - Test: `mutate/tests/test_mutations.py::test_expects`
-  - Since: this change
+  - Since: #91
 
 ## Actions
 
 - MUT-10: `merge` MUST be applied as a JSON Merge Patch (RFC 7386): maps
   merge recursively, `null` removes a key, lists and other values replace.
   - Test: `mutate/tests/test_mutations.py::test_merge_rfc7386`
-  - Since: this change
+  - Since: #91
 
 - MUT-11: `merge_lists` maps a list field name to its key field, for
   example `containers: name`; where a patch list under that name meets a
@@ -183,7 +183,7 @@ not load Kadet module: mutate`.
   are kept as they are. Removing an item takes a `json6902` `remove`.
 
   - Test: `mutate/tests/test_mutations.py::test_merge_lists_by_key`
-  - Since: this change
+  - Since: #91
 
 - MUT-12: `json6902` MUST apply its list of JSON Patch (RFC 6902)
   operations in order: `add`, `remove`, `replace`, `move`, `copy` and
@@ -195,11 +195,11 @@ not load Kadet module: mutate`.
   and `true` does not equal `1`.
 
   - Test: `mutate/tests/test_mutations.py::test_json6902`
-  - Since: this change
+  - Since: #91
 
 - MUT-13: `delete: true` MUST remove every matched document from its file.
   - Test: `mutate/tests/test_mutations.py::test_order_sorted_deletes_last`
-  - Since: this change
+  - Since: #91
 
 - MUT-14: `images` maps an image name to `name`, `tag` and `digest`, at
   least one of them; it MUST set the `image` of every container and init
@@ -216,7 +216,7 @@ not load Kadet module: mutate`.
   compile, as a match of zero documents does.
 
   - Test: `mutate/tests/test_mutations.py::test_images`
-  - Since: this change
+  - Since: #91
 
 ## Manifest and gate
 
@@ -230,7 +230,7 @@ not load Kadet module: mutate`.
   `helm template` in `binaries`.
 
   - Test: `./check mutate`
-  - Since: this change
+  - Since: #91
 
 ## Open questions
 
