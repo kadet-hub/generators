@@ -1,0 +1,26 @@
+# Minimal: the podinfo render with one merge, which must match (expects 1+)
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: copy
+        input_paths:
+          - rendered/podinfo
+        output_path: podinfo
+      - input_type: kadet
+        input_paths:
+          - lib/mutate
+        output_path: podinfo
+        output_type: plain
+        input_params:
+          mutations:
+            replicas:
+              match:
+                kind: Deployment
+                name: podinfo
+              merge:
+                spec:
+                  replicas: 2

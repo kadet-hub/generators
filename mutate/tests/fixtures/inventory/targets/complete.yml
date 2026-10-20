@@ -1,0 +1,113 @@
+# Complete: every action on the podinfo render
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: copy
+        input_paths:
+          - rendered/podinfo
+        output_path: podinfo
+      - input_type: kadet
+        input_paths:
+          - lib/mutate
+        output_path: podinfo
+        output_type: plain
+        input_params:
+          mutations: ${mutations}
+
+  mutations:
+    # Keyed list merge: env and ports merge by key, resources by map merge,
+    # limits: null in the chart output is replaced, maxUnavailable removed.
+    podinfo-hardening:
+      match:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: podinfo
+        namespace: apps
+      merge_lists:
+        containers: name
+        env: name
+        ports: containerPort
+      merge:
+        spec:
+          strategy:
+            rollingUpdate:
+              maxUnavailable: null
+              maxSurge: 1
+          template:
+            spec:
+              containers:
+                - name: podinfo
+                  env:
+                    - name: PODINFO_UI_MESSAGE
+                      value: mutated by kadet-hub mutate
+                  ports:
+                    - containerPort: 9898
+                      protocol: TCP
+                      name: http
+                  resources:
+                    limits:
+                      memory: 64Mi
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    runAsNonRoot: true
+    # JSON Patch with a guard: fails the compile if the chart renames the container
+    podinfo-grace:
+      match:
+        kind: Deployment
+        name: podinfo
+      json6902:
+        - op: test
+          path: /spec/template/spec/containers/0/name
+          value: podinfo
+        - op: replace
+          path: /spec/template/spec/terminationGracePeriodSeconds
+          value: 60
+        - op: add
+          path: /spec/template/metadata/annotations/example.org~1owner
+          value: platform
+    # Images: podinfo pinned by digest, redis moved to another tag, the
+    # untagged test image gets one
+    images:
+      match:
+        kind: "*"
+      images:
+        ghcr.io/stefanprodan/podinfo:
+          tag: 6.15.0
+          digest: sha256:ec73780a8425f59ea49f5bc8cdff0d598805a224fbaa1f86c67a244f250fa9da
+        docker.io/redis:
+          tag: 8.8.0-alpine
+        giantswarm/tiny-tools:
+          tag: "3.12"
+    # Wildcard kind with labels, exact count: Deployment, Service, HPA (deleted
+    # later, deletes run last) and the three test Pods of podinfo
+    team-label:
+      match:
+        kind: "*"
+        labels:
+          app.kubernetes.io/name: podinfo
+      expects: 6
+      merge:
+        metadata:
+          labels:
+            example.org/team: platform
+    # Optional: the chart renders a ServiceMonitor only with serviceMonitor.enabled
+    servicemonitor-interval:
+      match:
+        apiVersion: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+      expects: 0+
+      merge:
+        spec:
+          endpoints:
+            - port: http-metrics
+              interval: 30s
+    # Delete: hpa.yaml becomes a comment line
+    no-hpa:
+      match:
+        kind: HorizontalPodAutoscaler
+        name: podinfo
+      delete: true
