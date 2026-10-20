@@ -37,7 +37,9 @@ has an exception today; a finding the maintainers excepted still fails
 
   gitleaks is the release tarball of `GITLEAKS_VERSION`, verified against
   `GITLEAKS_SHA256`, both read from the registry's
-  `.github/actions/setup-gate/action.yml`. semgrep, GuardDog and ruff go into
+  `.github/actions/setup-gate/action.yml`. `GITLEAKS_VERSION` is the release tag
+  with its leading `v`, as the registry pins it since registry #292; the
+  tarball name carries the version without it. semgrep, GuardDog and ruff go into
   a uv virtual environment from `scan/requirements.txt` with
   `--require-hashes --no-deps`, for the Python version that file was
   compiled for. The gitleaks pin is the Linux x86-64 build and the pinned
@@ -45,7 +47,7 @@ has an exception today; a finding the maintainers excepted still fails
   gate.
 
   - Test: manual (as CHK-1)
-  - Since: #50
+  - Since: #50, #92
 
 ClamAV runs as in the gate, because `static-scan` runs it unconditionally and
 skipping it would mean changing or copying that script. The first run pulls
