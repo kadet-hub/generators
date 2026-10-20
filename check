@@ -26,7 +26,7 @@ echo "## static scan (SEC-1 to SEC-6, QA-3)"
 # The scanners as the gate's setup-gate action pins them, installed under $work.
 action=$reg/.github/actions/setup-gate/action.yml
 gitleaks=$(sed -n 's/^ *GITLEAKS_VERSION: *//p' "$action")
-curl -fsSLo "$work/gitleaks.tar.gz" "https://github.com/gitleaks/gitleaks/releases/download/v${gitleaks}/gitleaks_${gitleaks}_linux_x64.tar.gz"
+curl -fsSLo "$work/gitleaks.tar.gz" "https://github.com/gitleaks/gitleaks/releases/download/${gitleaks}/gitleaks_${gitleaks#v}_linux_x64.tar.gz"
 echo "$(sed -n 's/^ *GITLEAKS_SHA256: *//p' "$action")  $work/gitleaks.tar.gz" | sha256sum -c --quiet -
 mkdir -- "$work/bin"
 tar -xzf "$work/gitleaks.tar.gz" -C "$work/bin" gitleaks
