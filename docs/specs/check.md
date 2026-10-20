@@ -47,7 +47,7 @@ has an exception today; a finding the maintainers excepted still fails
   gate.
 
   - Test: manual (as CHK-1)
-  - Since: #50
+  - Since: #50, #92
 
 ClamAV runs as in the gate, because `static-scan` runs it unconditionally and
 skipping it would mean changing or copying that script. The first run pulls
