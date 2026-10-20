@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+Built for External Secrets Operator 2.13.0. The upstream CRDs in `config/crds/bases` are unchanged against 2.12.0, so the shipped schemas, CRDs and rendered output are unchanged.
+
 ## 1.0.4
 
 Built for External Secrets Operator 2.12.0. The SecretStore and ClusterSecretStore schemas and CRDs gain the Conjur `auth.azure`, `auth.gcp` and `auth.iam` authenticators; nothing was removed or renamed, and the ExternalSecret and ClusterExternalSecret schemas are unchanged. Provider blocks pass through as before, so the new authenticators work without a generator change. Rendered output is unchanged.
