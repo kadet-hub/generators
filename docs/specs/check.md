@@ -37,7 +37,9 @@ has an exception today; a finding the maintainers excepted still fails
 
   gitleaks is the release tarball of `GITLEAKS_VERSION`, verified against
   `GITLEAKS_SHA256`, both read from the registry's
-  `.github/actions/setup-gate/action.yml`. semgrep, GuardDog and ruff go into
+  `.github/actions/setup-gate/action.yml`. `GITLEAKS_VERSION` is the release tag
+  with its leading `v`, as the registry pins it since registry #292; the
+  tarball name carries the version without it. semgrep, GuardDog and ruff go into
   a uv virtual environment from `scan/requirements.txt` with
   `--require-hashes --no-deps`, for the Python version that file was
   compiled for. The gitleaks pin is the Linux x86-64 build and the pinned
