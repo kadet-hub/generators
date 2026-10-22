@@ -97,7 +97,7 @@ Component keys, by what they produce:
 | security | `security_profile` (`baseline`, `restricted`), `read_only_root_filesystem`, `workload_security_context`, `network_policies` |
 | config | `config_maps`, `secrets` (`data`, `string_data` from `value`, `template` or `file`; `items`, `mount`, `versioned`) |
 | services | `service`, `additional_services` |
-| RBAC | `service_account.create`, `role`, `cluster_role` (rules and an optional `binding`) |
+| RBAC | `service_account.create`, `role` (rules, an optional `binding`, and `namespace` for a Role outside the component's namespace, such as leader election in `kube-system`), `cluster_role` (rules and an optional `binding`) |
 | scaling | `hpa`, `pdb_min_available`, `auto_pdb`, `vpa` (update mode) |
 | other | `persistent_volumes`, `persistent_volume_claims`, `webhooks` (Mutating), `validating_webhooks`, `webhook_annotations`, `backend_config` (GKE BackendConfig) |
 
@@ -107,7 +107,7 @@ Probes are rendered only for the `healthcheck` entries that set a `type`, never 
 
 Secret `data` values are base64-encoded unless the entry sets `b64_encode: false`; `string_data` stays plain. A Kapitan ref (`?{...}`) passes through unchanged, so a ref used in `data` must hold a base64 value. With `versioned: true` the ConfigMap or Secret name gets a content hash, and the volumes, `env` and `env_from` references of the component follow it.
 
-A Service needs at least one container port with a `service_port`, except `headless` and `ExternalName` Services. A port's `app_protocol` becomes the Service port's `appProtocol`, for example `https` or `kubernetes.io/h2c`. Two resources that map to the same output file fail the compile.
+A Service needs at least one container port with a `service_port`, except `headless` and `ExternalName` Services. A Service port's `appProtocol` comes from the port name when the name says the protocol: `http` and `https` as they are, `h2c`, `ws` and `wss` as `kubernetes.io/h2c`, `kubernetes.io/ws` and `kubernetes.io/wss`. `app_protocol` sets it for any other name or overrides it, and an empty `app_protocol` leaves it out. `container_port` defaults to `service_port`, so a port that is the same on both needs only `service_port`. Two resources that map to the same output file fail the compile.
 
 For PersistentVolumes and PersistentVolumeClaims, `spec` is merged over the generator defaults first, then the flat keys are applied; a flat key that overrides a `spec` value logs a warning.
 
@@ -134,7 +134,7 @@ The generator sets no `privileged`, host namespace, `hostPath` or added capabili
 
 Pods and generated ServiceAccounts get `automountServiceAccountToken: false` ([Opt out of API credential automounting](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting)). A component that calls the API sets `automount_service_account_token: true`; a standalone ServiceAccount takes `service_account.automount_service_account_token`.
 
-A service webhook with `failurePolicy: Fail` (the API default) needs `clientConfig.caBundle` or `webhook_annotations` with `cert-manager.io/inject-ca-from`, else the compile fails. Each webhook without a `namespaceSelector` excludes the namespace of its own Service, so the webhook cannot block its own pods. ClusterRoles, ClusterRoleBindings and webhook configurations are named `<namespace>-<component>`.
+A component's webhook defaults to `admissionReviewVersions: [v1]` and `sideEffects: None`, the values a webhook written today declares; both are required by the API and can be set per webhook. A component's webhook without `clientConfig.url` is served by the component's own Service: `clientConfig.service` gets the Service's `name` and `namespace` unless it sets them, so only `path` (and `port`, if not 443) is left to write. A service webhook with `failurePolicy: Fail` (the API default) needs `clientConfig.caBundle` or `webhook_annotations` with one of cert-manager's CA injection annotations, `cert-manager.io/inject-ca-from`, `inject-ca-from-secret` or `inject-apiserver-ca`, else the compile fails. Each webhook without a `namespaceSelector` excludes the namespace of its own Service, so the webhook cannot block its own pods. ClusterRoles, ClusterRoleBindings and webhook configurations are named `<namespace>-<component>`.
 
 The generator also warns about images without a pinned tag, containers without CPU and memory requests or a memory limit, ports without a readiness probe and PodDisruptionBudgets that allow no eviction.
 

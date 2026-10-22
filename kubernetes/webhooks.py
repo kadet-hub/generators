@@ -4,7 +4,12 @@ from . import k8s
 from .rbac import cluster_scoped_name
 from .utils import _convert_to_dict, get_namespace
 
-CA_INJECTION = "cert-manager.io/inject-ca-from"
+# cert-manager's cainjector fills caBundle from any of these annotations.
+CA_INJECTION = (
+    "cert-manager.io/inject-ca-from",
+    "cert-manager.io/inject-ca-from-secret",
+    "cert-manager.io/inject-apiserver-ca",
+)
 
 
 def _webhooks(name, component, key):
@@ -16,18 +21,27 @@ def _webhooks(name, component, key):
     """
     annotations = component.get("webhook_annotations") or {}
     webhooks = _convert_to_dict(component.get(key)) or []
+    namespace = get_namespace(component, default="default")
+    service = (component.get("service") or {}).get("service_name", name)
     for webhook in webhooks:
-        client = webhook.get("clientConfig") or {}
+        # The only AdmissionReview version and the side-effect class a webhook
+        # written today declares; both fields are required by the API.
+        webhook.setdefault("admissionReviewVersions", ["v1"])
+        webhook.setdefault("sideEffects", "None")
+        client = webhook.setdefault("clientConfig", {})
+        # A component's webhook is served by the component's own Service.
+        if "url" not in client:
+            client["service"] = {"name": service, "namespace": namespace, **(client.get("service") or {})}
         if (
             webhook.get("failurePolicy", "Fail") == "Fail"
             and "service" in client
             and not client.get("caBundle")
-            and CA_INJECTION not in annotations
+            and not any(a in annotations for a in CA_INJECTION)
         ):
             raise ValueError(
                 f"{name}: webhook {webhook.get('name')!r} has failurePolicy Fail "
-                f"but no clientConfig.caBundle; set it or webhook_annotations "
-                f"{CA_INJECTION}"
+                f"but no clientConfig.caBundle; set it or one of the webhook_annotations "
+                f"{', '.join(CA_INJECTION)}"
             )
         # The webhook must not intercept the namespace that runs its own server.
         own = (client.get("service") or {}).get("namespace") or get_namespace(
