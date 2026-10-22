@@ -4,7 +4,7 @@
 cluster's VMs in the infra cluster, ``csi.role: tenant`` the node plugin,
 CSIDriver, storage classes and the RBAC of the controller's tenant
 kubeconfig into the tenant cluster. The manifests follow deploy/ at commit
-3a1a099330045754011803e3d53cd8276ff21723; the README's CSI defaults list
+e13603a1527794ac9599765e622029c284431e23; the README's CSI defaults list
 where they differ and why.
 """
 
@@ -23,8 +23,6 @@ APP = {"app": "kubevirt-csi-driver"}
 SIG_STORAGE = "registry.k8s.io/sig-storage/"
 PROVISIONER = SIG_STORAGE + "csi-provisioner:v6.0.2@sha256:80f0225e1b2beeade5734fef6b10ab459e02ac3816570660651b45bd50f178bf"
 ATTACHER = SIG_STORAGE + "csi-attacher:v4.10.0@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d"
-# Upstream pins v4.2.1, whose VolumeSnapshotContent updates the v8 snapshot
-# CRDs reject (kubevirt/csi-driver#395).
 SNAPSHOTTER = SIG_STORAGE + "csi-snapshotter:v8.7.0@sha256:b03d3334f8035fa42660b166f6eb819a659a14774da020eb1b6c52cd422eaadb"
 RESIZER = SIG_STORAGE + "csi-resizer:v1.13.1@sha256:2a0b297cc7c4cd376ac7413df339ff2fdaa1ec9d099aed92b5ea1f031ef7f639"
 LIVENESSPROBE = SIG_STORAGE + "livenessprobe:v2.17.0@sha256:9b75b9ade162136291d5e8f13a1dfc3dec71ee61419b1bfc112e0796ff8a6aa9"

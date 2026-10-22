@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/kubevirt/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/kubevirt/) page.
 
-Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.1, CDI 1.66.1 and KubeVirt CSI driver main@3a1a099. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
+Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.1, CDI 1.66.1 and KubeVirt CSI driver main@e13603a. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
 
 A VirtualMachine entry with `image`, `disks` and `cloudinit` expands into matching disks, volumes, `dataVolumeTemplates` and a pod network, so a short block yields a VM that KubeVirt admits. The other kinds take reference shorthands. Secrets for `cloudinit_secret_ref` belong in the `kubernetes` generator.
 
@@ -151,7 +151,7 @@ parameters:
 
 ### CSI driver
 
-`csi` renders the KubeVirt CSI driver in its split deployment, after `deploy/` at commit [3a1a099](https://github.com/kubevirt/csi-driver/tree/3a1a099330045754011803e3d53cd8276ff21723/deploy). The controller runs in the infra cluster, in the namespace of the tenant cluster's VMs: it creates DataVolumes there and hotplugs them into the VMs with its own ServiceAccount, and its CSI sidecars reach the tenant cluster API through a kubeconfig Secret. The node plugin runs in the tenant cluster. A target renders one side, chosen by `role`.
+`csi` renders the KubeVirt CSI driver in its split deployment, after `deploy/` at commit [e13603a](https://github.com/kubevirt/csi-driver/tree/e13603a1527794ac9599765e622029c284431e23/deploy). The controller runs in the infra cluster, in the namespace of the tenant cluster's VMs: it creates DataVolumes there and hotplugs them into the VMs with its own ServiceAccount, and its CSI sidecars reach the tenant cluster API through a kubeconfig Secret. The node plugin runs in the tenant cluster. A target renders one side, chosen by `role`.
 
 | Key | Role | Default | Meaning |
 |---|---|---|---|
@@ -182,7 +182,9 @@ Upstream publishes the driver only as `quay.io/kubevirt/kubevirt-csi-driver:late
 quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
 ```
 
-the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only), into a registry both clusters can pull from, and set `image` to the mirror by digest. The fixtures use the quay.io reference above, which works only while it is `latest`. The sidecars are pinned by tag and digest as upstream pins them at 3a1a099, except csi-snapshotter (see Defaults).
+the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only), into a registry both clusters can pull from, and set `image` to the mirror by digest. The fixtures use the quay.io reference above, which works only while it is `latest`.
+
+`latest` is still that build, because upstream removed its image workflow in [#393](https://github.com/kubevirt/csi-driver/pull/393), and no published image contains a later commit. That leaves out the fix of [#397](https://github.com/kubevirt/csi-driver/pull/397). In the 3a1a099 build the controller panics in `ControllerUnpublishVolume` when a VMI outlives its VM, and the volume stays on the VMI. An image built from e13603a has the fix. Its `USER 1001` changes nothing here, because the output sets the UID of the driver container on both sides. The sidecars are pinned by tag and digest as upstream pins them at e13603a.
 
 #### Storage class enforcement
 
@@ -214,9 +216,8 @@ Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annota
 
 | Default | Where | Reason |
 |---|---|---|
-| non-root UID and GID 1001, RuntimeDefault seccomp, no privilege escalation, read-only root filesystem, all capabilities dropped | controller | Pod Security restricted; upstream sets the same since commit 1522252. |
-| `privileged` and UID 0 for the `csi-driver` container, namespace label `pod-security.kubernetes.io/enforce: privileged` | node plugin | Bidirectional mount propagation into `/var/lib/kubelet` and access to the hotplugged disks in `/dev` need it. The registrar and livenessprobe sidecars run without capabilities and with a read-only root filesystem. |
-| csi-snapshotter v8.7.0 instead of upstream's v4.2.1 | controller | v4.2.1 predates `sourceVolumeMode`, so the external-snapshotter v8 CRDs reject its VolumeSnapshotContent updates and no snapshot becomes ready ([kubevirt/csi-driver#395](https://github.com/kubevirt/csi-driver/issues/395)). v8.7.0 is the current external-snapshotter release. |
+| UID and GID 1001 | controller | Upstream sets the same through its `plain-kubernetes` component since [#392](https://github.com/kubevirt/csi-driver/pull/392), because the sidecar images run as root by default and do not start under `runAsNonRoot` without a UID. Its base leaves the UID unset for OpenShift, whose `restricted-v2` SCC rejects a fixed one. |
+| namespace label `pod-security.kubernetes.io/enforce: privileged`, registrar and livenessprobe without capabilities and with a read-only root filesystem | node plugin | The `csi-driver` container is `privileged` and runs as UID 0, as upstream's does, for Bidirectional mount propagation into `/var/lib/kubelet` and access to the hotplugged disks in `/dev`. Only the `privileged` Pod Security level admits it. Upstream renders no Namespace and sets no security context on the sidecars. |
 | `strategy: Recreate` | controller | One replica and no leader election in the sidecars; a rolling update would run two controllers. |
 | `--enable-vmi-hotplug-fallback=false` | controller | KubeVirt 1.9 deprecates `HotplugVolumes` for `DeclarativeHotplugVolumes`, on by default, under which virt-api rejects the fallback's removevolume call on a VM-owned VMI; upstream's README prescribes the flag for it. |
 | liveness probe on the `csi-driver` container | controller | Upstream runs the livenessprobe sidecar, but no probe calls it. |
@@ -267,4 +268,4 @@ parameters:
 
 ## Schemas
 
-`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at 3a1a099, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
+`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at e13603a, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
