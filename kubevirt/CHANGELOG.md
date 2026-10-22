@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+Built for the KubeVirt CSI driver at main@e13603a. Upstream now deploys what `csi` already rendered. Since kubevirt/csi-driver#392 its controller runs with the restricted security context, with UID and GID 1001 from the `plain-kubernetes` component, and the node plugin's `csi-driver` container as UID 0. Since kubevirt/csi-driver#396 it pins csi-snapshotter v8.7.0. The rendered output stays the same, and the README's CSI defaults keep only the remaining differences. The VolumeSnapshotClass CRD and schema move to e13603a, whose file is external-snapshotter's v8.7.0 CRD and differs from the shipped one only in descriptions.
+
+The driver image is still the `latest` build of 3a1a099. Upstream removed its image workflow (kubevirt/csi-driver#393), so the controller fix of kubevirt/csi-driver#397 is in no published image.
+
 ## 1.1.1
 
 Built for KubeVirt 1.9.1. Its CRD validations are unchanged from 1.9.0, so the shipped schemas and the rendered output stay the same. The fixtures use the `cirros-container-disk-demo:v1.9.1` image, the same digest as `v1.9.0`.
