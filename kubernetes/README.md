@@ -107,7 +107,7 @@ Probes are rendered only for the `healthcheck` entries that set a `type`, never 
 
 Secret `data` values are base64-encoded unless the entry sets `b64_encode: false`; `string_data` stays plain. A Kapitan ref (`?{...}`) passes through unchanged, so a ref used in `data` must hold a base64 value. With `versioned: true` the ConfigMap or Secret name gets a content hash, and the volumes, `env` and `env_from` references of the component follow it.
 
-A Service needs at least one container port with a `service_port`, except `headless` and `ExternalName` Services. Two resources that map to the same output file fail the compile.
+A Service needs at least one container port with a `service_port`, except `headless` and `ExternalName` Services. A port's `app_protocol` becomes the Service port's `appProtocol`, for example `https` or `kubernetes.io/h2c`. Two resources that map to the same output file fail the compile.
 
 For PersistentVolumes and PersistentVolumeClaims, `spec` is merged over the generator defaults first, then the flat keys are applied; a flat key that overrides a `spec` value logs a warning.
 
