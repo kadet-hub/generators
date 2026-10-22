@@ -1,7 +1,8 @@
 # Complete: component shorthands for every workload type with their derived
-# Services, ConfigMaps, Secrets, RBAC, scaling, NetworkPolicies and volumes;
-# Ingress with a GKE ManagedCertificate; Gateway API with the services
-# shorthand; standalone resources, cluster policy sections and manifests.
+# Services, ConfigMaps, Secrets, RBAC, scaling, NetworkPolicies, volumes and
+# APIServices; Ingress with a GKE ManagedCertificate; Gateway API with the
+# services shorthand; standalone resources, cluster policy sections and
+# manifests.
 classes: []
 
 parameters:
@@ -566,6 +567,15 @@ parameters:
           - apiGroups: [coordination.k8s.io]
             resources: [leases]
             verbs: [get, create, update]
+      # cert-manager injects the CA; port and priorities set explicitly
+      api_service:
+        group: policy.example.com
+        version: v1alpha1
+        group_priority_minimum: 1000
+        version_priority: 15
+        port: 443
+        annotations:
+          cert-manager.io/inject-ca-from-secret: shop/policy-webhook-tls
       validating_webhooks:
         - name: validate.policy.example.com
           admissionReviewVersions: [v1]
@@ -592,3 +602,67 @@ parameters:
               apiVersions: [v1]
               operations: [CREATE]
               resources: [deployments]
+
+    # APIService v1beta1.metrics.k8s.io on the only Service port, with a
+    # self-signed serving certificate like metrics-server's
+    metrics-server:
+      namespace: kube-system
+      image: registry.k8s.io/metrics-server/metrics-server:v0.9.0
+      args: [--cert-dir=/tmp, --secure-port=10250, --kubelet-use-node-status-port]
+      ports:
+        https:
+          container_port: 10250
+          service_port: 443
+      healthcheck:
+        readiness:
+          type: http
+          scheme: HTTPS
+          port: https
+          path: /readyz
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          memory: 400Mi
+      volumes:
+        tmp:
+          emptyDir: {}
+      volume_mounts:
+        tmp:
+          mount_path: /tmp
+      service:
+        type: ClusterIP
+      api_service:
+        group: metrics.k8s.io
+        version: v1beta1
+        insecure_skip_tls_verify: true
+
+    # Two Service ports: the APIService takes the one named https
+    custom-metrics:
+      image: registry.example.com/platform/custom-metrics:0.4.0
+      ports:
+        https:
+          container_port: 6443
+          service_port: 443
+        metrics:
+          container_port: 9090
+          service_port: 9090
+      healthcheck:
+        readiness:
+          type: http
+          scheme: HTTPS
+          port: https
+          path: /readyz
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+      service:
+        type: ClusterIP
+      api_service:
+        group: custom.metrics.k8s.io
+        version: v1beta2
+        ca_bundle: bm90LWEtcmVhbC1jYQ==

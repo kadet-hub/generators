@@ -28,7 +28,7 @@ from .rbac import ClusterRole, ClusterRoleBinding, Role, RoleBinding, ServiceAcc
 from .scaling import HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler
 from .storage import PersistentVolume, PersistentVolumeClaim
 from .utils import get_components, inv
-from .webhooks import MutatingWebhookConfiguration, ValidatingWebhookConfiguration
+from .webhooks import APIService, MutatingWebhookConfiguration, ValidatingWebhookConfiguration
 from .workloads import CronJob
 
 
@@ -722,6 +722,8 @@ def _build_workload_extras(name, component, workload_spec):
         bundle += [MutatingWebhookConfiguration(name=name, component=component).root]
     if component.get("validating_webhooks"):
         bundle += [ValidatingWebhookConfiguration(name=name, component=component).root]
+    if component.get("api_service"):
+        bundle += [APIService(name=name, component=component, workload=workload_spec).root]
     for key in ("service_monitors", "prometheus_rules"):
         if component.get(key):
             logger.warning(

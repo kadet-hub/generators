@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0
+
+- `api_service` on a component renders the APIService of an aggregated API served by the component's Service, such as metrics-server's `v1beta1.metrics.k8s.io`, instead of a `manifests` entry that repeats the Service's name, namespace and port. The port is the Service port named `https` or the only one. `group_priority_minimum` and `version_priority` default to 100. The entry needs `ca_bundle`, a cert-manager CA injection annotation or `insecure_skip_tls_verify: true`; anything else fails the compile.
+- Ships the APIService schema.
+
+Output for inventories without `api_service` is unchanged.
+
 ## 1.4.0
 
 Defaults that remove values the inventory had to repeat:
