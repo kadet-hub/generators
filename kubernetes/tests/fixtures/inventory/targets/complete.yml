@@ -554,7 +554,7 @@ parameters:
           mount_path: /tls
           read_only: true
       webhook_annotations:
-        cert-manager.io/inject-ca-from: shop/policy-webhook-tls
+        cert-manager.io/inject-ca-from-secret: shop/policy-webhook-tls
       cluster_role:
         rules:
           - apiGroups: [""]
@@ -582,8 +582,6 @@ parameters:
           failurePolicy: Ignore
           clientConfig:
             service:
-              name: policy-webhook
-              namespace: shop
               path: /mutate
           rules:
             - apiGroups: [apps]

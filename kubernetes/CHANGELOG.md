@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0
+
+- A component's webhook without `clientConfig.url` points at the component's own Service; `clientConfig.service` takes its `name` and `namespace` unless the inventory sets them. Webhooks that set both render as before.
+- `cert-manager.io/inject-ca-from-secret` and `cert-manager.io/inject-apiserver-ca` count as CA injection for a `failurePolicy: Fail` webhook, like `inject-ca-from`. cert-manager uses `inject-ca-from-secret` for its own webhook.
+
 ## 1.3.0
 
 A container port's `app_protocol` sets `appProtocol` on its Service port, which charts such as metrics-server set and the Service API has supported since Kubernetes 1.20. Ports without it render as before.
