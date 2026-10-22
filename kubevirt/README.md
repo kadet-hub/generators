@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/kubevirt/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/kubevirt/) page.
 
-Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.1, CDI 1.66.1 and KubeVirt CSI driver main@e13603a. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
+Kapitan kadet generator for [KubeVirt](https://kubevirt.io/), its Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) and the [KubeVirt CSI driver](https://github.com/kubevirt/csi-driver). Built for KubeVirt 1.9.1, CDI 1.66.1, KubeVirt CSI driver main@e13603a and external-snapshotter 8.7.0. The `v1beta1` APIs it emits need KubeVirt 1.7.0 or later: `snapshot.kubevirt.io/v1beta1` is served since 1.3.0, `clone.kubevirt.io/v1beta1` since 1.5.0 and `pool.kubevirt.io/v1beta1` since 1.7.0 (checked in `crds.go` at each release tag).
 
 A VirtualMachine entry with `image`, `disks` and `cloudinit` expands into matching disks, volumes, `dataVolumeTemplates` and a pod network, so a short block yields a VM that KubeVirt admits. The other kinds take reference shorthands. Secrets for `cloudinit_secret_ref` belong in the `kubernetes` generator.
 
@@ -166,13 +166,14 @@ parameters:
 | `snapshot_classes.<infra storage class>` | infra | none | with `allowed_storage_classes`: list of the infra VolumeSnapshotClasses for snapshots of that class's volumes |
 | `storage_classes.<name>` | tenant | none | StorageClass; `default: true` marks it default, `infra_storage_class` sets the infra class of its DataVolumes (`infraStorageClassName`, unset: the infra default) |
 | `volume_snapshot_classes.<name>` | tenant | none | VolumeSnapshotClass; `default`, `deletion_policy` (`Delete`) and `infra_snapshot_class` (`infraSnapshotClassName`), which picks one of the infra side's `snapshot_classes` |
+| `snapshot_controller` | tenant | `false` | `true` renders the snapshot-controller and the `snapshot.storage.k8s.io` CRDs, see [Snapshot controller](#snapshot-controller) |
 
 Unknown keys fail the compile, and so do `snapshot_classes` naming a class outside `allowed_storage_classes` and `snapshot_classes` together with `allow_default_storage_class`.
 
 | Role | Output keys |
 |---|---|
 | infra | `<namespace>/<service_account>-sa`, `-role`, `-rolebinding`; `<namespace>-<service_account>-clusterrole`, `-clusterrolebinding` (read PersistentVolumes); `<namespace>/kubevirt-csi-controller-deployment` |
-| tenant | `<namespace>-namespace`; `csi.kubevirt.io-csidriver`; `<namespace>/kubevirt-csi-node-daemonset`; per component `node` and `controller`: `<namespace>/kubevirt-csi-<component>-sa`, `kubevirt-csi-<component>-clusterrole`, `-clusterrolebinding`; `<namespace>/kubevirt-csi-controller-sa-token-secret`; `<name>-storageclass`, `<name>-volumesnapshotclass` |
+| tenant | `<namespace>-namespace`; `csi.kubevirt.io-csidriver`; `<namespace>/kubevirt-csi-node-daemonset`; per component `node` and `controller`: `<namespace>/kubevirt-csi-<component>-sa`, `kubevirt-csi-<component>-clusterrole`, `-clusterrolebinding`; `<namespace>/kubevirt-csi-controller-sa-token-secret`; `<name>-storageclass`, `<name>-volumesnapshotclass`; with `snapshot_controller`: `<crd name>-crd`, `<namespace>/snapshot-controller-sa`, `-deployment`, `<namespace>/snapshot-controller-leaderelection-role`, `-rolebinding`, `snapshot-controller-runner-clusterrole`, `-clusterrolebinding` |
 
 #### Driver image
 
@@ -208,9 +209,15 @@ kubectl -n tenant-a create secret generic tenant-a-kubeconfig --from-file=value
 
 The cluster's admin kubeconfig, which Cluster API Provider KubeVirt stores in the same layout, works too, but gives the controller cluster-admin on the tenant.
 
+#### Snapshot controller
+
+`snapshot_controller: true` renders the VolumeSnapshotClass, VolumeSnapshotContent and VolumeSnapshot CRDs and the snapshot-controller with its RBAC into the tenant cluster, after `client/config/crd` and `deploy/kubernetes/snapshot-controller` of [external-snapshotter v8.7.0](https://github.com/kubernetes-csi/external-snapshotter/tree/v8.7.0), the release of the csi-snapshotter sidecar. The KubeVirt CSI driver keeps copies of these files in `deploy/tenant/base`, but applies them only in its e2e setup, and they still name controller v8.6.0. The CRDs are the files in `schemas/snapshot.storage.k8s.io/crds/`, which the gate installs to check the output and the upstream workflow regenerates on a new release.
+
+One key covers CRDs and controller, because RKE2 ships both as charts, and k3s v1.37.1+k3s1, kind v1.37.0 and kubeadm ship neither. Leave it off where a snapshot-controller already runs, since a second one in another namespace does not share its leader lease. The VolumeGroupSnapshot CRDs are not rendered, as the driver does not implement group snapshots, so the controller waits 30 seconds for them at start and then turns that feature off.
+
 #### Prerequisites
 
-Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which the generator does not render.
+Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which `snapshot_controller` renders where the cluster has neither.
 
 #### Defaults
 
@@ -229,6 +236,9 @@ Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annota
 | no preStop hook | registrar | Upstream's hook runs `/bin/sh`, which the distroless image lacks; the registrar removes its socket on SIGTERM. |
 | `allowVolumeExpansion: true` | StorageClass | The driver and its resizer sidecar expand volumes, and KubeVirt 1.9 grows the disk of a running VM (`ExpandDisks` is GA); upstream's test setup sets it too. The infra storage class has to allow expansion as well. |
 | default class only with `default: true` | StorageClass, VolumeSnapshotClass | Upstream marks its StorageClass default, which takes over PVCs without `storageClassName` when the tenant has another default. |
+| `namespace` instead of `kube-system` | snapshot-controller | Its leader-election Role grants create, update and delete on every Lease in its namespace, which in `kube-system` includes the leader leases of kube-controller-manager and kube-scheduler. |
+| image v8.7.0 | snapshot-controller | Upstream's manifest at the v8.7.0 tag still names v8.6.0, because upstream bumps it only after a release. v8.7.0 is the release of the CRDs and of csi-snapshotter. |
+| `runAsNonRoot` with UID and GID 1001, seccomp `RuntimeDefault`, no capabilities, read-only root filesystem | snapshot-controller | Upstream sets no security context, and the image runs as UID 0 unless the pod sets one. 1001 is the controller's UID. |
 
 #### Example
 
@@ -257,6 +267,7 @@ parameters:
       csi:
         role: tenant
         image: registry.example.com/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
+        snapshot_controller: true
         storage_classes:
           kubevirt:
             default: true
@@ -268,4 +279,4 @@ parameters:
 
 ## Schemas
 
-`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the VolumeSnapshotClass CRD and schema from the KubeVirt CSI driver at e13603a, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
+`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the three `snapshot.storage.k8s.io` CRDs of external-snapshotter 8.7.0 with the VolumeSnapshotClass schema, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
