@@ -126,14 +126,15 @@ class Service(k8s.Base):
             if expose_ports and port_name not in expose_ports:
                 continue
             if "service_port" in ports:
-                service_ports += [
-                    {
-                        "name": port_name,
-                        "port": ports.get("service_port"),
-                        "targetPort": port_name,
-                        "protocol": ports.get("protocol", "TCP"),
-                    }
-                ]
+                service_port = {
+                    "name": port_name,
+                    "port": ports.get("service_port"),
+                    "targetPort": port_name,
+                    "protocol": ports.get("protocol", "TCP"),
+                }
+                if ports.get("app_protocol"):
+                    service_port["appProtocol"] = ports.get("app_protocol")
+                service_ports += [service_port]
         return service_ports
 
 

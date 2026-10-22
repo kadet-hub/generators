@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+A container port's `app_protocol` sets `appProtocol` on its Service port, which charts such as metrics-server set and the Service API has supported since Kubernetes 1.20. Ports without it render as before.
+
 ## 1.2.0
 
 New standalone sections for Namespaces and RBAC without a workload, so they no longer go through `manifests` with `api_version`, `kind` and `body`:
