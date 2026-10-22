@@ -59,7 +59,12 @@ class NetworkPolicy(k8s.Base):
 
 
 class Service(k8s.Base):
-    """Kubernetes Service resource."""
+    """Kubernetes Service resource.
+
+    A standalone Service (generators.kubernetes.services) has no workload: its
+    entry is both component and service_spec, the selector is given and a
+    port's container_port is its targetPort.
+    """
 
     def new(self):
         self.need("component")
@@ -82,14 +87,44 @@ class Service(k8s.Base):
 
         self.add_labels(component.get("labels", {}))
         self.add_annotations(service_spec.get("annotations", {}))
-        self.root.spec.selector = dict(pod_labels(workload))
-        self.root.spec.selector.update(service_spec.get("selectors", {}))
+        name = self.root.metadata.name
+        # external_name makes an ExternalName Service; the type follows from it.
+        external_name = service_spec.get("external_name")
+        if external_name:
+            if service_spec.get("type", "ExternalName") != "ExternalName":
+                raise ValueError(
+                    f"service {name!r}: external_name needs type ExternalName, "
+                    f"not {service_spec.get('type')}"
+                )
+            if service_spec.get("headless"):
+                raise ValueError(f"service {name!r}: external_name and headless exclude each other")
+            service_spec = {**service_spec, "type": "ExternalName"}
+            self.root.spec.externalName = external_name
+        elif service_spec.get("type") == "ExternalName":
+            raise ValueError(f"service {name!r}: type ExternalName needs external_name")
+        if workload is None:
+            # Only a headless or ExternalName Service may go without a
+            # selector: its endpoints are managed elsewhere or it has none.
+            selector = service_spec.get("selector")
+            if not selector and not service_spec.get("headless") and not external_name:
+                raise ValueError(f"service {name!r}: selector is required unless headless or external_name")
+            if selector:
+                self.root.spec.selector = dict(selector)
+        else:
+            self.root.spec.selector = dict(pod_labels(workload))
+            self.root.spec.selector.update(service_spec.get("selectors", {}))
         # Only set type when configured; Kubernetes defaults to ClusterIP
         if service_spec.get("type"):
             self.root.spec.type = service_spec.get("type")
         if service_spec.get("publish_not_ready_address", False):
             self.root.spec.publishNotReadyAddresses = True
         if service_spec.get("headless", False):
+            # The API rejects clusterIP None on the other types.
+            if (service_spec.get("type") or "ClusterIP") != "ClusterIP":
+                raise ValueError(
+                    f"service {name!r}: headless needs type ClusterIP, "
+                    f"not {service_spec.get('type')}"
+                )
             self.root.spec.clusterIP = "None"
         self.root.spec.sessionAffinity = service_spec.get("session_affinity", "None")
         self.root.spec.ports = self._build_service_ports(
@@ -101,8 +136,8 @@ class Service(k8s.Base):
                 del self.root.spec["ports"]
             else:
                 raise ValueError(
-                    f"service {self.root.metadata.name!r}: no container port has a "
-                    "service_port (or expose_ports matches none)"
+                    f"service {name!r}: no port has a service_port "
+                    "(or expose_ports matches none)"
                 )
 
     def _collect_component_ports(self, component):
@@ -126,10 +161,15 @@ class Service(k8s.Base):
             if expose_ports and port_name not in expose_ports:
                 continue
             if "service_port" in ports:
+                # A component's container port carries the port name; a
+                # standalone Service has no container to name it.
+                target_port = port_name
+                if self.kwargs.workload is None:
+                    target_port = ports.get("container_port", ports.get("service_port"))
                 service_port = {
                     "name": port_name,
                     "port": ports.get("service_port"),
-                    "targetPort": port_name,
+                    "targetPort": target_port,
                     "protocol": ports.get("protocol", "TCP"),
                 }
                 app_protocol = ports.get("app_protocol", APP_PROTOCOLS.get(port_name))

@@ -50,6 +50,31 @@ parameters:
           string_data:
             api_key:
               value: not-a-real-api-key
+      services:
+        # Pods prometheus-operator runs: container_port is the targetPort, by
+        # number or by the pods' port name, and defaults to service_port
+        prometheus:
+          selector:
+            app.kubernetes.io/name: prometheus
+            operator.prometheus.io/name: main
+          ports:
+            http:
+              service_port: 9090
+            reloader-web:
+              service_port: 8080
+              container_port: reloader-web
+        # A DNS alias for a database outside the cluster
+        legacy-db:
+          external_name: db.example.org
+        # Headless, for scraping a static control-plane pod
+        kube-scheduler:
+          namespace: kube-system
+          headless: true
+          selector:
+            component: kube-scheduler
+          ports:
+            http-metrics:
+              service_port: 10259
       service_accounts:
         ci-deployer:
           service_account:

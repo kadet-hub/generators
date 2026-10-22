@@ -158,6 +158,13 @@ def generate_resource_manifests(input_params):
             lambda name, spec: ComponentConfig(name=name, config=spec),
         ),
         (
+            "services",
+            "svc",
+            lambda name, spec: Service(
+                name=name, component=spec, workload=None, service_spec=spec
+            ),
+        ),
+        (
             "service_accounts",
             "sa",
             lambda name, spec: ServiceAccount(name=name, component=spec),
