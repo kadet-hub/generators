@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+
+- `api_service` on a component renders the APIService of an aggregated API served by the component's Service, such as metrics-server's `v1beta1.metrics.k8s.io`, instead of a `manifests` entry that repeats the Service's name, namespace and port. The port is the Service port named `https` or the only one. `group_priority_minimum` and `version_priority` default to 100. The entry needs `ca_bundle`, a cert-manager CA injection annotation or `insecure_skip_tls_verify: true`; anything else fails the compile.
+- A compile entry with `function: generate_chainsaw_asserts` writes a Chainsaw StepTemplate per component that asserts its workload is ready, to use as a step in a Chainsaw test.
+- Ships the schemas of APIService and of the Chainsaw 0.2.15 StepTemplate, with its CRD.
+
+Output is unchanged for inventories without `api_service` and without that compile entry.
+
 ## 1.4.0
 
 Defaults that remove values the inventory had to repeat:

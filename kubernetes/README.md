@@ -2,9 +2,9 @@
 
 Published on kadet-hub ([catalog](https://kadet-hub.org/generators/kubernetes/)): pin a released version by digest from its catalog page.
 
-Kapitan kadet generator for plain Kubernetes resources. One component block under `parameters.components` becomes a workload (Deployment, StatefulSet, DaemonSet, Job or CronJob) plus the resources derived from it: Services selecting its pods, ConfigMaps and Secrets mounted into it, a ServiceAccount with Role or ClusterRole bindings, HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler, NetworkPolicies, PersistentVolumeClaims and admission webhooks. Next to components it renders Ingresses (with GKE ManagedCertificates), Gateway API resources, standalone ConfigMaps, Secrets, ServiceAccounts and volumes, cluster and namespace policy kinds, and any other kind through a passthrough.
+Kapitan kadet generator for plain Kubernetes resources. One component block under `parameters.components` becomes a workload (Deployment, StatefulSet, DaemonSet, Job or CronJob) plus the resources derived from it: Services selecting its pods, ConfigMaps and Secrets mounted into it, a ServiceAccount with Role or ClusterRole bindings, HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler, NetworkPolicies, PersistentVolumeClaims, admission webhooks and the APIService of an aggregated API. A second compile entry writes Chainsaw step templates that assert each workload is ready. Next to components it renders Ingresses (with GKE ManagedCertificates), Gateway API resources, standalone ConfigMaps, Secrets, ServiceAccounts and volumes, cluster and namespace policy kinds, and any other kind through a passthrough.
 
-Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.0 and GKE Managed Certificates 1.2.12.
+Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.0, GKE Managed Certificates 1.2.12 and Chainsaw 0.2.15.
 
 ServiceMonitor, PodMonitor and PrometheusRule belong in the [prometheus-operator generator](https://kadet-hub.org/generators/prometheus-operator/) (`generators.prometheus_operator`); the component keys `service_monitors` and `prometheus_rules` and the section `generators.kubernetes.pod_monitors` are ignored with a warning naming it.
 
@@ -99,7 +99,7 @@ Component keys, by what they produce:
 | services | `service`, `additional_services` |
 | RBAC | `service_account.create`, `role` (rules, an optional `binding`, and `namespace` for a Role outside the component's namespace, such as leader election in `kube-system`), `cluster_role` (rules and an optional `binding`) |
 | scaling | `hpa`, `pdb_min_available`, `auto_pdb`, `vpa` (update mode) |
-| other | `persistent_volumes`, `persistent_volume_claims`, `webhooks` (Mutating), `validating_webhooks`, `webhook_annotations`, `backend_config` (GKE BackendConfig) |
+| other | `persistent_volumes`, `persistent_volume_claims`, `webhooks` (Mutating), `validating_webhooks`, `webhook_annotations`, `api_service` (APIService), `backend_config` (GKE BackendConfig) |
 
 `labels` go on the workload and its pod template; `pod_labels` only on the pod template. Selectors use the `name` label only. `service_account.create` renders a ServiceAccount, `service_account.enabled` only sets `serviceAccountName`; either sets it, to `service_account.name` or the component name, and Role and ClusterRole bindings bind that name.
 
@@ -108,6 +108,8 @@ Probes are rendered only for the `healthcheck` entries that set a `type`, never 
 Secret `data` values are base64-encoded unless the entry sets `b64_encode: false`; `string_data` stays plain. A Kapitan ref (`?{...}`) passes through unchanged, so a ref used in `data` must hold a base64 value. With `versioned: true` the ConfigMap or Secret name gets a content hash, and the volumes, `env` and `env_from` references of the component follow it.
 
 A Service needs at least one container port with a `service_port`, except `headless` and `ExternalName` Services. A Service port's `appProtocol` comes from the port name when the name says the protocol: `http` and `https` as they are, `h2c`, `ws` and `wss` as `kubernetes.io/h2c`, `kubernetes.io/ws` and `kubernetes.io/wss`. `app_protocol` sets it for any other name or overrides it, and an empty `app_protocol` leaves it out. `container_port` defaults to `service_port`, so a port that is the same on both needs only `service_port`. Two resources that map to the same output file fail the compile.
+
+`api_service` serves an aggregated API, such as metrics-server's `metrics.k8s.io`, from the component's Service. It renders an APIService named `<version>.<group>` whose `service` is the component's Service in the component's namespace. The port is `port` if set, else the Service port named `https`, else the Service's only port. A Service with several ports and none named `https` fails the compile. `group_priority_minimum` and `version_priority` default to 100, the values metrics-server, prometheus-adapter and KEDA register with. The API requires both and has no default for them. The API server verifies the Service's serving certificate against the APIService's CA, so the entry needs `ca_bundle`, one of the cert-manager CA injection annotations listed under [Security defaults](#security-defaults) in `annotations`, or `insecure_skip_tls_verify: true` for a self-signed certificate such as metrics-server's. Without any of them the compile fails. `insecure_skip_tls_verify` next to a CA fails as well, because the API rejects `insecureSkipTLSVerify` together with a `caBundle`. `group`, `version` and the component's `service` are required.
 
 For PersistentVolumes and PersistentVolumeClaims, `spec` is merged over the generator defaults first, then the flat keys are applied; a flat key that overrides a `spec` value logs a warning.
 
@@ -144,7 +146,7 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 
 | Source | Suffix |
 |---|---|
-| component workload with its webhooks and BackendConfig | `deploy`, `sts`, `ds`, `job`, `cj` |
+| component workload with its webhooks, APIService and BackendConfig | `deploy`, `sts`, `ds`, `job`, `cj` |
 | component `config_maps` / `secrets` | `cm` / `secret` |
 | component `service`, `additional_services` | `svc` |
 | component ServiceAccount, Role, ClusterRole and bindings | `rbac` |
@@ -162,10 +164,57 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 | `namespaces` | `<name>-namespace`, no namespace directory |
 | `rbac` | `<name>-clusterrole`, `<name>-clusterrolebinding` without namespace directory; `role`, `rolebinding` in the namespace |
 | `manifests` | `<kind lowercased>`; no namespace directory without `namespace` |
+| component workload, compile entry with `function: generate_chainsaw_asserts` | `assert`; CronJobs get none |
+
+## Chainsaw asserts
+
+A compile entry with `input_params.function: generate_chainsaw_asserts` writes one [Chainsaw StepTemplate](https://kyverno.github.io/chainsaw/0.2.15/step-template/) per component, which asserts that the component's workload is ready. Give it its own `output_path`, so the templates stay out of the directory that kubectl, Argo CD or Flux apply:
+
+```yaml
+parameters:
+  kapitan:
+    compile:
+      - output_path: manifests/
+        input_type: kadet
+        output_type: yml
+        input_paths:
+          - lib/kubernetes
+      - output_path: chainsaw/
+        input_type: kadet
+        output_type: yml
+        input_paths:
+          - lib/kubernetes
+        input_params:
+          function: generate_chainsaw_asserts
+```
+
+A test runs a template as a step, by its path relative to the test file. The assert takes the test's timeout; Chainsaw's default of 30 seconds is short for image pulls.
+
+```yaml
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: shop
+spec:
+  timeouts:
+    assert: 3m
+  steps:
+    - use:
+        template: ../compiled/prod/chainsaw/shop/web-assert.yml
+```
+
+| Workload | Ready when |
+|---|---|
+| Deployment | `availableReplicas` equals `replicas`; with `hpa`, which leaves `replicas` unset, the `Available` condition is `True` |
+| StatefulSet | `readyReplicas` equals `replicas`; with `hpa`, it is at least `hpa.min_replicas` |
+| DaemonSet | `numberReady` equals `desiredNumberScheduled` and `observedGeneration` is set |
+| Job | `succeeded` equals `completions` |
+
+A DaemonSet is created with both counts at 0, so the assert also waits for `observedGeneration`, which the controller sets once it has counted the nodes. A CronJob gets no template, because it starts no pod before its schedule. The templates are StepTemplates and not plain assert files, because the kadet-hub gate creates every document of a built-in kind in the output with a server-side dry run, and a partial Deployment without `spec` fails it.
 
 ## API versions and schemas
 
-Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`.
+Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`, `apiregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`, the Chainsaw StepTemplate `chainsaw.kyverno.io/v1alpha1`.
 
 `schemas/` holds the JSON Schemas of these kinds: built-in kinds from [kubernetes-json-schema](https://github.com/yannh/kubernetes-json-schema) v1.37.1-standalone-strict, CRD kinds from the upstream CRDs at the versions above, closed against unknown fields. BackendConfig is not schema-checked, because GKE publishes no BackendConfig CRD file; kinds rendered through `manifests` are checked only where `schemas/` has their schema.
 
