@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0
+
+- `generators.kubernetes.services.<name>` renders a Service for pods that no component renders, such as Prometheus and Alertmanager from prometheus-operator or the static control-plane pods kube-prometheus-stack scrapes, instead of a `manifests` entry with the spec under `body`. It takes the keys and the port shape of a component's Service. `container_port` is the `targetPort` and defaults to `service_port`. `selector` is required unless the Service is `headless`. The file is `<namespace>/<name>-svc.yml`, where `manifests` wrote `<name>-service.yml`.
+- A `headless` Service with a `type` other than `ClusterIP` fails the compile, instead of rendering a Service the API rejects.
+
+Output is unchanged for inventories without `services`.
+
 ## 1.5.0
 
 - `api_service` on a component renders the APIService of an aggregated API served by the component's Service, such as metrics-server's `v1beta1.metrics.k8s.io`, instead of a `manifests` entry that repeats the Service's name, namespace and port. The port is the Service port named `https` or the only one. `group_priority_minimum` and `version_priority` default to 100. The entry needs `ca_bundle`, a cert-manager CA injection annotation or `insecure_skip_tls_verify: true`; anything else fails the compile.
