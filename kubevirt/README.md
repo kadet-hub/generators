@@ -219,6 +219,8 @@ One key covers CRDs and controller, because RKE2 ships both as charts, and k3s v
 
 Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annotation `cluster.x-k8s.io/cluster-namespace`, as Cluster API Provider KubeVirt sets them, or the annotations `csi.kubevirt.io/infra-vm-name` and `csi.kubevirt.io/infra-vm-namespace`. A VolumeSnapshotClass needs the external-snapshotter CRDs and snapshot-controller in the tenant cluster, which `snapshot_controller` renders where the cluster has neither.
 
+Plain `kubectl apply -R` on the tenant output needs two runs, or the Namespace and the `-crd` files applied first, because it applies the files in `<namespace>/` before the Namespace file and resolves the kind of every object before it creates any. Argo CD and Flux order Namespaces and CRDs before the objects that need them.
+
 #### Defaults
 
 | Default | Where | Reason |
