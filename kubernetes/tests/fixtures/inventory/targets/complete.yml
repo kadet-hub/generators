@@ -2,7 +2,7 @@
 # Services, ConfigMaps, Secrets, RBAC, scaling, NetworkPolicies, volumes and
 # APIServices; Ingress with a GKE ManagedCertificate; Gateway API with the
 # services shorthand; standalone resources, cluster policy sections and
-# manifests.
+# manifests; Chainsaw StepTemplates asserting the workloads.
 classes: []
 
 parameters:
@@ -14,6 +14,12 @@ parameters:
         input_paths:
           - lib/kubernetes
         output_path: manifests/
+      - input_type: kadet
+        input_paths:
+          - lib/kubernetes
+        output_path: chainsaw/
+        input_params:
+          function: generate_chainsaw_asserts
 
   namespace: shop
 

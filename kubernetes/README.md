@@ -2,9 +2,9 @@
 
 Published on kadet-hub ([catalog](https://kadet-hub.org/generators/kubernetes/)): pin a released version by digest from its catalog page.
 
-Kapitan kadet generator for plain Kubernetes resources. One component block under `parameters.components` becomes a workload (Deployment, StatefulSet, DaemonSet, Job or CronJob) plus the resources derived from it: Services selecting its pods, ConfigMaps and Secrets mounted into it, a ServiceAccount with Role or ClusterRole bindings, HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler, NetworkPolicies, PersistentVolumeClaims, admission webhooks and the APIService of an aggregated API. Next to components it renders Ingresses (with GKE ManagedCertificates), Gateway API resources, standalone ConfigMaps, Secrets, ServiceAccounts and volumes, cluster and namespace policy kinds, and any other kind through a passthrough.
+Kapitan kadet generator for plain Kubernetes resources. One component block under `parameters.components` becomes a workload (Deployment, StatefulSet, DaemonSet, Job or CronJob) plus the resources derived from it: Services selecting its pods, ConfigMaps and Secrets mounted into it, a ServiceAccount with Role or ClusterRole bindings, HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler, NetworkPolicies, PersistentVolumeClaims, admission webhooks and the APIService of an aggregated API. A second compile entry writes Chainsaw step templates that assert each workload is ready. Next to components it renders Ingresses (with GKE ManagedCertificates), Gateway API resources, standalone ConfigMaps, Secrets, ServiceAccounts and volumes, cluster and namespace policy kinds, and any other kind through a passthrough.
 
-Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.0 and GKE Managed Certificates 1.2.12.
+Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.0, GKE Managed Certificates 1.2.12 and Chainsaw 0.2.15.
 
 ServiceMonitor, PodMonitor and PrometheusRule belong in the [prometheus-operator generator](https://kadet-hub.org/generators/prometheus-operator/) (`generators.prometheus_operator`); the component keys `service_monitors` and `prometheus_rules` and the section `generators.kubernetes.pod_monitors` are ignored with a warning naming it.
 
@@ -164,10 +164,57 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 | `namespaces` | `<name>-namespace`, no namespace directory |
 | `rbac` | `<name>-clusterrole`, `<name>-clusterrolebinding` without namespace directory; `role`, `rolebinding` in the namespace |
 | `manifests` | `<kind lowercased>`; no namespace directory without `namespace` |
+| component workload, compile entry with `function: generate_chainsaw_asserts` | `assert`; CronJobs get none |
+
+## Chainsaw asserts
+
+A compile entry with `input_params.function: generate_chainsaw_asserts` writes one [Chainsaw StepTemplate](https://kyverno.github.io/chainsaw/0.2.15/step-template/) per component, which asserts that the component's workload is ready. Give it its own `output_path`, so the templates stay out of the directory that kubectl, Argo CD or Flux apply:
+
+```yaml
+parameters:
+  kapitan:
+    compile:
+      - output_path: manifests/
+        input_type: kadet
+        output_type: yml
+        input_paths:
+          - lib/kubernetes
+      - output_path: chainsaw/
+        input_type: kadet
+        output_type: yml
+        input_paths:
+          - lib/kubernetes
+        input_params:
+          function: generate_chainsaw_asserts
+```
+
+A test runs a template as a step, by its path relative to the test file. The assert takes the test's timeout; Chainsaw's default of 30 seconds is short for image pulls.
+
+```yaml
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: shop
+spec:
+  timeouts:
+    assert: 3m
+  steps:
+    - use:
+        template: ../compiled/prod/chainsaw/shop/web-assert.yml
+```
+
+| Workload | Ready when |
+|---|---|
+| Deployment | `availableReplicas` equals `replicas`; with `hpa`, which leaves `replicas` unset, the `Available` condition is `True` |
+| StatefulSet | `readyReplicas` equals `replicas`; with `hpa`, it is at least `hpa.min_replicas` |
+| DaemonSet | `numberReady` equals `desiredNumberScheduled` and `observedGeneration` is set |
+| Job | `succeeded` equals `completions` |
+
+A DaemonSet is created with both counts at 0, so the assert also waits for `observedGeneration`, which the controller sets once it has counted the nodes. A CronJob gets no template, because it starts no pod before its schedule. The templates are StepTemplates and not plain assert files, because the kadet-hub gate creates every document of a built-in kind in the output with a server-side dry run, and a partial Deployment without `spec` fails it.
 
 ## API versions and schemas
 
-Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`, `apiregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`.
+Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`, `apiregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`, the Chainsaw StepTemplate `chainsaw.kyverno.io/v1alpha1`.
 
 `schemas/` holds the JSON Schemas of these kinds: built-in kinds from [kubernetes-json-schema](https://github.com/yannh/kubernetes-json-schema) v1.37.1-standalone-strict, CRD kinds from the upstream CRDs at the versions above, closed against unknown fields. BackendConfig is not schema-checked, because GKE publishes no BackendConfig CRD file; kinds rendered through `manifests` are checked only where `schemas/` has their schema.
 

@@ -847,6 +847,62 @@ def generate_component_manifests(input_params):
     return obj
 
 
+def _ready_status(workload, component):
+    """The status of a ready workload as a Chainsaw assertion tree."""
+    spec = workload.spec
+    replicas = spec.get("replicas")
+    if workload.kind == "Deployment":
+        # With an HPA the workload has no replicas to compare with.
+        if replicas is None:
+            return {"(conditions[?type == 'Available'])": [{"status": "True"}]}
+        return {"availableReplicas": replicas}
+    if workload.kind == "StatefulSet":
+        # The HPA scales the StatefulSet up to min_replicas after its creation.
+        if replicas is None:
+            minimum = component.get("hpa", {}).get("min_replicas") or 1
+            return {f"(readyReplicas >= `{minimum}`)": True}
+        return {"readyReplicas": replicas}
+    if workload.kind == "DaemonSet":
+        # Both counts are 0 until the controller has seen the DaemonSet, which
+        # sets observedGeneration.
+        return {"(observedGeneration > `0` && numberReady == desiredNumberScheduled)": True}
+    return {"succeeded": spec.completions}
+
+
+def generate_chainsaw_asserts(input_params):
+    """One Chainsaw StepTemplate per component that asserts its workload is ready.
+
+    A CronJob gets none: it starts no pod before its schedule.
+    """
+    obj = BaseObj()
+    for name, component in get_components():
+        if component.get("schedule"):
+            continue
+        namespace_name = component.get(
+            "namespace", inv.parameters.get("namespace", "default")
+        )
+        workload = Workload(name=name, component=component).root
+        resource = {
+            "apiVersion": workload.apiVersion,
+            "kind": workload.kind,
+            "metadata": {
+                k: workload.metadata[k] for k in ("name", "namespace") if k in workload.metadata
+            },
+            "status": _ready_status(workload, component),
+        }
+        _put(
+            obj,
+            f"{namespace_name}/{name}-assert",
+            {
+                "apiVersion": "chainsaw.kyverno.io/v1alpha1",
+                "kind": "StepTemplate",
+                "metadata": {"name": name},
+                "spec": {"try": [{"assert": {"resource": resource}}]},
+            },
+        )
+    return obj
+
+
 def generate_manifests(input_params):
     """Generate all manifests."""
     all_manifests = BaseObj()
@@ -872,7 +928,11 @@ def main(input_params):
     """Main entry point for manifest generation."""
     from .utils import generate_docs
 
-    whitelisted_functions = ["generate_manifests", "generate_docs"]
+    whitelisted_functions = [
+        "generate_manifests",
+        "generate_docs",
+        "generate_chainsaw_asserts",
+    ]
     function = input_params.get("function", "generate_manifests")
     if function not in whitelisted_functions:
         raise ValueError(

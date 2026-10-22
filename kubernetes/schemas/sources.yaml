@@ -80,3 +80,8 @@ networking.gke.io:
   version: 1.2.12
   source: https://github.com/GoogleCloudPlatform/gke-managed-certs/blob/v1.2.12/deploy/managedcertificates-crd.yaml
   license: Apache-2.0
+chainsaw.kyverno.io:
+  software: Chainsaw
+  version: 0.2.15
+  source: https://github.com/kyverno/chainsaw/blob/v0.2.15/.crds/chainsaw.kyverno.io_steptemplates.yaml
+  license: Apache-2.0
