@@ -88,12 +88,26 @@ class Service(k8s.Base):
         self.add_labels(component.get("labels", {}))
         self.add_annotations(service_spec.get("annotations", {}))
         name = self.root.metadata.name
+        # external_name makes an ExternalName Service; the type follows from it.
+        external_name = service_spec.get("external_name")
+        if external_name:
+            if service_spec.get("type", "ExternalName") != "ExternalName":
+                raise ValueError(
+                    f"service {name!r}: external_name needs type ExternalName, "
+                    f"not {service_spec.get('type')}"
+                )
+            if service_spec.get("headless"):
+                raise ValueError(f"service {name!r}: external_name and headless exclude each other")
+            service_spec = {**service_spec, "type": "ExternalName"}
+            self.root.spec.externalName = external_name
+        elif service_spec.get("type") == "ExternalName":
+            raise ValueError(f"service {name!r}: type ExternalName needs external_name")
         if workload is None:
-            # Only a headless Service may go without a selector: its endpoints
-            # are managed elsewhere.
+            # Only a headless or ExternalName Service may go without a
+            # selector: its endpoints are managed elsewhere or it has none.
             selector = service_spec.get("selector")
-            if not selector and not service_spec.get("headless"):
-                raise ValueError(f"service {name!r}: selector is required unless headless")
+            if not selector and not service_spec.get("headless") and not external_name:
+                raise ValueError(f"service {name!r}: selector is required unless headless or external_name")
             if selector:
                 self.root.spec.selector = dict(selector)
         else:

@@ -63,6 +63,9 @@ parameters:
             reloader-web:
               service_port: 8080
               container_port: reloader-web
+        # A DNS alias for a database outside the cluster
+        legacy-db:
+          external_name: db.example.org
         # Headless, for scraping a static control-plane pod
         kube-scheduler:
           namespace: kube-system
