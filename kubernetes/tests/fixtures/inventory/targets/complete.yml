@@ -287,7 +287,6 @@ parameters:
         http:
           container_port: 8080
           service_port: 80
-          app_protocol: http
         metrics:
           container_port: 9100
       healthcheck:
@@ -560,6 +559,13 @@ parameters:
           - apiGroups: [""]
             resources: [namespaces]
             verbs: [get, list, watch]
+      # leader election in kube-system, bound to this component's ServiceAccount
+      role:
+        namespace: kube-system
+        rules:
+          - apiGroups: [coordination.k8s.io]
+            resources: [leases]
+            verbs: [get, create, update]
       validating_webhooks:
         - name: validate.policy.example.com
           admissionReviewVersions: [v1]
@@ -577,8 +583,6 @@ parameters:
               resources: [deployments]
       webhooks:
         - name: default.policy.example.com
-          admissionReviewVersions: [v1]
-          sideEffects: None
           failurePolicy: Ignore
           clientConfig:
             service:

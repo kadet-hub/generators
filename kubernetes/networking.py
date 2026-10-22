@@ -132,10 +132,22 @@ class Service(k8s.Base):
                     "targetPort": port_name,
                     "protocol": ports.get("protocol", "TCP"),
                 }
-                if ports.get("app_protocol"):
-                    service_port["appProtocol"] = ports.get("app_protocol")
+                app_protocol = ports.get("app_protocol", APP_PROTOCOLS.get(port_name))
+                if app_protocol:
+                    service_port["appProtocol"] = app_protocol
                 service_ports += [service_port]
         return service_ports
+
+
+# Port names that say the protocol: IANA service names as they are, the others
+# as the Kubernetes-defined appProtocol values.
+APP_PROTOCOLS = {
+    "http": "http",
+    "https": "https",
+    "h2c": "kubernetes.io/h2c",
+    "ws": "kubernetes.io/ws",
+    "wss": "kubernetes.io/wss",
+}
 
 
 class Ingress(k8s.Base):

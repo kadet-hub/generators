@@ -24,6 +24,10 @@ def _webhooks(name, component, key):
     namespace = get_namespace(component, default="default")
     service = (component.get("service") or {}).get("service_name", name)
     for webhook in webhooks:
+        # The only AdmissionReview version and the side-effect class a webhook
+        # written today declares; both fields are required by the API.
+        webhook.setdefault("admissionReviewVersions", ["v1"])
+        webhook.setdefault("sideEffects", "None")
         client = webhook.setdefault("clientConfig", {})
         # A component's webhook is served by the component's own Service.
         if "url" not in client:

@@ -80,7 +80,8 @@ class Role(k8s.Base):
         super().body()
         _name = self.kwargs.name
         component = self.kwargs.component
-        namespace = get_namespace(component)
+        # role.namespace puts the Role elsewhere, e.g. leader election in kube-system.
+        namespace = component.get("role", {}).get("namespace") or get_namespace(component)
         if namespace:
             self.add_namespace(namespace)
         self.root.rules = component.get("role", {}).get("rules")
@@ -114,8 +115,9 @@ class RoleBinding(k8s.Base):
         _name = self.kwargs.name
         component = self.kwargs.component
         namespace = get_namespace(component)
-        if namespace:
-            self.add_namespace(namespace)
+        role_namespace = component.get("role", {}).get("namespace") or namespace
+        if role_namespace:
+            self.add_namespace(role_namespace)
         sa_subject = {
             "kind": "ServiceAccount",
             "name": service_account_name(component),

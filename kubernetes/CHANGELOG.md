@@ -2,6 +2,11 @@
 
 ## 1.4.0
 
+Defaults that remove values the inventory had to repeat:
+
+- A Service port's `appProtocol` comes from the port name when the name says the protocol: `http`, `https`, and `h2c`, `ws`, `wss` as their `kubernetes.io/` values. **Services with ports named like this now render `appProtocol`.** An explicit `app_protocol` overrides it; an empty one leaves it out.
+- A component's webhook defaults to `admissionReviewVersions: [v1]` and `sideEffects: None`.
+- `role.namespace` renders a component's Role and RoleBinding in another namespace, bound to the component's ServiceAccount, for leader election in `kube-system`.
 - A component's webhook without `clientConfig.url` points at the component's own Service; `clientConfig.service` takes its `name` and `namespace` unless the inventory sets them. Webhooks that set both render as before.
 - `cert-manager.io/inject-ca-from-secret` and `cert-manager.io/inject-apiserver-ca` count as CA injection for a `failurePolicy: Fail` webhook, like `inject-ca-from`. cert-manager uses `inject-ca-from-secret` for its own webhook.
 
