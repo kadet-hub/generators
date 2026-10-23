@@ -83,14 +83,21 @@ second key for the same thing and still could not change or drop an
 argument a class sets. The list form stays because existing inventories
 use it; a class whose arguments targets change switches to the mapping.
 
-## Open questions
+## RBAC for one workload
 
-- OQ-1: Whether an `rbac` entry should render several roles for one set of
-  subjects, so a workload such as cert-manager's controller keeps the
-  chart's 8 ClusterRoles without repeating `cluster_wide` and
-  `service_accounts` in 8 entries. One entry with all rules grants the
-  same permissions. Whether keeping chart object names is a goal, and a
-  proposal for a `roles` map on an `rbac` entry, are in #101.
+DEC-2: An `rbac` entry stays one role with its bindings; there is no
+mechanism for several roles per set of subjects. cert-manager's
+controller binds 8 ClusterRoles cluster-wide to one ServiceAccount, which
+took 8 entries repeating `cluster_wide` and `service_accounts`. A recipe
+merges those rules into one `rbac` entry, which grants the same
+permissions. Where several entries share subjects, such as a Role in
+another namespace, the subject list is written once and referenced with
+`${...}` interpolation, which reclass-rs and omegaconf both resolve.
+Chart role names are not preserved. Keeping them would only ease an
+in-place migration from the chart, and names such as
+`<release>-controller-approve:cert-manager-io` cannot be kept anyway,
+because every name is also a `name` label value. A `roles` map on an
+`rbac` entry was proposed in #101 and not taken.
 
 ## Implementation inventory
 
