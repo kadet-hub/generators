@@ -669,7 +669,8 @@ parameters:
         version: v1beta1
         insecure_skip_tls_verify: true
 
-    # Two Service ports: the APIService takes the one named https
+    # Two Service ports: the APIService takes the one named https. An empty
+    # service is a ClusterIP Service.
     custom-metrics:
       image: registry.example.com/platform/custom-metrics:0.4.0
       ports:
@@ -691,8 +692,7 @@ parameters:
           memory: 64Mi
         limits:
           memory: 128Mi
-      service:
-        type: ClusterIP
+      service: {}
       api_service:
         group: custom.metrics.k8s.io
         version: v1beta2

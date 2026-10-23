@@ -115,7 +115,7 @@ class APIService(k8s.Base):
     def body(self):
         name, component = self.kwargs.name, self.kwargs.component
         api = component.get("api_service")
-        if not (api.get("group") and api.get("version") and component.get("service")):
+        if not (api.get("group") and api.get("version") and component.get("service") is not None):
             raise ValueError(
                 f"{name}: api_service needs group, version and the component's service"
             )
