@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+The KubeVirt CR renders `spec: {}` when the inventory sets no `spec` or `spec: null`. Before, it rendered without `spec`, which the CRD requires, so the API server rejected it with `spec: Required value`. Targets that set `spec` render the same output.
+
 ## 1.3.0
 
 `csi.image` is optional and defaults to `ghcr.io/kadet-hub/mirror/kubevirt-csi-driver:3a1a099330045754011803e3d53cd8276ff21723@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409`, kadet-hub's unmodified copy of the quay.io `latest` build of 3a1a099. Targets that set `image` render the same output. The README's Driver image section links the image's upstream sources.

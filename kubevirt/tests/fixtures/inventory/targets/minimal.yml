@@ -1,4 +1,5 @@
-# Minimal: one VirtualMachine from a container disk and one blank DataVolume
+# Minimal: one VirtualMachine from a container disk, one blank DataVolume
+# and the KubeVirt CR without spec
 classes: []
 
 parameters:
@@ -24,3 +25,5 @@ parameters:
           size: 1Gi
           source:
             blank: {}
+      kubevirt_operators:
+        kubevirt: {}

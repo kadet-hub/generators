@@ -776,8 +776,8 @@ class KubeVirt(KubevirtBase):
         super().body()
         config = self.kwargs.config
         self._add_common_metadata(config)
-        if "spec" in config:
-            self.root.spec = _convert_to_dict(config["spec"])
+        # The CRD requires spec, and none of its fields.
+        self.root.spec = _convert_to_dict(config.get("spec")) or {}
 
 
 # ---------------------------------------------------------------------------
