@@ -21,7 +21,11 @@ from . import k8s
 DRIVER = "csi.kubevirt.io"
 APP = {"app": "kubevirt-csi-driver"}
 # quay.io has only a moving latest tag and deletes replaced digests, so the
-# driver image has no default: the README names the digest to mirror.
+# default is kadet-hub's unmodified copy, tagged by its source commit (KV-2).
+IMAGE = (
+    "ghcr.io/kadet-hub/mirror/kubevirt-csi-driver:3a1a099330045754011803e3d53cd8276ff21723"
+    "@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409"
+)
 SIG_STORAGE = "registry.k8s.io/sig-storage/"
 PROVISIONER = SIG_STORAGE + "csi-provisioner:v6.0.2@sha256:80f0225e1b2beeade5734fef6b10ab459e02ac3816570660651b45bd50f178bf"
 ATTACHER = SIG_STORAGE + "csi-attacher:v4.10.0@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d"
@@ -514,13 +518,7 @@ def render(obj: Any, config: dict, default_namespace: str) -> None:
     if role not in KEYS:
         raise ValueError(f"kubevirt csi: role must be one of {sorted(KEYS)}, got {role!r}")
     _check_keys(f"csi (role {role})", config, KEYS[role])
-    if not config.get("image"):
-        raise ValueError(
-            "kubevirt csi: set image, the KubeVirt CSI driver image to pull. Upstream publishes only a moving"
-            " quay.io latest tag and deletes replaced digests; mirror"
-            " quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409"
-            " (built from 3a1a099, see the README) and reference the mirror by digest"
-        )
+    config = {**config, "image": config.get("image") or IMAGE}
     if role == "infra":
         _infra(obj, config, config.get("namespace", default_namespace))
     else:

@@ -156,7 +156,7 @@ parameters:
 | Key | Role | Default | Meaning |
 |---|---|---|---|
 | `role` | | required | `infra` or `tenant` |
-| `image` | both | required | driver image of the controller and the node plugin, see [Driver image](#driver-image) |
+| `image` | both | the kadet-hub mirror | driver image of the controller and the node plugin, see [Driver image](#driver-image) |
 | `namespace` | both | infra: the generator `namespace` fallback chain; tenant: `kubevirt-csi-driver` | |
 | `tenant_kubeconfig_secret` | infra | required | name of the Secret in `namespace` whose key `value` holds the tenant kubeconfig, the layout of Cluster API's `<cluster>-kubeconfig` Secrets; the generator never renders its content |
 | `infra_cluster_labels` | infra | required | map of labels the controller puts on this tenant cluster's DataVolumes (`--infra-cluster-labels`) |
@@ -177,13 +177,13 @@ Unknown keys fail the compile, and so do `snapshot_classes` naming a class outsi
 
 #### Driver image
 
-Upstream publishes the driver only as `quay.io/kubevirt/kubevirt-csi-driver:latest` and deletes a digest once `latest` moves on (the previous one already returns 404), so `image` has no default. Mirror
+Upstream publishes the driver only as `quay.io/kubevirt/kubevirt-csi-driver:latest` and deletes a digest once `latest` moves on (the previous one already returns 404). `image` therefore defaults to kadet-hub's copy of the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only):
 
 ```
-quay.io/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
+ghcr.io/kadet-hub/mirror/kubevirt-csi-driver:3a1a099330045754011803e3d53cd8276ff21723@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
 ```
 
-the `latest` build of 3a1a099 (image label `multi.GIT_SHA`, linux/amd64 only), into a registry both clusters can pull from, and set `image` to the mirror by digest. The fixtures use the quay.io reference above, which works only while it is `latest`.
+The copy is unmodified and has upstream's digest. Its sources are referenced, not hosted: the driver at [kubevirt/csi-driver@3a1a099](https://github.com/kubevirt/csi-driver/tree/3a1a099330045754011803e3d53cd8276ff21723), the CentOS Stream 9 base packages in the [BaseOS](https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/) and [AppStream](https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/) source trees ([Mirrored images](https://github.com/kadet-hub/registry/blob/main/docs/consumers.md#mirrored-images), [DEC-16](https://github.com/kadet-hub/registry/blob/main/docs/specs/publishing.md#mirrored-images)). Set `image` to pull from a registry of your own.
 
 `latest` is still that build, because upstream removed its image workflow in [#393](https://github.com/kubevirt/csi-driver/pull/393), and no published image contains a later commit. That leaves out the fix of [#397](https://github.com/kubevirt/csi-driver/pull/397). In the 3a1a099 build the controller panics in `ControllerUnpublishVolume` when a VMI outlives its VM, and the volume stays on the VMI. An image built from e13603a has the fix. Its `USER 1001` changes nothing here, because the output sets the UID of the driver container on both sides. The sidecars are pinned by tag and digest as upstream pins them at e13603a.
 
@@ -254,7 +254,6 @@ parameters:
       namespace: tenant-a
       csi:
         role: infra
-        image: registry.example.com/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
         tenant_kubeconfig_secret: tenant-a-kubeconfig
         infra_cluster_labels:
           csi-driver/cluster: tenant-a
@@ -270,7 +269,6 @@ parameters:
     kubevirt:
       csi:
         role: tenant
-        image: registry.example.com/kubevirt/kubevirt-csi-driver@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409
         snapshot_controller: true
         storage_classes:
           kubevirt:
