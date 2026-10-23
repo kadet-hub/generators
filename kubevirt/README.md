@@ -221,6 +221,8 @@ Tenant nodes have to name their VM: providerID `kubevirt://<vm>` with the annota
 
 Plain `kubectl apply -R` on the tenant output needs two runs, or the Namespace and the `-crd` files applied first, because it applies the files in `<namespace>/` before the Namespace file and resolves the kind of every object before it creates any. Argo CD and Flux order Namespaces and CRDs before the objects that need them.
 
+In `<namespace>/` plain `kubectl apply -R` also creates the Secret `kubevirt-csi-controller-sa-token` before its ServiceAccount `kubevirt-csi-controller-sa`, because `-sa-token-secret.yaml` sorts before `-sa.yaml`. The token controller deletes a token Secret whose ServiceAccount does not exist yet, while kubectl reports it as created. Apply `kubevirt-csi-controller-sa.yaml` first, or apply once more after the ServiceAccount exists, then check that `kubectl -n kubevirt-csi-driver get secret kubevirt-csi-controller-sa-token` finds the Secret. Argo CD and Flux apply ServiceAccounts before Secrets.
+
 #### Defaults
 
 | Default | Where | Reason |
