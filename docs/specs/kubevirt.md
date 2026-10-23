@@ -39,10 +39,29 @@ sort ServiceAccounts before Secrets (gitops-engine `sync_tasks.go`, fluxcd/pkg
     existing namespace, then `kubectl get secret kubevirt-csi-controller-sa-token`
   - Since: #100
 
+## CSI driver image
+
+Upstream publishes the driver only as `quay.io/kubevirt/kubevirt-csi-driver:latest`
+and deletes a digest once `latest` moves on. kadet-hub/registry copies that
+image unchanged into `ghcr.io/kadet-hub/mirror/kubevirt-csi-driver`, tagged by
+its source commit (registry PUB-13). Its upstream sources are referenced, not
+hosted (registry DEC-16 in `docs/specs/publishing.md`).
+
+- KV-2: Without `csi.image`, both roles MUST render the driver image
+  `ghcr.io/kadet-hub/mirror/kubevirt-csi-driver:3a1a099330045754011803e3d53cd8276ff21723@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409`.
+
+  `csi.image` still overrides it, for consumers who mirror into their own
+  registry. The fixtures set no `image`, so `./check kubevirt` compiles
+  the default.
+
+  - Test: `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
 | Code | `kubevirt/csi.py` (tenant role, output keys `<namespace>/kubevirt-csi-controller-sa`, `<namespace>/kubevirt-csi-controller-sa-token-secret`) |
-| Docs | `kubevirt/README.md`, section Prerequisites under CSI driver |
-| Fixture | `kubevirt/tests/fixtures`, target `csi-tenant` |
+| Code | `kubevirt/csi.py` (`render`, default `csi.image`) |
+| Docs | `kubevirt/README.md`, section Prerequisites under CSI driver; section Driver image |
+| Fixture | `kubevirt/tests/fixtures`, targets `csi-tenant`, `csi-infra` |

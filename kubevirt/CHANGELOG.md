@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+`csi.image` is optional and defaults to `ghcr.io/kadet-hub/mirror/kubevirt-csi-driver:3a1a099330045754011803e3d53cd8276ff21723@sha256:44c98353e6137455d6a393ad13e04f60e10ee49fdcd00cf078f7f7084714f409`, kadet-hub's unmodified copy of the quay.io `latest` build of 3a1a099. Targets that set `image` render the same output. The README's Driver image section links the image's upstream sources.
+
 ## 1.2.0
 
 Adds `csi.snapshot_controller` for the tenant role. `true` renders the snapshot-controller of external-snapshotter v8.7.0 with its RBAC and the VolumeSnapshotClass, VolumeSnapshotContent and VolumeSnapshot CRDs, so a tenant VolumeSnapshotClass works without a separate install. The controller runs in the CSI namespace with a restricted security context. The README's CSI defaults list where it differs from upstream's manifest. On the infra role the key fails the compile. Output without the key stays the same.
