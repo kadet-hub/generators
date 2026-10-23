@@ -57,6 +57,20 @@ hosted (registry DEC-16 in `docs/specs/publishing.md`).
   - Test: `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
   - Since: this change
 
+## KubeVirt CR spec
+
+The KubeVirt CRD marks `spec` as required (`kubevirt.io/schemas/kubevirt_v1.json`,
+from KubeVirt 1.9.1), so the API server rejects a KubeVirt CR without it with
+`spec: Required value`. No field inside `spec` is required, so an empty
+mapping deploys the operator with its defaults. The other kinds the generator
+renders always get a `spec` mapping built from their flat keys.
+
+- KV-3: The KubeVirt CR MUST always render `spec`. Without `spec` in the
+  inventory, or with `spec: null`, it MUST render `spec: {}`.
+
+  - Test: `./check kubevirt` (fixture `minimal`, QA-7 schema check)
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
@@ -65,3 +79,5 @@ hosted (registry DEC-16 in `docs/specs/publishing.md`).
 | Code | `kubevirt/csi.py` (`render`, default `csi.image`) |
 | Docs | `kubevirt/README.md`, section Prerequisites under CSI driver; section Driver image |
 | Fixture | `kubevirt/tests/fixtures`, targets `csi-tenant`, `csi-infra` |
+| Code | `kubevirt/__init__.py` (`KubeVirt.body`, `spec` default) |
+| Fixture | `kubevirt/tests/fixtures`, target `minimal` (`kubevirt_operators.kubevirt` without `spec`) |
