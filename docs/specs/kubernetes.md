@@ -27,7 +27,7 @@ so a target could not change or drop one argument that a class sets.
   unchanged, so an empty `service` still fails without a `service_port`.
 
   - Test: `kubernetes/tests/test_components.py::test_empty_service_renders_service`, `::test_empty_service_serves_api_service`; fixture target `complete`
-  - Since: this change
+  - Since: #102
 
 - K8S-2: A component without `service`, or with `service: null`, MUST
   render no Service from that key.
@@ -37,7 +37,7 @@ so a target could not change or drop one argument that a class sets.
   `additional_services` is not affected.
 
   - Test: `kubernetes/tests/test_components.py::test_missing_or_null_service_renders_none`, `::test_null_service_on_statefulset`
-  - Since: this change
+  - Since: #102
 
 ## Container args
 
@@ -64,13 +64,13 @@ so a target could not change or drop one argument that a class sets.
   `[--leader-election-namespace, kube-system]`.
 
   - Test: `kubernetes/tests/test_components.py::test_args_mapping`; fixture target `complete`
-  - Since: this change
+  - Since: #102
 
 - K8S-5: An `args` mapping value that is itself a mapping MUST fail the
   compile, naming the container and the key.
 
   - Test: `kubernetes/tests/test_components.py::test_args_mapping_value_mapping_fails`
-  - Since: this change
+  - Since: #102
 
 DEC-1: `args` takes a mapping next to the list. Three alternatives were
 considered. A flag map that renders `--flag: value` as `--flag=value`
