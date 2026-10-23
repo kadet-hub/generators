@@ -85,19 +85,20 @@ use it; a class whose arguments targets change switches to the mapping.
 
 ## RBAC for one workload
 
-DEC-2: An `rbac` entry stays one role with its bindings; there is no
-mechanism for several roles per set of subjects. cert-manager's
-controller binds 8 ClusterRoles cluster-wide to one ServiceAccount, which
-took 8 entries repeating `cluster_wide` and `service_accounts`. A recipe
-merges those rules into one `rbac` entry, which grants the same
-permissions. Where several entries share subjects, such as a Role in
-another namespace, the subject list is written once and referenced with
-`${...}` interpolation, which reclass-rs and omegaconf both resolve.
-Chart role names are not preserved. Keeping them would only ease an
-in-place migration from the chart, and names such as
-`<release>-controller-approve:cert-manager-io` cannot be kept anyway,
-because every name is also a `name` label value. A `roles` map on an
-`rbac` entry was proposed in #101 and not taken.
+DEC-2: There is no generator mechanism for several roles per set of
+subjects; an `rbac` entry stays one role with its bindings. A recipe keeps
+the chart's split: one `rbac` entry per chart role, as the chart has it.
+cert-manager's controller binds 8 ClusterRoles cluster-wide to one
+ServiceAccount, so its recipe has 8 entries. Role names follow the chart
+and change only where the generator requires it: every name is also a
+`name` label value, so `<release>-controller-approve:cert-manager-io`
+needs a name without `:`.
+
+The repeated parts, such as the subject list, `cluster_wide` and common
+rule blocks, are written once in the inventory and referenced with
+omegaconf interpolation and Kapitan's built-in `${merge:...}` resolver.
+A `roles` map on an `rbac` entry was proposed in #101 and not taken,
+because the inventory can already share these parts.
 
 ## Implementation inventory
 
