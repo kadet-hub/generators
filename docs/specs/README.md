@@ -14,3 +14,4 @@ request, as its first commit.
 | [check.md](check.md) | Gate check (`CHK-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
+| [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |
