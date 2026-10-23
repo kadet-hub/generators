@@ -700,7 +700,8 @@ def _build_security_bundle(name, component, workload_spec):
 def _build_service_bundle(name, component, workload_spec):
     """Build Service manifests (primary + additional) for a component."""
     bundle = []
-    if component.get("service"):
+    # An empty mapping is a Service with the API defaults (K8S-1).
+    if component.get("service") is not None:
         bundle += [
             Service(
                 name=name,

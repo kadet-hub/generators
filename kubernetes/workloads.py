@@ -123,7 +123,7 @@ class StatefulSet(k8s.Base, WorkloadCommon):
         self.root.spec.updateStrategy = component.get(
             "update_strategy", default_update_strategy
         )
-        self.root.spec.serviceName = component.get("service", {}).get(
+        self.root.spec.serviceName = (component.get("service") or {}).get(
             "service_name", name
         )
         self.set_replicas(component.get("replicas", 1))

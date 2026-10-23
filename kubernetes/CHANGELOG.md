@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0
+
+- `args` takes a mapping next to the list. Its values render in the mapping's order: a string as one argument, a list as several, `null` as none. A target can override or drop one argument a class sets by its key, which a list did not allow because the backends append or merge lists. A mapping value fails the compile.
+- `service: {}` renders the component's Service with the API defaults. Before, an empty mapping rendered no Service and `type: ClusterIP` had to be written. `api_service` accepts it as well. A StatefulSet with `service: null` no longer fails the compile.
+- README: component `labels` go on the workload, its Services, HPA and VPA, not on the pod template. Service, PodDisruptionBudget and NetworkPolicy selectors take all pod template labels. The README also states the label-value rule for names, the sorted container ports and `namespaceSelector: {}` on a webhook.
+
+Output is unchanged for inventories without an empty `service` mapping and without an `args` mapping.
+
 ## 1.6.0
 
 - `generators.kubernetes.services.<name>` renders a Service for pods that no component renders, such as Prometheus and Alertmanager from prometheus-operator or the static control-plane pods kube-prometheus-stack scrapes, instead of a `manifests` entry with the spec under `body`. It takes the keys and the port shape of a component's Service. `container_port` is the `targetPort` and defaults to `service_port`. `selector` is required unless the Service is `headless`. The file is `<namespace>/<name>-svc.yml`, where `manifests` wrote `<name>-service.yml`.
