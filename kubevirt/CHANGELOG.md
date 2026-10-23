@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+Adds `csi.snapshot_controller` for the tenant role. `true` renders the snapshot-controller of external-snapshotter v8.7.0 with its RBAC and the VolumeSnapshotClass, VolumeSnapshotContent and VolumeSnapshot CRDs, so a tenant VolumeSnapshotClass works without a separate install. The controller runs in the CSI namespace with a restricted security context. The README's CSI defaults list where it differs from upstream's manifest. On the infra role the key fails the compile. Output without the key stays the same.
+
+The `snapshot.storage.k8s.io` schema group now names external-snapshotter 8.7.0 (`client/config/crd`) as its source instead of the KubeVirt CSI driver's copy, and adds the VolumeSnapshotContent and VolumeSnapshot CRDs. All three files are upstream's byte for byte, and the output renders them from there.
+
 ## 1.1.2
 
 Built for the KubeVirt CSI driver at main@e13603a. Upstream now deploys what `csi` already rendered. Since kubevirt/csi-driver#392 its controller runs with the restricted security context, with UID and GID 1001 from the `plain-kubernetes` component, and the node plugin's `csi-driver` container as UID 0. Since kubevirt/csi-driver#396 it pins csi-snapshotter v8.7.0. The rendered output stays the same, and the README's CSI defaults keep only the remaining differences. The VolumeSnapshotClass CRD and schema move to e13603a, whose file is external-snapshotter's v8.7.0 CRD and differs from the shipped one only in descriptions.

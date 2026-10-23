@@ -5,9 +5,8 @@
 # KubeVirt and CDI ship no CRD YAML in their trees; virt-operator and
 # cdi-operator install the CRDs from the generated Go sources linked below.
 # KubeVirt applies one schema to every served version of a CRD.
-# The KubeVirt CSI driver has no release or tag. Its VolumeSnapshotClass CRD
-# is taken at the deploy/ commit the csi section follows. The file is
-# external-snapshotter's v8.7.0 CRD byte for byte.
+# The snapshot.storage.k8s.io CRDs follow the snapshot-controller release
+# that csi.snapshot_controller renders, and its output takes them from crds/.
 # core, apps, rbac.authorization.k8s.io and storage.k8s.io schemas are the
 # kubernetes-json-schema standalone-strict files of this Kubernetes release,
 # unchanged.
@@ -37,9 +36,9 @@ cdi.kubevirt.io:
   source: https://github.com/kubevirt/containerized-data-importer/blob/v1.66.1/pkg/operator/resources/crds_generated.go
   license: Apache-2.0
 snapshot.storage.k8s.io:
-  software: KubeVirt CSI driver
-  version: main@e13603a
-  source: https://github.com/kubevirt/csi-driver/blob/e13603a1527794ac9599765e622029c284431e23/deploy/tenant/base/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+  software: Kubernetes CSI external-snapshotter
+  version: 8.7.0
+  source: https://github.com/kubernetes-csi/external-snapshotter/tree/v8.7.0/client/config/crd
   license: Apache-2.0
 core:
   software: Kubernetes
