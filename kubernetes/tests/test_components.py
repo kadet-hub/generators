@@ -3,7 +3,7 @@
 from box import Box
 
 from .. import utils
-from ..base import Workload
+from ..base import Container, Workload
 from ..generators import _build_service_bundle
 from ..webhooks import APIService
 
@@ -38,6 +38,28 @@ def test_empty_service_renders_service():
 def test_missing_or_null_service_renders_none():
     assert services(component()) == []
     assert services(component(service=None)) == []
+
+
+def args(value):
+    return Container(name="web", container={"image": "x/web:1.0", "args": value}).root.to_dict().get("args")
+
+
+def test_args_list():
+    assert args(["--since", "24h"]) == ["--since", "24h"]
+
+
+def test_args_mapping():
+    value = {"v": "--v=4", "port": 8080, "leader": ["--leader-election-namespace", "kube-system"], "dropped": None}
+    assert args(value) == ["--v=4", "8080", "--leader-election-namespace", "kube-system"]
+
+
+def test_args_mapping_value_mapping_fails():
+    try:
+        args({"v": {"level": 4}})
+    except ValueError as e:
+        assert "web: args.v" in str(e), str(e)
+    else:
+        raise AssertionError("no ValueError")
 
 
 def test_null_service_on_statefulset():

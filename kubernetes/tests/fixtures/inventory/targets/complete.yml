@@ -669,10 +669,13 @@ parameters:
         version: v1beta1
         insecure_skip_tls_verify: true
 
-    # Two Service ports: the APIService takes the one named https. An empty
-    # service is a ClusterIP Service.
+    # Two Service ports: the APIService takes the one named https. args as a
+    # mapping, rendered in order; an empty service is a ClusterIP Service.
     custom-metrics:
       image: registry.example.com/platform/custom-metrics:0.4.0
+      args:
+        secure_port: --secure-port=6443
+        cert_dir: [--cert-dir, /tmp]
       ports:
         https:
           container_port: 6443

@@ -707,8 +707,18 @@ class Container(BaseObj):
         if container.get("lifecycle"):
             self.root.lifecycle = container.get("lifecycle")
         self.root.resources = container.get("resources", {})
-        if container.get("args"):
-            self.root.args = container.get("args")
+        args = container.get("args")
+        if isinstance(args, dict):
+            # A mapping lets a target override or drop one argument by key (K8S-4).
+            listed = []
+            for key, value in args.items():
+                if isinstance(value, dict):
+                    raise ValueError(f"{name}: args.{key} must be a string or a list, not a mapping")
+                if value is not None:
+                    listed += [str(v) for v in value] if isinstance(value, list) else [str(value)]
+            args = listed
+        if args:
+            self.root.args = args
         if container.get("command"):
             self.root.command = container.get("command")
         self.root.securityContext = container.get("security_context", {})
