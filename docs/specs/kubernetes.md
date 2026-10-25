@@ -111,13 +111,13 @@ its Gateway needs no ReferenceGrant.
   for each entry of `parent_refs`, and MUST render no Gateway.
 
   - Test: `kubernetes/tests/test_components.py::test_route_parent_refs`; fixture target `complete`
-  - Since: this change
+  - Since: #107
 
 - K8S-7: A `routes` entry without `parent_refs`, or with a `parent_refs`
   entry without `name`, MUST fail the compile, naming the route.
 
   - Test: `kubernetes/tests/test_components.py::test_route_without_parent_fails`
-  - Since: this change
+  - Since: #107
 
 - K8S-8: A redirect rule with `replace_full_path` MUST render
   `path: {type: ReplaceFullPath, replaceFullPath: <value>}`, one with
@@ -130,7 +130,7 @@ its Gateway needs no ReferenceGrant.
   `PathPrefix`. An empty `replace_prefix_match` strips the matched prefix.
 
   - Test: `kubernetes/tests/test_components.py::test_redirect_path`, `::test_redirect_both_paths_fails`; fixture target `complete`
-  - Since: this change
+  - Since: #107
 
 DEC-3: Routes to a Gateway outside the inventory get a section of their
 own. A flag on `gateways.<gateway>` that skips the Gateway was considered.
@@ -159,7 +159,7 @@ start, so its chart renders them without one.
   the CA. Until it does, every call of the webhook fails.
 
   - Test: `kubernetes/tests/test_components.py::test_webhook_ca_injected`, `::test_webhook_without_ca_fails`
-  - Since: this change
+  - Since: #107
 
 ## RBAC for one workload
 
