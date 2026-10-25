@@ -16,3 +16,4 @@ request, as its first commit.
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
 | [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |
 | [kubernetes.md](kubernetes.md) | kubernetes generator (`K8S-`) |
+| [cloudnative-pg.md](cloudnative-pg.md) | cloudnative-pg generator (`CNPG-`) |
