@@ -17,3 +17,4 @@ request, as its first commit.
 | [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |
 | [kubernetes.md](kubernetes.md) | kubernetes generator (`K8S-`) |
 | [cloudnative-pg.md](cloudnative-pg.md) | cloudnative-pg generator (`CNPG-`) |
+| [rabbitmq.md](rabbitmq.md) | rabbitmq generator (`RMQ-`) |

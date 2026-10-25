@@ -42,7 +42,7 @@ All keys live under `parameters.generators.rabbitmq`.
 | `secrets.<name>` | Secret | `<namespace>/<name>-secret` |
 | `configs.<name>` | ConfigMap | `<namespace>/<name>-cm` |
 
-Every entry accepts `namespace`, `labels` and `annotations`. The CRD kinds take their spec from `spec`, passed through unchanged, and topology kinds also accept `cluster_reference`.
+Every entry accepts `namespace`, `labels` and `annotations`, and `name`, which names the resource and its output key in place of the entry key. The CRD kinds take their spec from `spec`, passed through unchanged, and topology kinds also accept `cluster_reference`.
 
 ### Defaults and shorthands
 
@@ -50,7 +50,7 @@ Precedence, lowest first: generator defaults, `spec`, flat keys and shorthands; 
 
 | Input | Result |
 |---|---|
-| entry key of Queue, Exchange, Policy, Vhost, Federation, Shovel | `spec.name` |
+| `name`, else the entry key, of Queue, Exchange, Policy, Vhost, Federation, Shovel | `spec.name` |
 | `cluster_reference: <name>` on an entry or generator-wide | `spec.rabbitmqClusterReference: {name: <name>}` |
 
 `spec.name` is the object's name inside RabbitMQ and [required by the CRD](https://github.com/rabbitmq/messaging-topology-operator/tree/v1.20.4/api/v1beta1). The webhook [forbids changing it](https://github.com/rabbitmq/messaging-topology-operator/blob/v1.20.4/internal/webhook/v1beta1/queue_webhook.go) after creation, so set `spec.name` when the RabbitMQ name differs from the entry key, for example a queue named `analytics.reports`.
