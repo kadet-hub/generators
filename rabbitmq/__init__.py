@@ -5,7 +5,7 @@ Binding, User, Permission, Vhost, Federation, and Shovel resources.
 Also supports ConfigMaps and Secrets for RabbitMQ configuration.
 """
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 import base64
 import hashlib
@@ -273,14 +273,22 @@ def generate_rabbitmq_obj(kind, input_params):
     rabbitmq_obj_list = rabbitmq_config.get(kind.lower(), {})
     namespace = _get_namespace()
 
-    for name in rabbitmq_obj_list.keys():
-        resource_config = rabbitmq_obj_list[name] or {}
-        rabbitmq_obj = RabbitmqObject(
+    keys: dict[str, str] = {}
+    for key in rabbitmq_obj_list.keys():
+        resource_config = rabbitmq_obj_list[key] or {}
+        # RMQ-1: the resource takes the entry's name, else its key.
+        name = resource_config.get("name") or key
+        resource_namespace = resource_config.get("namespace") or namespace
+        output = f"{resource_namespace}/{name}-{kind.lower()}"
+        if output in keys:
+            raise ValueError(
+                f"rabbitmq: {kind.lower()} '{keys[output]}' and '{key}' both render "
+                f"'{name}' in namespace '{resource_namespace}'"
+            )
+        keys[output] = key
+        obj.root[output] = RabbitmqObject(
             kind=kind, name=name, rabbitmq_obj=resource_config
         )
-        resource_namespace = resource_config.get("namespace") or namespace
-
-        obj.root[f"{resource_namespace}/{name}-{kind.lower()}"] = rabbitmq_obj
 
     return obj
 

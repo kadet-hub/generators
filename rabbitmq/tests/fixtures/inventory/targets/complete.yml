@@ -19,7 +19,9 @@ parameters:
       cluster_reference: production
 
       rabbitmqcluster:
-        production:
+        # Named by name, not by its key
+        primary:
+          name: production
           labels:
             team: platform
           annotations:

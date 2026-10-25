@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+`name` on an entry of a custom resource section names its resource, its output file and, for the kinds with `spec.name`, the default of `spec.name`, which before always took the entry's key. A recipe that may write only keys of its own name can then keep a resource name, such as the RabbitmqCluster `production` whose StatefulSet, claims and Secrets carry its name. Two entries of a section with the same name in one namespace now fail the compile; before, the later one replaced the earlier output file. Output is unchanged for inventories without `name` on those sections and without such a collision.
+
 ## 1.0.3
 
 Built for RabbitMQ Cluster Operator 2.23.1 and Messaging Topology Operator 1.20.4. The Federation schema and CRD gain the upstream default `reconnectDelay: 1`; the other `rabbitmq.com` schemas and CRDs are unchanged. ConfigMaps and Secrets are checked against the Kubernetes 1.37.1 schemas instead of 1.35.0, which differ only in a ConfigMap description. Rendered output is unchanged.
