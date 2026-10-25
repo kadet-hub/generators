@@ -20,7 +20,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 API_VERSION = "kafka.strimzi.io/v1"
 CLUSTER_LABEL = "strimzi.io/cluster"
@@ -237,13 +237,17 @@ def main(input_params: dict | None = None) -> BaseObj:
     gen = _convert_to_dict(inv.parameters.get("generators", {}).get("strimzi", {}) or {})
     default_namespace = str(gen.get("namespace") or inv.parameters.get("namespace", "default"))
     kafkas = gen.get("kafkas") or {}
-    namespaces = {}
+    # STZ-1: a resource takes its entry's name, else its key; references name the resource.
+    namespaces: dict[str, list[str]] = {}
     pools: set[tuple[str, str]] = set()
 
-    for name, config in kafkas.items():
+    for key, config in kafkas.items():
         config = dict(config or {})
+        name = config.get("name") or key
         namespace = config.get("namespace") or default_namespace
-        namespaces[name] = namespace
+        namespaces.setdefault(name, [])
+        if namespace not in namespaces[name]:
+            namespaces[name].append(namespace)
         no_authorization = config.get("authorization") == "none"
         if no_authorization:
             config.pop("authorization")
@@ -251,8 +255,9 @@ def main(input_params: dict | None = None) -> BaseObj:
         if entity_operator not in (None, True, False):
             raise ValueError(f"Kafka '{name}': entity_operator must be true or false")
         brokers = 0
-        for pool, pool_config in (config.get("node_pools") or {}).items():
+        for pool_key, pool_config in (config.get("node_pools") or {}).items():
             pool_config = pool_config or {}
+            pool = pool_config.get("name") or pool_key
             if (namespace, pool) in pools:
                 raise ValueError(f"KafkaNodePool '{pool}' is defined twice in namespace '{namespace}'")
             pools.add((namespace, pool))
@@ -291,13 +296,23 @@ def main(input_params: dict | None = None) -> BaseObj:
     for section, kind, flat in (("topics", "KafkaTopic", TOPIC_FLAT), ("users", "KafkaUser", USER_FLAT)):
         for key, config in (gen.get(section) or {}).items():
             config = config or {}
-            cluster = config.get("cluster") or gen.get("cluster") or (next(iter(kafkas)) if len(kafkas) == 1 else None)
+            only = next(iter(namespaces)) if len(kafkas) == 1 else None
+            cluster = config.get("cluster") or gen.get("cluster") or only
             if not cluster:
                 raise ValueError(f"{kind} '{key}': set cluster, generators.strimzi.cluster or define exactly one Kafka")
-            if kafkas and cluster not in kafkas:
-                raise ValueError(f"{kind} '{key}': cluster '{cluster}' is not one of the Kafka entries {list(kafkas)}")
-            namespace = config.get("namespace") or namespaces.get(cluster) or default_namespace
-            name, topic_name = _topic_names(key) if kind == "KafkaTopic" else (key, None)
+            if kafkas and cluster not in namespaces:
+                raise ValueError(f"{kind} '{key}': cluster '{cluster}' is not one of the Kafkas {list(namespaces)}")
+            namespace = config.get("namespace")
+            if not namespace:
+                # STZ-2: two Kafkas of that name leave the namespace open.
+                found = namespaces.get(cluster) or [default_namespace]
+                if len(found) > 1:
+                    raise ValueError(f"{kind} '{key}': Kafka '{cluster}' is in the namespaces {found}, set namespace")
+                namespace = found[0]
+            if config.get("name"):
+                name, topic_name = config["name"], None
+            else:
+                name, topic_name = _topic_names(key) if kind == "KafkaTopic" else (key, None)
             defaults = {"topicName": topic_name} if topic_name else {}
             _put(obj, f"{namespace}/{name}-{kind.lower()}", StrimziResource(
                 kind=kind,

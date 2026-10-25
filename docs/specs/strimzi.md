@@ -42,7 +42,7 @@ clients' settings only if both keep their names.
   - Test: `strimzi/tests/test_names.py`; fixture target `complete`, whose
     entries `development`, `single`, `scratch-topic` and `dev-client-user`
     render `dev`, `dual`, `scratch` and `dev-client`
-  - Since: not implemented
+  - Since: this change
 
 - STZ-2: A topic or user without `namespace` whose `cluster` names Kafkas
   in more than one namespace MUST fail the compile, naming the namespaces.
@@ -52,7 +52,7 @@ clients' settings only if both keep their names.
   would otherwise land in either.
 
   - Test: `strimzi/tests/test_names.py::test_cluster_in_two_namespaces_fails`
-  - Since: not implemented
+  - Since: this change
 
 DEC-1: The name is a key of the entry, as in the cloudnative-pg and
 rabbitmq generators (DEC-1 there). Letting kadet-hub/recipes accept the

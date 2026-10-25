@@ -1,4 +1,5 @@
-# Complete: two clusters, every flat key and shorthand, spec passthrough and a flat key overriding spec
+# Complete: three clusters, every flat key and shorthand, spec passthrough, a flat key overriding spec
+# and entries that take their resource's name from name (STZ-1)
 classes: []
 
 parameters:
@@ -94,11 +95,13 @@ parameters:
                 superUsers:
                   - CN=platform-admin
             cruiseControl: {}
-        dev:
+        development:
+          name: dev
           namespace: dev
           authorization: simple
           node_pools:
-            dual:
+            single:
+              name: dual
               roles: [controller, broker]
               replicas: 1
               storage:
@@ -136,7 +139,8 @@ parameters:
             partitions: 3
             config:
               cleanup.policy: compact
-        scratch:
+        scratch-topic:
+          name: scratch
           cluster: dev
           partitions: 1
       users:
@@ -170,7 +174,8 @@ parameters:
             authorization:
               type: simple
               acls: []
-        dev-client:
+        dev-client-user:
+          name: dev-client
           cluster: dev
           spec:
             authentication:
