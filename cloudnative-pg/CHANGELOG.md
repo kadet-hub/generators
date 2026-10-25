@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+`__version__` now reports the release version, which still read 1.0.1. Rendered output is unchanged.
+
 ## 1.1.0
 
 `name` on any entry names its resource and its output file, which before always took the entry's key. A recipe that may write only keys of its own name can then keep a resource name, such as the Cluster `app-db` whose claims and Secrets carry its name. Two entries of a section with the same name in one namespace now fail the compile; before, the later one replaced the earlier output file. Output is unchanged for inventories without `name` and without such a collision.

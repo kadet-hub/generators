@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.1
+
+`__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.
+
 ## 1.9.0
 
 - `webhook_configuration_name` and `validating_webhook_configuration_name` on a component name its MutatingWebhookConfiguration and ValidatingWebhookConfiguration. Without them both stay `<namespace>-<component>`. The CloudNativePG operator writes its CA only into configurations of fixed names.
