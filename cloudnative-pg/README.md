@@ -69,7 +69,7 @@ This yields a three-instance Cluster that archives WAL to `app-db-store`, the `a
 
 ### Inventory Contract
 
-All keys live under `parameters.generators.cloudnative-pg`. Each entry becomes one resource named after its key. The namespace resolves from the entry's `namespace`, then `parameters.generators.cloudnative-pg.namespace`, then `parameters.namespace`, then `default`.
+All keys live under `parameters.generators.cloudnative-pg`. Each entry becomes one resource named after its key, or after its `name` if it sets one. A reference such as `cluster: <name>` names the resource. Two entries of a section with the same name in one namespace fail the compile. The namespace resolves from the entry's `namespace`, then `parameters.generators.cloudnative-pg.namespace`, then `parameters.namespace`, then `default`.
 
 | Key | Kind |
 |---|---|
