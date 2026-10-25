@@ -118,7 +118,9 @@ parameters:
               parameters:
                 max_client_conn: "1000"
                 default_pool_size: "20"
-        app-db-pooler-ro:
+        # Named by name, not by its key
+        reader:
+          name: app-db-pooler-ro
           cluster: app-db
           type: ro
       scheduled_backups:

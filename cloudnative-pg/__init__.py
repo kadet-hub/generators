@@ -291,11 +291,21 @@ def main(input_params: dict | None = None) -> BaseObj:
     for section, suffix, build in SECTIONS:
         entries = config.get(section) or {}
         resources[section] = []
-        for name in sorted(entries):
-            entry = entries[name] or {}
+        keys: dict[str, str] = {}
+        for key in sorted(entries):
+            entry = entries[key] or {}
+            # CNPG-1: the resource takes the entry's name, else its key.
+            name = entry.get("name") or key
             namespace = entry.get("namespace") or default_namespace
+            output = f"{namespace}/{name}-{suffix}"
+            if output in keys:
+                raise CompileError(
+                    f"cloudnative-pg: {section} '{keys[output]}' and '{key}' both render "
+                    f"'{name}' in namespace '{namespace}'"
+                )
+            keys[output] = key
             resource = build(name, namespace, entry)
             resources[section].append(resource)
-            out.root[f"{namespace}/{name}-{suffix}"] = resource
+            out.root[output] = resource
     _check_references(resources)
     return out

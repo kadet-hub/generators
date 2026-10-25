@@ -28,7 +28,8 @@ keeps its data only if the Cluster keeps its name.
   `name` applies to every section. A reference to the resource, such as a
   Pooler's or a Backup's `cluster`, names the resource, not the key.
 
-  - Test: `cloudnative-pg/tests/test_names.py::test_name_overrides_key`, `::test_key_names_resource`; fixture target `complete`
+  - Test: fixture target `complete`, whose Pooler entry `reader` renders
+    `app-db-pooler-ro` and the other entries their keys
   - Since: this change
 
 - CNPG-2: Two entries of one section that render the same name in the same
@@ -36,7 +37,8 @@ keeps its data only if the Cluster keeps its name.
 
   Before, the later one would have replaced the earlier output file.
 
-  - Test: `cloudnative-pg/tests/test_names.py::test_same_name_fails`
+  - Test: manual: compile the `complete` fixture with a second Pooler
+    entry named `app-db-pooler-ro`; it fails naming both keys
   - Since: this change
 
 DEC-1: The name is a key of the entry, as `name` in the standalone sections
@@ -45,10 +47,13 @@ chart's names need was considered. RCP-18 there keeps one recipe from
 writing into another's keys, and an exception for chart names would have
 to tell a chart name from any other key.
 
+The generator has no unit tests. Its directory name is not a Python
+identifier, so a test module cannot import it relatively, and the gate's
+import policy allows neither `sys` nor `importlib`.
+
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
 | Resource names | `cloudnative-pg/__init__.py` (`main`) |
-| Unit tests | `cloudnative-pg/tests/test_names.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider cloudnative-pg/tests` |
 | Fixture | `cloudnative-pg/tests/fixtures`, targets `minimal` and `complete` |
