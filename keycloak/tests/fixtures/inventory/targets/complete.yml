@@ -1,7 +1,8 @@
 # Complete: every section, spec passthrough with a flat key overriding it,
 # realm content maps with Secret refs, and two instances in one namespace so
 # keycloak_cr_name has to be named explicitly there; operator-managed OIDC and
-# SAML clients (client-admin-api:v2 enabled where they point)
+# SAML clients (client-admin-api:v2 enabled where they point), and an instance
+# that takes its Keycloak's name from name (KC-1)
 classes: []
 
 parameters:
@@ -18,7 +19,8 @@ parameters:
   generators:
     keycloak:
       instances:
-        sso:
+        primary:
+          name: sso
           labels:
             app.kubernetes.io/part-of: identity
           annotations:
