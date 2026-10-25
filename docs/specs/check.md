@@ -1,7 +1,7 @@
 # Gate check
 
 Status: Draft
-Code: `check`, `.github/workflows/check.yml`, `.github/CODEOWNERS`
+Code: `check`, `.github/workflows/check.yml`, `.github/workflows/request-review.yml`
 Verified against: main @ ca05de9
 
 ## Problem and decision
@@ -78,18 +78,21 @@ signatures with `freshclam`, or warns and scans with the shipped database.
 - CHK-6: Every pull request MUST request a review from `neat-bot`. That
   review MUST NOT be a condition for merging.
 
-  `.github/CODEOWNERS` names `@neat-bot` for every path. GitHub requests a
-  code owner only when it has write access, and never the author of the
-  pull request. With write access, an approval by `neat-bot` counts toward
-  the one approval the `main` ruleset requires, which UPD-5 keeps
-  `GITHUB_TOKEN` from giving. The ruleset leaves code owner review off, so
-  a missing review from `neat-bot` does not block a merge.
+  The `request review` workflow requests `neat-bot` with the repository's
+  own token when a pull request is opened, reopened or marked ready. It
+  skips drafts, pull requests opened by bots, and pull requests from forks,
+  whose token is read-only; on a fork the reviewer is requested by hand after
+  a look at it. `neat-bot` has read access only (terraform-homezone GHO-6a),
+  so CODEOWNERS, which requests a code owner only with write access, cannot
+  do it, and an approval by `neat-bot` does not count toward the one approval
+  the `main` ruleset requires. That approval comes from a person; UPD-5 keeps
+  `GITHUB_TOKEN` from giving it.
 
-  - Test: manual: `gh pr view <n> --json reviewRequests` on a new pull
-    request; `gh api repos/kadet-hub/generators/codeowners/errors` lists no
-    errors; the `main` ruleset in `gh api repos/kadet-hub/generators/rulesets`
-    has `require_code_owner_review: false`
-  - Since: #105
+  - Test: manual: on a new pull request the `request review` run succeeds and
+    `gh pr view <n> --json reviewRequests` lists `neat-bot`;
+    `gh api repos/kadet-hub/generators/collaborators/neat-bot/permission`
+    reports `read`
+  - Since: #105 (CODEOWNERS), #108 (workflow)
 
 ## Open questions
 
@@ -103,4 +106,4 @@ None.
 | Registry | `https://github.com/kadet-hub/registry.git` at `REGISTRY_REF`, default `main` |
 | Scanner pins | registry `.github/actions/setup-gate/action.yml` (gitleaks), `scan/requirements.txt` (semgrep, GuardDog, ruff), `scan/static-scan` (ClamAV image digest) |
 | Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |
-| Code owners | `.github/CODEOWNERS`, `@neat-bot` for every path (CHK-6) |
+| Review request | `.github/workflows/request-review.yml`, `pull_request` (CHK-6) |
