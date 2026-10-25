@@ -75,21 +75,24 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   - Test: manual: review of `.github/workflows/check.yml`
   - Since: #39
 
-- CHK-6: Every pull request MUST request a review from `neat-bot`. That
-  review MUST NOT be a condition for merging.
+- CHK-6: Every pull request MUST request a review from the team
+  `kadet-hub/reviewers`. That review MUST NOT be a condition for merging.
 
-  `.github/CODEOWNERS` names `@neat-bot` for every path. GitHub requests a
-  code owner only when it has write access, and never the author of the
-  pull request. With write access, an approval by `neat-bot` counts toward
-  the one approval the `main` ruleset requires, which UPD-5 keeps
-  `GITHUB_TOKEN` from giving. The ruleset leaves code owner review off, so
-  a missing review from `neat-bot` does not block a merge.
+  `.github/CODEOWNERS` names `@kadet-hub/reviewers` for every path. GitHub
+  requests a code owner team only when the team is visible and has write
+  access, and never requests the author of the pull request. The team's
+  members, today only `neat-bot`, have write access through the team, so
+  their approval counts toward the one approval the `main` ruleset
+  requires, which UPD-5 keeps `GITHUB_TOKEN` from giving. The ruleset
+  leaves code owner review off, so a missing review does not block a
+  merge.
 
   - Test: manual: `gh pr view <n> --json reviewRequests` on a new pull
-    request; `gh api repos/kadet-hub/generators/codeowners/errors` lists no
-    errors; the `main` ruleset in `gh api repos/kadet-hub/generators/rulesets`
-    has `require_code_owner_review: false`
-  - Since: #105
+    request lists the team; `gh api repos/kadet-hub/generators/codeowners/errors`
+    lists no errors; the `main` ruleset in
+    `gh api repos/kadet-hub/generators/rulesets` has
+    `require_code_owner_review: false`
+  - Since: #105, #106
 
 ## Open questions
 
@@ -103,4 +106,4 @@ None.
 | Registry | `https://github.com/kadet-hub/registry.git` at `REGISTRY_REF`, default `main` |
 | Scanner pins | registry `.github/actions/setup-gate/action.yml` (gitleaks), `scan/requirements.txt` (semgrep, GuardDog, ruff), `scan/static-scan` (ClamAV image digest) |
 | Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |
-| Code owners | `.github/CODEOWNERS`, `@neat-bot` for every path (CHK-6) |
+| Code owners | `.github/CODEOWNERS`, `@kadet-hub/reviewers` for every path (CHK-6) |
