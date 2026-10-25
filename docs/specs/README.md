@@ -18,3 +18,4 @@ request, as its first commit.
 | [kubernetes.md](kubernetes.md) | kubernetes generator (`K8S-`) |
 | [cloudnative-pg.md](cloudnative-pg.md) | cloudnative-pg generator (`CNPG-`) |
 | [rabbitmq.md](rabbitmq.md) | rabbitmq generator (`RMQ-`) |
+| [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
