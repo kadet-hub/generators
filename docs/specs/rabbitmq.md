@@ -38,7 +38,7 @@ keeps its data and its clients' Secret only if the cluster keeps its name.
 
   - Test: `rabbitmq/tests/test_names.py::test_name_names_the_resource`,
     `::test_key_names_the_resource_without_name`; fixture target `complete`
-  - Since: this change
+  - Since: #111
 
 - RMQ-2: Two entries of one section that render the same name in the same
   namespace MUST fail the compile, naming both keys.
@@ -46,7 +46,7 @@ keeps its data and its clients' Secret only if the cluster keeps its name.
   Before, the later one would have replaced the earlier output file.
 
   - Test: `rabbitmq/tests/test_names.py::test_same_name_fails`
-  - Since: this change
+  - Since: #111
 
 DEC-1: The name is a key of the entry, as for this generator's `secrets`
 and `configs` and for every entry of the cloudnative-pg generator (CNPG-1).
