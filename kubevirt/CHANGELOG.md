@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2
+
+`__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.
+
 ## 1.3.1
 
 The KubeVirt CR renders `spec: {}` when the inventory sets no `spec` or `spec: null`. Before, it rendered without `spec`, which the CRD requires, so the API server rejected it with `spec: Required value`. Targets that set `spec` render the same output.

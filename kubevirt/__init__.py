@@ -44,7 +44,7 @@ from . import csi, k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.1.1"
+__version__ = "1.3.2"
 
 
 # ---------------------------------------------------------------------------
