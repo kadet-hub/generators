@@ -161,6 +161,37 @@ start, so its chart renders them without one.
   - Test: `kubernetes/tests/test_components.py::test_webhook_ca_injected`, `::test_webhook_without_ca_fails`
   - Since: #107
 
+The same operator patches its webhook configurations by name. CloudNativePG
+1.30.1 looks for `cnpg-mutating-webhook-configuration` and
+`cnpg-validating-webhook-configuration` (`internal/configuration` of
+cloudnative-pg), while the generator names both `<namespace>-<component>`.
+The operator then writes no CA into them, and every call fails.
+
+- K8S-10: A component's `webhook_configuration_name` MUST name its
+  MutatingWebhookConfiguration and `validating_webhook_configuration_name`
+  its ValidatingWebhookConfiguration. Without them both MUST keep the name
+  `<namespace>-<component>`.
+
+  The two kinds take separate keys because an operator may expect two
+  different names, as CloudNativePG does. A name the user sets is not
+  scoped by namespace, so two components that set the same one collide.
+
+  - Test: `kubernetes/tests/test_components.py::test_webhook_configuration_names`, `::test_webhook_configuration_default_names`
+  - Since: this change
+
+## Volume mounts
+
+A container's `volume_mounts` is a mapping whose keys name the volumes, so
+a volume can be mounted once per container. Nextcloud's chart mounts its
+claim `nextcloud-main` at six paths, each with its own `subPath`.
+
+- K8S-11: A `volume_mounts` entry with `volume` MUST mount that volume, and
+  its key MUST then name only the mount. An entry without `volume` MUST
+  mount the volume of its key, as before.
+
+  - Test: `kubernetes/tests/test_components.py::test_volume_mounts_of_one_volume`, `::test_volume_mount_named_by_key`
+  - Since: this change
+
 ## RBAC for one workload
 
 DEC-2: There is no generator mechanism for several roles per set of
@@ -186,5 +217,7 @@ because the inventory can already share these parts.
 | Container args | `kubernetes/base.py` (`Container.body`) |
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
+| Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
+| Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
