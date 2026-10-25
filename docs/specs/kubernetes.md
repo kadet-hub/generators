@@ -177,7 +177,7 @@ The operator then writes no CA into them, and every call fails.
   scoped by namespace, so two components that set the same one collide.
 
   - Test: `kubernetes/tests/test_components.py::test_webhook_configuration_names`, `::test_webhook_configuration_default_names`
-  - Since: this change
+  - Since: #109
 
 ## Volume mounts
 
@@ -190,7 +190,7 @@ claim `nextcloud-main` at six paths, each with its own `subPath`.
   mount the volume of its key, as before.
 
   - Test: `kubernetes/tests/test_components.py::test_volume_mounts_of_one_volume`, `::test_volume_mount_named_by_key`
-  - Since: this change
+  - Since: #109
 
 ## RBAC for one workload
 
