@@ -73,7 +73,9 @@ class MutatingWebhookConfiguration(k8s.Base):
         self.need("component")
         self.kwargs.apiVersion = "admissionregistration.k8s.io/v1"
         self.kwargs.kind = "MutatingWebhookConfiguration"
-        self.kwargs.rendered_name = cluster_scoped_name(self.kwargs.component)
+        self.kwargs.rendered_name = self.kwargs.component.get(
+            "webhook_configuration_name"
+        ) or cluster_scoped_name(self.kwargs.component)
         super().new()
 
     def body(self):
@@ -91,7 +93,9 @@ class ValidatingWebhookConfiguration(k8s.Base):
         self.need("component")
         self.kwargs.apiVersion = "admissionregistration.k8s.io/v1"
         self.kwargs.kind = "ValidatingWebhookConfiguration"
-        self.kwargs.rendered_name = cluster_scoped_name(self.kwargs.component)
+        self.kwargs.rendered_name = self.kwargs.component.get(
+            "validating_webhook_configuration_name"
+        ) or cluster_scoped_name(self.kwargs.component)
         super().new()
 
     def body(self):

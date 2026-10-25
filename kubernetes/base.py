@@ -654,7 +654,9 @@ class Container(BaseObj):
     def add_volume_mounts(self, volume_mounts):
         for key, value in volume_mounts.items():
             mount = {
-                "name": key,
+                # The key names the volume, or only the mount when volume is set,
+                # so one volume can be mounted at several paths.
+                "name": value.get("volume") or key,
                 "mountPath": value.get("mount_path"),
             }
             # Add optional fields if present

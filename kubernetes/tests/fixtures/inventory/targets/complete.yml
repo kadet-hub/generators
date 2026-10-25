@@ -483,6 +483,11 @@ parameters:
           mount_path: /var/lib/postgresql/data
         run:
           mount_path: /var/run/postgresql
+        # A second mount of the volume run, named by its key
+        run-lock:
+          volume: run
+          mount_path: /var/lock/postgresql
+          sub_path: lock
       volumes:
         run:
           emptyDir: {}

@@ -5,7 +5,7 @@ from box import Box
 from .. import utils
 from ..base import Container, Workload
 from ..generators import _build_service_bundle, generate_gateway
-from ..webhooks import APIService, _webhooks
+from ..webhooks import APIService, MutatingWebhookConfiguration, ValidatingWebhookConfiguration, _webhooks
 
 # The generator reads the target's inventory; these tests have none. The
 # gate's import policy has no pytest, so there are no fixtures.
@@ -172,3 +172,43 @@ def test_webhook_without_ca_fails():
         assert "webhook_ca_injected" in str(e), str(e)
     else:
         raise AssertionError("no ValueError")
+
+
+def test_webhook_configuration_names():
+    comp = component(
+        webhooks=[OPERATOR_WEBHOOK],
+        validating_webhooks=[OPERATOR_WEBHOOK],
+        webhook_ca_injected=True,
+        webhook_configuration_name="cnpg-mutating-webhook-configuration",
+        validating_webhook_configuration_name="cnpg-validating-webhook-configuration",
+    )
+    mutating = MutatingWebhookConfiguration(name="web", component=comp).root.to_dict()
+    validating = ValidatingWebhookConfiguration(name="web", component=comp).root.to_dict()
+    assert mutating["metadata"]["name"] == "cnpg-mutating-webhook-configuration"
+    assert validating["metadata"]["name"] == "cnpg-validating-webhook-configuration"
+
+
+def test_webhook_configuration_default_names():
+    comp = component(webhooks=[OPERATOR_WEBHOOK], validating_webhooks=[OPERATOR_WEBHOOK], webhook_ca_injected=True)
+    assert MutatingWebhookConfiguration(name="web", component=comp).root.to_dict()["metadata"]["name"] == "demo-web"
+    assert ValidatingWebhookConfiguration(name="web", component=comp).root.to_dict()["metadata"]["name"] == "demo-web"
+
+
+def mounts(volume_mounts):
+    return Container(name="web", container={"image": "x/web:1.0", "volume_mounts": volume_mounts}).root.to_dict()["volumeMounts"]
+
+
+def test_volume_mounts_of_one_volume():
+    assert mounts(
+        {
+            "html": {"volume": "main", "mount_path": "/var/www/html", "sub_path": "html"},
+            "config": {"volume": "main", "mount_path": "/var/www/html/config", "sub_path": "config"},
+        }
+    ) == [
+        {"name": "main", "mountPath": "/var/www/html", "subPath": "html"},
+        {"name": "main", "mountPath": "/var/www/html/config", "subPath": "config"},
+    ]
+
+
+def test_volume_mount_named_by_key():
+    assert mounts({"data": {"mount_path": "/data"}}) == [{"name": "data", "mountPath": "/data"}]
