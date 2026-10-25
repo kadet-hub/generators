@@ -20,7 +20,7 @@ RULES for inventory access:
      them to resource classes or mutating them.
 """
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 import logging
 import re
@@ -656,23 +656,35 @@ def main(input_params: dict) -> BaseObj:
         "namespace", inv.parameters.get("namespace", "default")
     )
 
+    def entries(section: str, kind: str):
+        """KC-1, KC-2: each entry of a section with its name, namespace and output key."""
+        keys: dict[str, str] = {}
+        for key, config in keycloak_config.get(section, {}).items():
+            config = _convert_to_dict(config) or {}
+            name = config.get("name") or key
+            namespace = config.get("namespace", default_namespace)
+            output = f"{namespace}/{name}-{kind.lower()}"
+            if output in keys:
+                raise ValueError(
+                    f"keycloak: {section} '{keys[output]}' and '{key}' both render "
+                    f"'{name}' in namespace '{namespace}'"
+                )
+            keys[output] = key
+            yield name, config, namespace, output
+
     # Generate Keycloak instances
     instances_by_namespace: dict[str, list[str]] = {}
-    for name, config in keycloak_config.get("instances", {}).items():
-        config = _convert_to_dict(config) or {}
-        namespace = config.get("namespace", default_namespace)
+    for name, config, namespace, output in entries("instances", "Keycloak"):
         instances_by_namespace.setdefault(namespace, []).append(name)
-        obj.root[f"{namespace}/{name}-keycloak"] = Keycloak(
+        obj.root[output] = Keycloak(
             name=name, config=config, default_namespace=default_namespace
         )
 
     # Generate KeycloakRealmImports; keycloakCRName defaults to the only
     # instance in the import's namespace
-    for name, config in keycloak_config.get("realm_imports", {}).items():
-        config = _convert_to_dict(config) or {}
-        namespace = config.get("namespace", default_namespace)
+    for name, config, namespace, output in entries("realm_imports", "KeycloakRealmImport"):
         candidates = instances_by_namespace.get(namespace, [])
-        obj.root[f"{namespace}/{name}-keycloakrealmimport"] = KeycloakRealmImport(
+        obj.root[output] = KeycloakRealmImport(
             name=name,
             config=config,
             default_namespace=default_namespace,
@@ -681,11 +693,9 @@ def main(input_params: dict) -> BaseObj:
 
     # Generate KeycloakOIDCClients and KeycloakSAMLClients, same default
     for key, kind in (("oidc_clients", "KeycloakOIDCClient"), ("saml_clients", "KeycloakSAMLClient")):
-        for name, config in keycloak_config.get(key, {}).items():
-            config = _convert_to_dict(config) or {}
-            namespace = config.get("namespace", default_namespace)
+        for name, config, namespace, output in entries(key, kind):
             candidates = instances_by_namespace.get(namespace, [])
-            obj.root[f"{namespace}/{name}-{kind.lower()}"] = KeycloakClient(
+            obj.root[output] = KeycloakClient(
                 name=name,
                 kind=kind,
                 config=config,

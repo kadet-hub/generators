@@ -19,3 +19,4 @@ request, as its first commit.
 | [cloudnative-pg.md](cloudnative-pg.md) | cloudnative-pg generator (`CNPG-`) |
 | [rabbitmq.md](rabbitmq.md) | rabbitmq generator (`RMQ-`) |
 | [strimzi.md](strimzi.md) | strimzi generator (`STZ-`) |
+| [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
