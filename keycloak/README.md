@@ -41,7 +41,7 @@ All keys live under `parameters.generators.keycloak`.
 | `oidc_clients.<name>` | KeycloakOIDCClient | `<namespace>/<name>-keycloakoidcclient` |
 | `saml_clients.<name>` | KeycloakSAMLClient | `<namespace>/<name>-keycloaksamlclient` |
 
-Every entry accepts `namespace`, `labels`, `annotations` and `spec`. Precedence, lowest first: generator defaults, `spec`, flat keys and shorthands; a flat key that overrides a `spec` value logs a warning.
+Every entry accepts `namespace`, `labels`, `annotations`, `spec` and `name`, which names the resource and its output key in place of the entry key. Precedence, lowest first: generator defaults, `spec`, flat keys and shorthands; a flat key that overrides a `spec` value logs a warning.
 
 ### Keycloak
 

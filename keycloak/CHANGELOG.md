@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+`name` on an entry of `instances`, `realm_imports`, `oidc_clients` or `saml_clients` names its resource and its output file, which before always took the entry's key. The defaults `realm.realm` and `keycloakCRName` follow it. A recipe that may write only keys of its own name can then keep a Keycloak name, such as `sso`, whose StatefulSet, Services and Secrets carry it. Two entries of a section with the same name in one namespace now fail the compile. Output is unchanged for inventories without `name` and without such a collision.
+
 ## 1.0.3
 
 Built for Keycloak Operator 26.8.1. The CRDs and their JSON Schemas are unchanged from 26.8.0, as is the operator code the generator's defaults rely on. Rendered output is unchanged.
