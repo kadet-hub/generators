@@ -83,6 +83,84 @@ second key for the same thing and still could not change or drop an
 argument a class sets. The list form stays because existing inventories
 use it; a class whose arguments targets change switches to the mapping.
 
+## Routes to a Gateway outside the inventory
+
+A route rendered below `gateways.<gateway>.routes` attaches to the Gateway
+of that entry, which the generator renders too. A chart such as Nextcloud's
+renders only an HTTPRoute, attached to a Gateway the cluster already runs,
+and redirects `/.well-known/caldav` to `/remote.php/dav` with a path
+redirect. A recipe of that chart could render neither. kadet-hub/recipes
+needs both for its `nextcloud` recipe (RCP-56 there).
+
+`generators.kubernetes.routes.<name>` takes the keys of a Gateway's route,
+`type`, `namespace`, `hostnames`, `rules`, `annotations`, `labels`,
+`api_version` and `enabled`, plus `parent_refs`. Each entry of
+`parent_refs` has `name` and optionally `namespace`, `section_name` and
+`port`, and renders as a `parentRefs` entry with `name`, `namespace`,
+`sectionName` and `port`. The API defaults `group` and `kind` to a
+Gateway. The route's namespace resolves as a Gateway's does, from its
+`namespace`, `generators.kubernetes.namespace` or `parameters.namespace`.
+The output file is `<namespace>/<name>-route`.
+
+Whether the Gateway admits the route is decided by the Gateway's listener
+(`allowedRoutes`), not by the route, so a route in another namespace than
+its Gateway needs no ReferenceGrant.
+
+- K8S-6: Every enabled entry of `generators.kubernetes.routes` MUST render
+  one route of its `type`, HTTPRoute by default, with a `parentRefs` entry
+  for each entry of `parent_refs`, and MUST render no Gateway.
+
+  - Test: `kubernetes/tests/test_components.py::test_route_parent_refs`; fixture target `complete`
+  - Since: this change
+
+- K8S-7: A `routes` entry without `parent_refs`, or with a `parent_refs`
+  entry without `name`, MUST fail the compile, naming the route.
+
+  - Test: `kubernetes/tests/test_components.py::test_route_without_parent_fails`
+  - Since: this change
+
+- K8S-8: A redirect rule with `replace_full_path` MUST render
+  `path: {type: ReplaceFullPath, replaceFullPath: <value>}`, one with
+  `replace_prefix_match` `path: {type: ReplacePrefixMatch,
+  replacePrefixMatch: <value>}`. A rule with both MUST fail the compile.
+
+  This holds for the routes of `gateways` and of `routes`. A path redirect
+  is Extended support in Gateway API (`HTTPRoutePathRedirect`), and the API
+  accepts `ReplacePrefixMatch` only on a rule whose match is a
+  `PathPrefix`. An empty `replace_prefix_match` strips the matched prefix.
+
+  - Test: `kubernetes/tests/test_components.py::test_redirect_path`, `::test_redirect_both_paths_fails`; fixture target `complete`
+  - Since: this change
+
+DEC-3: Routes to a Gateway outside the inventory get a section of their
+own. A flag on `gateways.<gateway>` that skips the Gateway was considered.
+The key of a `gateways` entry is the Gateway's name, which for a route to
+the user's Gateway is the user's choice. A recipe may only write keys below
+its own name (RCP-18 in kadet-hub/recipes), so its route needs a key of
+its own, and `parent_refs` can name the Gateway from the inventory. A
+`routes` entry can also attach to several Gateways.
+
+## Webhooks with a CA from their server
+
+A webhook with `failurePolicy: Fail` and no `clientConfig.caBundle` fails
+the compile, unless a cert-manager CA injection annotation is set, because
+the API server could call it without a CA to verify. Some operators write
+the CA themselves. The CloudNativePG operator creates its serving
+certificate and patches `caBundle` into its webhook configurations at
+start, so its chart renders them without one.
+
+- K8S-9: A component with `webhook_ca_injected: true` MUST render its
+  webhooks without `caBundle` and with `failurePolicy: Fail` without
+  failing. Without that key or a CA injection annotation such a webhook
+  MUST still fail the compile.
+
+  The key covers `webhooks` and `validating_webhooks` of the component and
+  renders nothing. It states that something outside the inventory writes
+  the CA. Until it does, every call of the webhook fails.
+
+  - Test: `kubernetes/tests/test_components.py::test_webhook_ca_injected`, `::test_webhook_without_ca_fails`
+  - Since: this change
+
 ## RBAC for one workload
 
 DEC-2: There is no generator mechanism for several roles per set of
@@ -106,5 +184,7 @@ because the inventory can already share these parts.
 |---|---|
 | Component Service | `kubernetes/generators.py` (`_build_service_bundle`) |
 | Container args | `kubernetes/base.py` (`Container.body`) |
+| Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
+| Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
