@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0
+
+- `webhook_configuration_name` and `validating_webhook_configuration_name` on a component name its MutatingWebhookConfiguration and ValidatingWebhookConfiguration. Without them both stay `<namespace>-<component>`. The CloudNativePG operator writes its CA only into configurations of fixed names.
+- A `volume_mounts` entry takes `volume`, the volume it mounts. Its key then names only the mount, so one volume can be mounted at several paths with their own `sub_path`, as Nextcloud's chart mounts its claim six times. Without `volume` the key names the volume, as before.
+
+Output is unchanged for inventories without the two name keys and without `volume` in `volume_mounts`.
+
 ## 1.8.0
 
 - `generators.kubernetes.routes.<name>` renders one route attached to Gateways outside the inventory, named in `parent_refs` by `name` and optionally `namespace`, `section_name` and `port`. It takes the route keys of `gateways.<gw>.routes` and renders no Gateway. Before, a route was rendered only together with its Gateway, so a route to the cluster's shared Gateway needed a `manifests` entry. The file is `<namespace>/<name>-route`.
