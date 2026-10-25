@@ -527,6 +527,25 @@ def _generate_single_gateway(obj, gateway_name, gateway_config):
     _generate_gateway_routes(obj, gateway, expanded_config, namespace_name)
 
 
+def _generate_routes(obj):
+    """Routes to Gateways outside the inventory, from generators.kubernetes.routes (K8S-6, K8S-7)."""
+    for route_name, route_config in _gateway_section("routes").items():
+        if not route_config.get("enabled", True):
+            continue
+        parent_refs = route_config.get("parent_refs")
+        if not parent_refs or not isinstance(parent_refs, list):
+            raise ValueError(f"route {route_name!r}: parent_refs needs a list of Gateways")
+        route_namespace = route_config.get("namespace") or _default_namespace()
+        route = GatewayRoute(
+            name=route_name,
+            route=route_config,
+            namespace=route_namespace,
+            route_type=route_config.get("type"),
+            parent_refs=parent_refs,
+        )
+        _put(obj, f"{route_namespace}/{route_name}-route", route)
+
+
 def _scope_listeners(gateway_config, gateway_namespace):
     """Default each listener's allowedRoutes to the namespaces of its routes.
 
@@ -626,6 +645,7 @@ def generate_gateway(input_params):
         if gateway_config.get("enabled", True):
             _generate_single_gateway(obj, gateway_name, gateway_config)
 
+    _generate_routes(obj)
     _generate_backend_tls_policies(obj)
     _generate_standalone_reference_grants(obj)
 
