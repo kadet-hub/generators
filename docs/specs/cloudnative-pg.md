@@ -30,7 +30,7 @@ keeps its data only if the Cluster keeps its name.
 
   - Test: fixture target `complete`, whose Pooler entry `reader` renders
     `app-db-pooler-ro` and the other entries their keys
-  - Since: this change
+  - Since: #110
 
 - CNPG-2: Two entries of one section that render the same name in the same
   namespace MUST fail the compile, naming both keys.
@@ -39,7 +39,7 @@ keeps its data only if the Cluster keeps its name.
 
   - Test: manual: compile the `complete` fixture with a second Pooler
     entry named `app-db-pooler-ro`; it fails naming both keys
-  - Since: this change
+  - Since: #110
 
 DEC-1: The name is a key of the entry, as `name` in the standalone sections
 of the kubernetes generator. Letting kadet-hub/recipes accept keys that a
