@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0
+
+- `generators.kubernetes.routes.<name>` renders one route attached to Gateways outside the inventory, named in `parent_refs` by `name` and optionally `namespace`, `section_name` and `port`. It takes the route keys of `gateways.<gw>.routes` and renders no Gateway. Before, a route was rendered only together with its Gateway, so a route to the cluster's shared Gateway needed a `manifests` entry. The file is `<namespace>/<name>-route`.
+- A redirect rule takes `replace_full_path` or `replace_prefix_match`, which render the redirect's `path` as `ReplaceFullPath` or `ReplacePrefixMatch`, on the routes of `gateways` and of `routes`. Both together fail the compile.
+- `webhook_ca_injected: true` on a component renders its webhooks with `failurePolicy: Fail` and no `caBundle`, for a server that writes the CA into its webhook configurations itself, as the CloudNativePG operator does. Without it such a webhook still fails the compile.
+
+Output is unchanged for inventories without `routes`, without the two redirect keys and without `webhook_ca_injected`.
+
 ## 1.7.0
 
 - `args` takes a mapping next to the list. Its values render in the mapping's order: a string as one argument, a list as several, `null` as none. A target can override or drop one argument a class sets by its key, which a list did not allow because the backends append or merge lists. A mapping value fails the compile.

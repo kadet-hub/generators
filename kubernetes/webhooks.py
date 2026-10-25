@@ -38,11 +38,14 @@ def _webhooks(name, component, key):
             and "service" in client
             and not client.get("caBundle")
             and not any(a in annotations for a in CA_INJECTION)
+            # K8S-9: the webhook's server, such as an operator, writes the CA itself.
+            and not component.get("webhook_ca_injected")
         ):
             raise ValueError(
                 f"{name}: webhook {webhook.get('name')!r} has failurePolicy Fail "
-                f"but no clientConfig.caBundle; set it or one of the webhook_annotations "
-                f"{', '.join(CA_INJECTION)}"
+                f"but no clientConfig.caBundle; set it, one of the webhook_annotations "
+                f"{', '.join(CA_INJECTION)}, or webhook_ca_injected: true when the "
+                f"webhook's server writes the CA itself"
             )
         # The webhook must not intercept the namespace that runs its own server.
         own = (client.get("service") or {}).get("namespace") or get_namespace(

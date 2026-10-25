@@ -379,7 +379,8 @@ class GatewayRoute(k8s.Base):
         name: Route name
         route: Route configuration dict
         route_type: One of 'http', 'grpc', 'tcp', 'tls', 'udp'
-        parent_refs: Gateway name to attach to
+        parent_refs: Gateway name to attach to, or a list of parent_refs
+            entries (name, namespace, section_name, port) of a routes entry
 
     Optional kwargs:
         namespace: Route namespace
@@ -425,7 +426,19 @@ class GatewayRoute(k8s.Base):
         if self.kwargs.route_type not in ("tcp", "udp"):
             self.root.spec.hostnames = route.get("hostnames", [])
 
-        # Build parentRefs with automatic sectionName resolution from listener
+        if isinstance(self.kwargs.parent_refs, str):
+            self.root.spec.parentRefs = [self._gateway_parent_ref(namespace)]
+        else:
+            self.root.spec.parentRefs = [
+                self._explicit_parent_ref(ref) for ref in self.kwargs.parent_refs
+            ]
+
+        self.root.spec.rules = [
+            self._build_rule(rule) for rule in route.get("rules", {}).values()
+        ]
+
+    def _gateway_parent_ref(self, namespace):
+        """parentRef to the Gateway this route is rendered with, sectionName from its listener."""
         parent_ref = {"name": self.kwargs.parent_refs}
 
         # Add namespace to parentRef if gateway is in a different namespace
@@ -433,14 +446,17 @@ class GatewayRoute(k8s.Base):
         if parent_namespace and parent_namespace != namespace:
             parent_ref["namespace"] = parent_namespace
 
-        listener_name = self._resolve_listener(route.get("listener"))
+        listener_name = self._resolve_listener(self.kwargs.route.get("listener"))
         if listener_name:
             parent_ref["sectionName"] = listener_name
-        self.root.spec.parentRefs = [parent_ref]
+        return parent_ref
 
-        self.root.spec.rules = [
-            self._build_rule(rule) for rule in route.get("rules", {}).values()
-        ]
+    def _explicit_parent_ref(self, ref):
+        """parentRef from a parent_refs entry of generators.kubernetes.routes (K8S-6)."""
+        if not (ref or {}).get("name"):
+            raise ValueError(f"route {self.kwargs.name!r}: every parent_refs entry needs a name")
+        keys = {"name": "name", "namespace": "namespace", "section_name": "sectionName", "port": "port"}
+        return {api: ref[key] for key, api in keys.items() if ref.get(key) is not None}
 
     def _resolve_listener(self, listener_ref):
         """
@@ -499,6 +515,25 @@ class GatewayRoute(k8s.Base):
             filter_config["requestRedirect"]["statusCode"] = redirect_config.get(
                 "status_code"
             )
+
+        # K8S-8: the path part of the redirect, Extended support (HTTPRoutePathRedirect).
+        full = redirect_config.get("replace_full_path")
+        prefix = redirect_config.get("replace_prefix_match")
+        if full is not None and prefix is not None:
+            raise ValueError(
+                f"route {self.kwargs.name!r}: a redirect takes replace_full_path "
+                "or replace_prefix_match, not both"
+            )
+        if full is not None:
+            filter_config["requestRedirect"]["path"] = {
+                "type": "ReplaceFullPath",
+                "replaceFullPath": full,
+            }
+        elif prefix is not None:
+            filter_config["requestRedirect"]["path"] = {
+                "type": "ReplacePrefixMatch",
+                "replacePrefixMatch": prefix,
+            }
 
         return filter_config
 

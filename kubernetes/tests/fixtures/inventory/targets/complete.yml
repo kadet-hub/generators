@@ -279,6 +279,36 @@ parameters:
                   name: mq
                   namespace: shop
                   port: 5671
+      # HTTPRoute to a Gateway outside this inventory, with path redirects
+      routes:
+        shop-dav:
+          namespace: shop
+          hostnames: [dav.example.com]
+          parent_refs:
+            - name: shared
+              namespace: edge
+              section_name: https
+          rules:
+            caldav:
+              matches:
+                caldav:
+                  type: Exact
+                  value: /.well-known/caldav
+              redirect:
+                replace_full_path: /remote.php/dav
+                status_code: 301
+            legacy:
+              matches:
+                legacy:
+                  value: /old
+              redirect:
+                replace_prefix_match: /new
+            app:
+              matches:
+                root:
+                  value: /
+              name: web
+              port: 80
       reference_grants:
         gateway-mq-route:
           target_namespace: shop
