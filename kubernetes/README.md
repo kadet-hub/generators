@@ -4,7 +4,7 @@ Published on kadet-hub ([catalog](https://kadet-hub.org/generators/kubernetes/))
 
 Kapitan kadet generator for plain Kubernetes resources. One component block under `parameters.components` becomes a workload (Deployment, StatefulSet, DaemonSet, Job or CronJob) plus the resources derived from it: Services selecting its pods, ConfigMaps and Secrets mounted into it, a ServiceAccount with Role or ClusterRole bindings, HorizontalPodAutoscaler, PodDisruptionBudget, VerticalPodAutoscaler, NetworkPolicies, PersistentVolumeClaims, admission webhooks and the APIService of an aggregated API. A second compile entry writes Chainsaw step templates that assert each workload is ready. Next to components it renders Ingresses (with GKE ManagedCertificates), Gateway API resources, standalone ConfigMaps, Secrets, Services, ServiceAccounts and volumes, cluster and namespace policy kinds, and any other kind through a passthrough.
 
-Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.0, GKE Managed Certificates 1.2.12 and Chainsaw 0.2.15.
+Built for Kubernetes 1.37.1, Gateway API 1.6.3, Vertical Pod Autoscaler 1.8.1, GKE Managed Certificates 1.2.12 and Chainsaw 0.2.15.
 
 ServiceMonitor, PodMonitor and PrometheusRule belong in the [prometheus-operator generator](https://kadet-hub.org/generators/prometheus-operator/) (`generators.prometheus_operator`); the component keys `service_monitors` and `prometheus_rules` and the section `generators.kubernetes.pod_monitors` are ignored with a warning naming it.
 

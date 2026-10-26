@@ -72,8 +72,8 @@ gateway.networking.k8s.io:
   license: Apache-2.0
 autoscaling.k8s.io:
   software: Vertical Pod Autoscaler
-  version: 1.8.0
-  source: https://github.com/kubernetes/autoscaler/blob/vertical-pod-autoscaler-1.8.0/vertical-pod-autoscaler/deploy/vpa-v1-crd-gen.yaml
+  version: 1.8.1
+  source: https://github.com/kubernetes/autoscaler/blob/vertical-pod-autoscaler-1.8.1/vertical-pod-autoscaler/deploy/vpa-v1-crd-gen.yaml
   license: Apache-2.0
 networking.gke.io:
   software: GKE Managed Certificates
