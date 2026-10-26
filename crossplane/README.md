@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/crossplane/): pin a released version by digest from its catalog page.
 
-Kapitan kadet generator for [Crossplane](https://www.crossplane.io/) v2 resources. Built for Crossplane 2.4.2 and Crossplane Provider AWS 2.9.0:
+Kapitan kadet generator for [Crossplane](https://www.crossplane.io/) v2 resources. Built for Crossplane 2.4.3 and Crossplane Provider AWS 2.9.0:
 
 - **Provider**, **Function** (`pkg.crossplane.io/v1`): packages, pinned by version or digest
 - **CompositeResourceDefinition** (`apiextensions.crossplane.io/v2`): the API of a composite resource (XR)

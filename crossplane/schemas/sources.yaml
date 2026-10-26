@@ -4,13 +4,13 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 apiextensions.crossplane.io:
   software: Crossplane
-  version: 2.4.2
-  source: https://github.com/crossplane/crossplane/tree/v2.4.2/cluster/crds
+  version: 2.4.3
+  source: https://github.com/crossplane/crossplane/tree/v2.4.3/cluster/crds
   license: Apache-2.0
 pkg.crossplane.io:
   software: Crossplane
-  version: 2.4.2
-  source: https://github.com/crossplane/crossplane/tree/v2.4.2/cluster/crds
+  version: 2.4.3
+  source: https://github.com/crossplane/crossplane/tree/v2.4.3/cluster/crds
   license: Apache-2.0
 aws.m.upbound.io:
   software: Crossplane Provider AWS
