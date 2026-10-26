@@ -21,7 +21,7 @@ Kapitan kadet generator for [Kyverno](https://kyverno.io/) policy resources:
 | `namespaced_deleting_policies` | NamespacedDeletingPolicy | `policies.kyverno.io/v1beta1` | `<namespace>/<name>-ndpol` |
 | `cel_policy_exceptions` | PolicyException | `policies.kyverno.io/v1beta1` | `<namespace>/<name>-celpolex` |
 
-Built for Kyverno 1.19.1.
+Built for Kyverno 1.19.2.
 
 At 1.19.1 Kyverno marks every version of ClusterPolicy, Policy, PolicyException, ClusterCleanupPolicy and CleanupPolicy deprecated in favour of the CEL-based `policies.kyverno.io` kinds and plans to remove them in 1.20 ([ClusterPolicy][dep-cpol], [Policy][dep-pol], [PolicyException][dep-polex], [ClusterCleanupPolicy][dep-ccleanup], [CleanupPolicy][dep-cleanup], [migration guide](https://kyverno.io/docs/guides/migration-to-cel/)). For these legacy kinds the generator emits the storage versions `kyverno.io/v1` and `kyverno.io/v2`, and the API server prints a deprecation warning when they are applied. The `policies.kyverno.io` kinds are emitted at `v1beta1`, their storage version at 1.19.1; `v1` is served with the same schema and becomes the storage version in 1.20 ([storage version][storage]).
 

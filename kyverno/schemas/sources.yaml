@@ -4,11 +4,11 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 kyverno.io:
   software: Kyverno
-  version: 1.19.1
-  source: https://github.com/kyverno/kyverno/tree/v1.19.1/config/crds/kyverno
+  version: 1.19.2
+  source: https://github.com/kyverno/kyverno/tree/v1.19.2/config/crds/kyverno
   license: Apache-2.0
 policies.kyverno.io:
   software: Kyverno
-  version: 1.19.1
-  source: https://github.com/kyverno/kyverno/tree/v1.19.1/config/crds/policies.kyverno.io
+  version: 1.19.2
+  source: https://github.com/kyverno/kyverno/tree/v1.19.2/config/crds/policies.kyverno.io
   license: Apache-2.0
