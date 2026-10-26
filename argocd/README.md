@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/argocd/) page.
 
-Kapitan kadet generator for [Argo CD](https://argo-cd.readthedocs.io/) resources (`argoproj.io/v1alpha1`). Built for Argo CD 3.5.5.
+Kapitan kadet generator for [Argo CD](https://argo-cd.readthedocs.io/) resources (`argoproj.io/v1alpha1`). Built for Argo CD 3.5.6.
 
 - **Application**: one source or several, synced to a destination cluster and namespace
 - **ApplicationSet**: Applications templated from generators (clusters, git, list, matrix, ...)
