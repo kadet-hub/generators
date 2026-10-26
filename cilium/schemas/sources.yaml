@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 cilium.io:
   software: Cilium
-  version: 1.20.3
-  source: https://github.com/cilium/cilium/tree/v1.20.3/pkg/k8s/apis/cilium.io/client/crds
+  version: 1.20.4
+  source: https://github.com/cilium/cilium/tree/v1.20.4/pkg/k8s/apis/cilium.io/client/crds
   license: Apache-2.0
