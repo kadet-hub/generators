@@ -19,7 +19,7 @@ Kapitan kadet generator for [Prometheus Operator](https://prometheus-operator.de
 
 `rbac: true` on a Prometheus or PrometheusAgent adds its ServiceAccount, ClusterRole and ClusterRoleBinding (see [RBAC](#rbac)).
 
-These are all `monitoring.coreos.com` kinds the operator and the kube-prometheus-stack chart install. Built for Prometheus Operator 0.94.1. `monitoring.thanos.io` resources (Thanos Operator) belong in the `thanos` generator.
+These are all `monitoring.coreos.com` kinds the operator and the kube-prometheus-stack chart install. Built for Prometheus Operator 0.94.2. `monitoring.thanos.io` resources (Thanos Operator) belong in the `thanos` generator.
 
 ## Usage
 

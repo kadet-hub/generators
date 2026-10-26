@@ -6,8 +6,8 @@
 # standalone-strict files of this Kubernetes release, unchanged.
 monitoring.coreos.com:
   software: Prometheus Operator
-  version: 0.94.1
-  source: https://github.com/prometheus-operator/prometheus-operator/tree/v0.94.1/example/prometheus-operator-crd
+  version: 0.94.2
+  source: https://github.com/prometheus-operator/prometheus-operator/tree/v0.94.2/example/prometheus-operator-crd
   license: Apache-2.0
 core:
   software: Kubernetes
