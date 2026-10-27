@@ -89,7 +89,7 @@ def scan(root, patterns):
             rel = os.path.relpath(path, base)
             try:
                 docs = load(path.read_text(encoding="utf-8"))
-            except yaml.YAMLError as e:
+            except (yaml.YAMLError, UnicodeDecodeError) as e:
                 raise OcmError(f"ocm: {rel}: not YAML: {e}") from e
             for doc in docs:
                 found.update(images_in(doc))

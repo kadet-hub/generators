@@ -151,6 +151,9 @@ def test_scan_errors():
         with open(os.path.join(root, "k8s", "bad.yml"), "w") as f:
             f.write("a: [\n")
         raises(lambda: resources(root, images={"scan": ["k8s/*.yml"]}), "k8s/bad.yml: not YAML")
+        with open(os.path.join(root, "k8s", "bad.yml"), "wb") as f:
+            f.write(b"image: \xff\n")
+        raises(lambda: resources(root, images={"scan": ["k8s/*.yml"]}), "k8s/bad.yml: not YAML")
         write(os.path.join(d, "outside.yml"), "image: a:1\n")
         raises(lambda: resources(root, images={"scan": ["../outside.yml"]}), "outside the compile root")
 
