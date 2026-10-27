@@ -188,11 +188,14 @@ and CHANGELOG entry before merging.
   `id-token`, `attestations` or `pages` write, names no environment, names
   one whose policy admits anything but `main`, or is part of a
   `pull_request_target` workflow, where GitHub evaluates the policy
-  against the default branch. It also fails when `yq` or `jq` cannot read
-  a workflow. Where a secret is stored the check cannot see: listing
+  against the default branch. A job reads a secret when an expression
+  names one, in any case, or passes the whole `secrets` context, as
+  `toJSON(secrets)` does. The check also fails when `yq` or `jq` cannot
+  read a workflow. Where a secret is stored the check cannot see: listing
   secrets needs a permission `GITHUB_TOKEN` cannot hold.
 
-  - Test: `tools/workflow-policy` in the `check` workflow; manual:
+  - Test: `tools/workflow-policy` in the `check` workflow,
+    `tools/test_workflow_policy.py`; manual:
     `gh api repos/kadet-hub/generators/actions/secrets` lists neither secret
   - Since: #87
 
