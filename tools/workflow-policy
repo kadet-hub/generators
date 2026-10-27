@@ -37,7 +37,9 @@ while IFS=$'\x1f' read -r file job env why event; do
       || fail "UPD-6: $file job $job holds $why in environment $env, which admits ${policy[$env]:-every branch}, not only main"
   fi
 done < <(for f in .github/workflows/*.yml .github/workflows/*.yaml; do
-  [[ -e $f ]] && yq -o json "$f" | jq -r --arg f "${f##*/}" "$jobs"
+  [[ -e $f ]] || continue
+  yq -o json "$f" | jq -r --arg f "${f##*/}" "$jobs"
 done)
+wait $! || fail "UPD-6: a workflow could not be read"
 
 exit "$status"
