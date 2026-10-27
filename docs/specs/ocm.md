@@ -67,6 +67,17 @@ rules, and reading images from anything other than YAML.
   - Test: `ocm/tests/test_constructor.py::test_unknown_keys`
   - Since: this change
 
+- OCM-1a: A key of `images` with a value of the wrong type MUST fail the
+  compile, naming the key: `scan` and `refs` are lists of strings, `access`
+  and `label` strings, `require_digest` a boolean, `names` a map of strings.
+
+  An unquoted inventory value can arrive as a number, a single pattern as a
+  string, and `require_digest: "false"` as a truthy string. Each of those
+  would otherwise change the output silently or end in a traceback.
+
+  - Test: `ocm/tests/test_constructor.py::test_image_key_types`
+  - Since: this change
+
 - OCM-2: `components` maps an id to a component. Every key of a component
   except `images` and `resources` MUST be copied to the constructor as
   written, and a component without `name`, `version` or `provider` MUST
