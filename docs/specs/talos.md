@@ -70,5 +70,5 @@ images for one version.
 | Item | Value |
 |---|---|
 | Code | `talos/multidoc.py` (`_component_images`, called from `split`) |
-| Unit tests | `talos/tests/test_multidoc.py`, run with `cd talos && PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider tests` |
+| Unit tests | `talos/tests/test_multidoc.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider talos/tests` |
 | Upstream repositories | `ghcr.io/siderolabs/kubelet`, `registry.k8s.io/kube-apiserver`, `registry.k8s.io/kube-controller-manager`, `registry.k8s.io/kube-scheduler`, `registry.k8s.io/kube-proxy` |
