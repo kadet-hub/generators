@@ -156,6 +156,7 @@ def test_scan_errors():
         raises(lambda: resources(root, images={"scan": ["k8s/*.yml"]}), "k8s/bad.yml: not YAML")
         write(os.path.join(d, "outside.yml"), "image: a:1\n")
         raises(lambda: resources(root, images={"scan": ["../outside.yml"]}), "outside the compile root")
+        raises(lambda: resources(root, images={"scan": ["/etc/*.yml"]}), "images.scan '/etc/*.yml'")
 
 
 def test_refs_dedup_order():
@@ -249,3 +250,18 @@ def test_dedup_parsed():
             lambda: resources(root, images={"refs": ["ghcr.io/org/web:1.0@sha256:aaa", "ghcr.io/org/web:1.0@sha256:bbb"]}),
             "web: ghcr.io/org/web:1.0@sha256:aaa, ghcr.io/org/web:1.0@sha256:bbb",
         )
+
+
+def test_image_key_types():
+    with tempfile.TemporaryDirectory() as d:
+        root = compiled(d)
+        for key, value in (
+            ("scan", "k8s/*.yaml"),
+            ("scan", [2024]),
+            ("refs", "redis:8"),
+            ("access", 1),
+            ("label", ["x"]),
+            ("require_digest", "false"),
+            ("names", {"docker.io/library/redis": 1}),
+        ):
+            raises(lambda: resources(root, images={"refs": ["redis:8"], key: value}), f"images.{key} must be")

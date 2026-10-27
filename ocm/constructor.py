@@ -9,7 +9,21 @@ from pathlib import Path
 import yaml
 
 PARAM_KEYS = {"components", "file"}
-IMAGE_KEYS = {"scan", "refs", "access", "label", "require_digest", "names"}
+
+
+def strings(value):
+    return isinstance(value, list) and all(isinstance(i, str) for i in value)
+
+
+IMAGE_TYPES = {
+    "scan": (strings, "a list of strings"),
+    "refs": (strings, "a list of strings"),
+    "access": (lambda v: isinstance(v, str), "a string"),
+    "label": (lambda v: isinstance(v, str), "a string"),
+    "require_digest": (lambda v: isinstance(v, bool), "true or false"),
+    "names": (lambda v: isinstance(v, dict) and all(isinstance(i, str) for i in v.values()), "a map of strings"),
+}
+IMAGE_KEYS = set(IMAGE_TYPES)
 REQUIRED = ("name", "version", "provider")
 
 
@@ -80,7 +94,10 @@ def scan(root, patterns):
     base = Path(os.path.realpath(root))
     found = set()
     for pattern in patterns:
-        matches = sorted(p for p in base.glob(pattern) if p.is_file())
+        try:
+            matches = sorted(p for p in base.glob(pattern) if p.is_file())
+        except (ValueError, NotImplementedError) as e:
+            raise OcmError(f"ocm: images.scan {pattern!r}: {e}") from e
         if not matches:
             raise OcmError(f"ocm: images.scan {pattern!r} matches no file")
         for path in matches:
@@ -100,6 +117,10 @@ def image_resources(cid, images, root):
     unknown = set(images) - IMAGE_KEYS
     if unknown:
         raise OcmError(f"ocm: component {cid}: unknown images keys {sorted(unknown)}")
+    for key, value in images.items():
+        check, kind = IMAGE_TYPES[key]
+        if value is not None and not check(value):
+            raise OcmError(f"ocm: component {cid}: images.{key} must be {kind}, not {value!r}")
     refs = set(images.get("refs") or [])
     if images.get("scan"):
         refs |= scan(root, images["scan"])
