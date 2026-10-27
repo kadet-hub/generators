@@ -46,7 +46,7 @@ def parse_ref(ref):
     rest, _, digest = ref.partition("@")
     first, sep, remainder = rest.partition("/")
     if sep and ("." in first or ":" in first or first == "localhost"):
-        registry, path = first, remainder
+        registry, path = first.lower(), remainder
     else:
         registry, path = "docker.io", rest if sep else f"library/{rest}"
     repo, tag = path, ""
@@ -107,8 +107,15 @@ def image_resources(cid, images, root):
     names = dict(images.get("names") or {})
     used = set()
     resources = []
+    # One image per parsed reference; a tag-only one folds into a pinned one of the same tag.
+    unique = {}
     for ref in sorted(refs):
         p = parse_ref(ref)
+        unique.setdefault((p["registry"], p["path"]), (ref, p))
+    pinned = {(p["repository"], p["tag"]) for _, p in unique.values() if p["digest"]}
+    for ref, p in sorted(unique.values(), key=lambda item: item[0]):
+        if not p["digest"] and (p["repository"], p["tag"]) in pinned:
+            continue
         if p["digest"] and not p["tag"]:
             raise OcmError(f"ocm: component {cid}: image {ref} has a digest but no tag to use as version")
         if images.get("require_digest") and not p["digest"]:

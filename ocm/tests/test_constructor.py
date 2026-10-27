@@ -233,3 +233,16 @@ def test_schema():
             },
         )
         jsonschema.Draft202012Validator(schema).validate(doc)
+
+
+def test_dedup_parsed():
+    with tempfile.TemporaryDirectory() as d:
+        root = compiled(d)
+        (r,) = resources(root, images={"refs": ["redis:8", "docker.io/library/redis:8", "DOCKER.IO/library/redis:8"], "label": "l"})
+        assert r["labels"] == [{"name": "l", "value": "DOCKER.IO/library/redis:8"}]
+        (r,) = resources(root, images={"refs": ["ghcr.io/org/web:1.0", "ghcr.io/org/web:1.0@sha256:aaa"], "require_digest": True})
+        assert r["access"]["imageReference"] == "ghcr.io/org/web:1.0@sha256:aaa"
+        raises(
+            lambda: resources(root, images={"refs": ["ghcr.io/org/web:1.0@sha256:aaa", "ghcr.io/org/web:1.0@sha256:bbb"]}),
+            "web: ghcr.io/org/web:1.0@sha256:aaa, ghcr.io/org/web:1.0@sha256:bbb",
+        )
