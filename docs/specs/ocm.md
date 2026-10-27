@@ -61,7 +61,9 @@ rules, and reading images from anything other than YAML.
   MUST fail the compile, naming the key.
 
   `file` is the output path relative to the compile root, default
-  `component-constructor.yaml`. The compile entry needs `output_type:
+  `component-constructor.yaml`. A `file` that is not a string, is absolute
+  or contains `..` MUST fail the compile, so the output stays below the
+  compile root. The compile entry needs `output_type:
   plain`, as `ocm` returns the file's text.
 
   - Test: `ocm/tests/test_constructor.py::test_unknown_keys`
