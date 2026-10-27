@@ -16,7 +16,8 @@ jobs='. as $w | ($w.on | if type == "object" then keys elif type == "array" then
   | ($j.permissions // $w.permissions // {}) as $p
   | ([if ($p | type) == "string" then ($p | select(. == "write-all"))
       else ($p | to_entries[] | select(.value == "write" and (.key | IN("contents", "packages", "id-token", "attestations", "pages"))) | .key + ": write") end]
-    + [$j | .. | strings | match("secrets *(\\.|\\[) *[\"'\'']?([A-Za-z0-9_-]+)"; "g") | .captures[1].string | select(. != "GITHUB_TOKEN") | "secrets." + .]
+    + [$j | .. | strings | match("secrets *(\\.|\\[) *[\"'\'']?([A-Za-z0-9_-]+)"; "gi") | .captures[1].string | select(ascii_upcase != "GITHUB_TOKEN") | "secrets." + .]
+    + [$j | .. | strings | select(test("\\$\\{\\{(((?!\\}\\})[\\s\\S])*[^\\w.-])?secrets(?![\\w-]| *(\\.|\\[))"; "i")) | "secrets"]
     + [$j.secrets | strings | "secrets: " + .])
   | unique | select(length > 0)
   | [$f, $job, ($j.environment | if type == "object" then .name else . end // ""), join(", "),
