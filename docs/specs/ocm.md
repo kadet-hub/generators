@@ -135,6 +135,20 @@ rules, and reading images from anything other than YAML.
   - Test: `ocm/tests/test_constructor.py::test_refs_dedup_order`
   - Since: this change
 
+- OCM-6a: Duplicates MUST be detected on the parsed reference, with the
+  registry in lower case: `redis:8` and `docker.io/library/redis:8` are one
+  image. A reference with a tag and no digest MUST collapse into a
+  reference with the same registry, repository and tag and a digest.
+
+  The second rule covers an image that one manifest pins by digest and
+  another names by tag only. Both are the same resource; kept apart, they
+  would clash on name and version and `images.names` could not separate
+  them. Two different digests of one tag stay two images and clash.
+  `%ref%` and the label carry the first reference in sort order.
+
+  - Test: `ocm/tests/test_constructor.py::test_dedup_parsed`
+  - Since: this change
+
 - OCM-7: Each image MUST become a resource of type `ociImage` whose
   `access` is `{type: ociArtifact, imageReference: <images.access>}`, its
   name the last path segment of the repository and its version the tag.
