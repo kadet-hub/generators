@@ -205,6 +205,9 @@ def build(params, root):
     need_map(components, "input_params.components")
     if not components:
         raise OcmError("ocm: input_params.components is empty")
+    file = params.get("file") or "component-constructor.yaml"
+    if not isinstance(file, str) or os.path.isabs(file) or ".." in Path(file).parts:
+        raise OcmError(f"ocm: input_params.file must be a relative path below the compile root, not {file!r}")
     constructor = {"components": [component(cid, components[cid], root) for cid in sorted(components)]}
     text = yaml.safe_dump(constructor, sort_keys=False, default_flow_style=False)
-    return {params.get("file") or "component-constructor.yaml": text}
+    return {file: text}

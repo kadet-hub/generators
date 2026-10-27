@@ -275,3 +275,10 @@ def test_map_types():
         raises(lambda: resources(root, images=["redis:8"]), "component app: images must be a map")
         raises(lambda: resources(root, resources=[{"name": "a"}]), "component app: resources must be a map")
         raises(lambda: resources(root, resources={"a": "blob"}), "component app: resources.a must be a map")
+
+
+def test_file_stays_in_root():
+    with tempfile.TemporaryDirectory() as d:
+        root = compiled(d)
+        for bad in ("../c.yaml", "/tmp/c.yaml", "ocm/../../c.yaml", 1):
+            raises(lambda: run(root, {"app": base()}, file=bad), "input_params.file must be a relative path below the compile root")
