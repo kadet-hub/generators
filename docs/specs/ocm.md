@@ -70,6 +70,8 @@ rules, and reading images from anything other than YAML.
 - OCM-1a: A key of `images` with a value of the wrong type MUST fail the
   compile, naming the key: `scan` and `refs` are lists of strings, `access`
   and `label` strings, `require_digest` a boolean, `names` a map of strings.
+  The same holds for `components`, each component, `images`, `resources`
+  and each resource, which are maps.
 
   An unquoted inventory value can arrive as a number, a single pattern as a
   string, and `require_digest: "false"` as a truthy string. Each of those
