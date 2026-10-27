@@ -265,3 +265,13 @@ def test_image_key_types():
             ("names", {"docker.io/library/redis": 1}),
         ):
             raises(lambda: resources(root, images={"refs": ["redis:8"], key: value}), f"images.{key} must be")
+
+
+def test_map_types():
+    with tempfile.TemporaryDirectory() as d:
+        root = compiled(d)
+        raises(lambda: build({"components": ["app"]}, root), "components must be a map")
+        raises(lambda: run(root, {"app": "x"}), "component app must be a map")
+        raises(lambda: resources(root, images=["redis:8"]), "component app: images must be a map")
+        raises(lambda: resources(root, resources=[{"name": "a"}]), "component app: resources must be a map")
+        raises(lambda: resources(root, resources={"a": "blob"}), "component app: resources.a must be a map")

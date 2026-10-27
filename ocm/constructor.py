@@ -162,16 +162,25 @@ def image_resources(cid, images, root):
     return resources
 
 
+def need_map(value, what):
+    if not isinstance(value, dict):
+        raise OcmError(f"ocm: {what} must be a map, not {value!r}")
+
+
 def component(cid, spec, root):
     spec = plain(spec or {})
+    need_map(spec, f"component {cid}")
     missing = [k for k in REQUIRED if k not in spec]
     if missing:
         raise OcmError(f"ocm: component {cid}: missing {missing}")
     images = spec.pop("images", None) or {}
     resources = spec.pop("resources", None) or {}
+    need_map(images, f"component {cid}: images")
+    need_map(resources, f"component {cid}: resources")
     out = copy.deepcopy(spec)
     listed, seen = [], {}
     for key, resource in resources.items():
+        need_map(resource or {}, f"component {cid}: resources.{key}")
         resource = {"name": key, **(resource or {})}
         listed.append(resource)
         seen.setdefault(resource["name"], []).append(f"resources.{key}")
@@ -193,6 +202,7 @@ def build(params, root):
     if unknown:
         raise OcmError(f"ocm: unknown input_params {sorted(unknown)}")
     components = params.get("components") or {}
+    need_map(components, "input_params.components")
     if not components:
         raise OcmError("ocm: input_params.components is empty")
     constructor = {"components": [component(cid, components[cid], root) for cid in sorted(components)]}
