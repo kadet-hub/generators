@@ -12,6 +12,7 @@ request, as its first commit.
 | Spec | Area |
 |---|---|
 | [check.md](check.md) | Gate check (`CHK-`) |
+| [images.md](images.md) | Default images (`IMG-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
 | [ocm.md](ocm.md) | ocm generator (`OCM-`) |
