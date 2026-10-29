@@ -90,8 +90,10 @@ default and supports 1.37.2.
   release is Talos 1.14.5, so the component images are Kubernetes 1.37.2.
 
   - Test: `talos/tests/test_multidoc.py::test_no_images_unchanged`;
-    manual: `talosctl validate --mode metal` of v1.14.5 on a compiled
-    control plane config
+    manual: `talosctl gen config` of v1.14.5 writes the same installer
+    repository and tag; `reference.ParseNormalizedNamed` of
+    distribution/reference v0.6.0, which Talos' `VersionFromImageRef`
+    uses, reads the tag of each default
   - Since: this change
 
 ## Implementation inventory

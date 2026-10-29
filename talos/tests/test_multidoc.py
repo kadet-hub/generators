@@ -2,7 +2,7 @@
 
 import copy
 
-from ..multidoc import split
+from ..multidoc import IMAGES, split
 
 
 def config(machine_type="controlplane", **cluster):
@@ -54,5 +54,5 @@ def test_no_images_unchanged():
     c = config(proxy={"disabled": True})
     before = copy.deepcopy(c)
     docs = split("cp-1", c)
-    assert images(docs) == {"KubeProxyConfig": "registry.k8s.io/kube-proxy:v1.37.1"}
+    assert images(docs) == {"KubeProxyConfig": IMAGES["proxy"]}
     assert "kubelet" not in docs[0]["machine"] and before["cluster"]["proxy"] == {"disabled": True}

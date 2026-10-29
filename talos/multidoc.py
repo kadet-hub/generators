@@ -2,7 +2,7 @@
 
 Each translator pops the legacy keys it handles from the v1alpha1 machine
 and cluster sections and returns the replacement documents. The mapping
-follows the legacy bridges of Talos v1.14.3
+follows the legacy bridges of Talos v1.14.5
 (pkg/machinery/config/types/v1alpha1/v1alpha1_*_bridge.go) and the
 documents `talosctl gen config` writes at that release, so a translated
 config behaves like the legacy one. Values the legacy path defaulted
@@ -22,13 +22,13 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-K8S_VERSION = "v1.37.1"  # constants.DefaultKubernetesVersion at Talos v1.14.3
+# Newest patch of constants.DefaultKubernetesVersion (1.37.1) at Talos v1.14.5 (TAL-4).
 IMAGES = {
-    "kubelet": f"ghcr.io/siderolabs/kubelet:{K8S_VERSION}",
-    "apiServer": f"registry.k8s.io/kube-apiserver:{K8S_VERSION}",
-    "controllerManager": f"registry.k8s.io/kube-controller-manager:{K8S_VERSION}",
-    "scheduler": f"registry.k8s.io/kube-scheduler:{K8S_VERSION}",
-    "proxy": f"registry.k8s.io/kube-proxy:{K8S_VERSION}",
+    "kubelet": "ghcr.io/siderolabs/kubelet:v1.37.2@sha256:d80d3843530cfae376a0814f73bcc4ac70e32bc157de777b38a90f33b82d1111",
+    "apiServer": "registry.k8s.io/kube-apiserver:v1.37.2@sha256:3e563afb5cb5b72a10bac7012698dd09f5a42bde7d22de8d7d3c12e654df86b4",
+    "controllerManager": "registry.k8s.io/kube-controller-manager:v1.37.2@sha256:28e62daf706ed815a8bd1dd27b03294ba09421b2e1674e9a83bbac38e24ceb0c",
+    "scheduler": "registry.k8s.io/kube-scheduler:v1.37.2@sha256:028c847fc321b8a7f9787f7b1c0840f832d6b68439be2e5c09279ffb14203d6b",
+    "proxy": "registry.k8s.io/kube-proxy:v1.37.2@sha256:b2e075697d7ab4f0878775dff9e5dccf818b67644437175210ce72fc1ec70551",
 }
 # Where each component's block sits in the v1alpha1 config.
 COMPONENTS = {
@@ -309,7 +309,7 @@ def _cel_string(value: str) -> str:
 
 
 def _disk_match(install: dict) -> str:
-    """CEL expression of v1alpha1 InstallConfig.DiskMatchExpression at v1.14.3."""
+    """CEL expression of v1alpha1 InstallConfig.DiskMatchExpression at v1.14.5."""
     disk = install.get("disk")
     if disk:
         if disk.startswith("/dev/disk/"):
@@ -457,7 +457,7 @@ def _machine_docs(node: str, machine: dict, features: dict, node_cfg: dict) -> l
     machine.pop("env", None)
     servers = (machine.get("time") or {}).get("servers") or []
     # Legacy servers mix NTP hosts and PTP devices (/dev/...); TimeSyncConfig takes
-    # either ntp or ptp, and Talos v1.14.3 rejects PTP devices in ntp.servers.
+    # either ntp or ptp, and Talos v1.14.5 rejects PTP devices in ntp.servers.
     ptp = [s for s in servers if str(s).startswith("/dev/")]
     if ptp and len(ptp) < len(servers):
         _keep(node, "machine.time (NTP servers and PTP devices together)")
@@ -732,7 +732,7 @@ def _component_images(node: str, config: dict) -> None:
     for key, (a, b) in COMPONENTS.items():
         if key not in tags:
             block = config.setdefault(a, {}).setdefault(b, None) or {}
-            block["image"] = f"{IMAGES[key].rsplit(':', 1)[0]}:{tag}"
+            block["image"] = f"{IMAGES[key].split('@', 1)[0].rsplit(':', 1)[0]}:{tag}"
             config[a][b] = block
 
 
