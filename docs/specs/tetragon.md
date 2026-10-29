@@ -33,7 +33,7 @@ policy examples could no longer be copied.
 
   - Test: `tetragon/tests/test_tetragon.py::test_tracing_policy`; fixture
     targets `minimal` and `complete`
-  - Since: this change
+  - Since: #138
 
 - TET-2: An entry of `tracing_policies_namespaced` MUST render one
   TracingPolicyNamespaced, written to
@@ -47,13 +47,13 @@ policy examples could no longer be copied.
 
   - Test: `tetragon/tests/test_tetragon.py::test_namespace_fallback`;
     fixture target `complete`
-  - Since: this change
+  - Since: #138
 
 - TET-3: An entry with `name` MUST render its resource with that name. An
   entry without `name` MUST take the name of its key.
 
   - Test: `tetragon/tests/test_tetragon.py::test_name_names_the_resource`
-  - Since: this change
+  - Since: #138
 
 - TET-4: Two entries of one section that render the same name, in the same
   namespace for TracingPolicyNamespaced, MUST fail the compile, naming both
@@ -62,7 +62,7 @@ policy examples could no longer be copied.
   Otherwise the later entry would replace the earlier output file.
 
   - Test: `tetragon/tests/test_tetragon.py::test_same_name_fails`
-  - Since: this change
+  - Since: #138
 
 ## Spec fields
 
@@ -71,7 +71,7 @@ policy examples could no longer be copied.
 
   - Test: `tetragon/tests/test_tetragon.py::test_spec_and_flat_keys`;
     fixture target `complete`
-  - Since: this change
+  - Since: #138
 
 - TET-6: The flat keys `kprobes`, `tracepoints`, `uprobes`, `usdts`,
   `lsmhooks`, `fentries`, `enforcers`, `lists`, `options`, `loader`,
@@ -81,14 +81,14 @@ policy examples could no longer be copied.
   field in `spec` and log a warning.
 
   - Test: `tetragon/tests/test_tetragon.py::test_spec_and_flat_keys`
-  - Since: this change
+  - Since: #138
 
 - TET-7: Compiled output MUST validate against the closed JSON schemas of
   the TracingPolicy and TracingPolicyNamespaced CRDs of Tetragon 1.7.1.
 
   - Test: the kadet-hub gate (registry QA-7, QA-11) through `./check
     tetragon`, fixture targets `minimal` and `complete`
-  - Since: this change
+  - Since: #138
 
 ## Implementation inventory
 
