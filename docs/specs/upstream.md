@@ -199,6 +199,18 @@ and CHANGELOG entry before merging.
     `gh api repos/kadet-hub/generators/actions/secrets` lists neither secret
   - Since: #87
 
+- UPD-8: The workflow MUST run `./check` without `GH_TOKEN` and
+  `GITHUB_TOKEN` in its environment.
+
+  `./check` runs the registry's scripts from `REGISTRY_REF`, which is
+  `main` and not pinned here (CHK-1), and builds and runs containers. With
+  the App token in its environment, any of that could push to this
+  repository and open pull requests and issues. `./check` needs no token,
+  because it clones the public registry anonymously.
+
+  - Test: `tools/test_upstream.py` (`test_check_runs_without_the_token`)
+  - Since: this change
+
 ## Branches and tags
 
 - UPD-7: Rulesets MUST restrict creating, updating and deleting branches
