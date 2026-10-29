@@ -57,6 +57,27 @@ hosted (registry DEC-16 in `docs/specs/publishing.md`).
   - Test: `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
   - Since: this change
 
+## CSI sidecar images
+
+Until 1.3.2 the sidecars were pinned to the tags upstream's manifests use
+at csi-driver e13603a. Those images carry known vulnerabilities with fixes
+in later kubernetes-csi releases: trivy 0.76.1 counted 77 to 103 advisory
+IDs per sidecar, 2 of them critical, against 17 for livenessprobe v2.20.0.
+The generator now follows the kubernetes-csi releases.
+
+- KV-4: The CSI sidecar images MUST be pinned by tag and digest, each at
+  a kubernetes-csi release whose `deploy/kubernetes/rbac.yaml` grants
+  nothing beyond what the tenant ClusterRole holds and which accepts every
+  flag the generator passes.
+
+  The digest is the multi-arch index digest of the tag. Each image is
+  one string literal `<repository>:<tag>@sha256:<digest>`.
+
+  - Test: manual: `diff` of `deploy/kubernetes/rbac.yaml` between the old
+    and new tag, `grep` of the passed flags in the release's `cmd/`
+    sources; `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
+  - Since: this change
+
 ## KubeVirt CR spec
 
 The KubeVirt CRD marks `spec` as required (`kubevirt.io/schemas/kubevirt_v1.json`,
@@ -77,6 +98,7 @@ renders always get a `spec` mapping built from their flat keys.
 |---|---|
 | Code | `kubevirt/csi.py` (tenant role, output keys `<namespace>/kubevirt-csi-controller-sa`, `<namespace>/kubevirt-csi-controller-sa-token-secret`) |
 | Code | `kubevirt/csi.py` (`render`, default `csi.image`) |
+| Sidecar images | `kubevirt/csi.py` (`PROVISIONER`, `ATTACHER`, `SNAPSHOTTER`, `RESIZER`, `LIVENESSPROBE`, `REGISTRAR`, `SNAPSHOT_CONTROLLER`) |
 | Docs | `kubevirt/README.md`, section Prerequisites under CSI driver; section Driver image |
 | Fixture | `kubevirt/tests/fixtures`, targets `csi-tenant`, `csi-infra` |
 | Code | `kubevirt/__init__.py` (`KubeVirt.body`, `spec` default) |
