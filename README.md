@@ -39,6 +39,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [terraform-azurerm](terraform-azurerm/) ([catalog](https://kadet-hub.org/generators/terraform-azurerm/)) | Terraform JSON for Azure: resource group, VNet with derived subnets, NSGs and associations, and hardened storage accounts with CAF names (hashicorp/azurerm 5.10.0) |
 | [terraform-google](terraform-google/) ([catalog](https://kadet-hub.org/generators/terraform-google/)) | Terraform JSON for Google Cloud: custom-mode VPC with subnets, Cloud NAT and baseline firewall, and hardened GCS buckets (hashicorp/google 8.7.0) |
 | [terraform-opentelekomcloud](terraform-opentelekomcloud/) ([catalog](https://kadet-hub.org/generators/terraform-opentelekomcloud/)) | Terraform JSON for Open Telekom Cloud: VPC with derived subnets, NAT gateway and SNAT, and KMS-encrypted OBS buckets (opentelekomcloud/opentelekomcloud 1.37.10) |
+| [tetragon](tetragon/) ([catalog](https://kadet-hub.org/generators/tetragon/)) | Tetragon TracingPolicies and TracingPolicyNamespaced, hooks in upstream CRD form |
 | [thanos](thanos/) ([catalog](https://kadet-hub.org/generators/thanos/)) | Thanos Operator ThanosQuery, Receive, Ruler, Store and Compact sharing one object storage setting |
 | [velero](velero/) ([catalog](https://kadet-hub.org/generators/velero/)) | Velero BackupStorageLocations, VolumeSnapshotLocations, Schedules, Backups and Restores |
 

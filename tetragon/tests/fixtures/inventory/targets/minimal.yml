@@ -1,0 +1,33 @@
+# Minimal: one cluster-wide TracingPolicy that reports writes below /etc
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/tetragon
+        output_path: manifests/
+
+  generators:
+    tetragon:
+      tracing_policies:
+        write-etc:
+          kprobes:
+            - call: security_file_permission
+              syscall: false
+              args:
+                - index: 0
+                  type: file
+                - index: 1
+                  type: int
+              selectors:
+                - matchArgs:
+                    - index: 0
+                      operator: Prefix
+                      values: ["/etc/"]
+                    - index: 1
+                      operator: Equal
+                      values: ["2"]

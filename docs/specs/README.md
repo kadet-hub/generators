@@ -23,3 +23,4 @@ request, as its first commit.
 | [strimzi.md](strimzi.md) | strimzi generator (`STZ-`) |
 | [talos.md](talos.md) | talos generator (`TAL-`) |
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
+| [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |
