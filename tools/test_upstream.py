@@ -587,6 +587,16 @@ class Act(Repo):
         self.assertEqual((self.root / "gen" / "README.md").read_text(), "Built for Widgets 1.1.0.\n")
         self.assertIn('"type": "number"', (self.group / "widget_v1alpha1.json").read_text())
 
+    def test_check_runs_without_the_token(self):
+        check = subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n")
+        tokens = {"GH_TOKEN": "app-token", "GITHUB_TOKEN": "workflow-token"}
+        with mock.patch.dict("os.environ", tokens), mock.patch.object(upstream, "run"), mock.patch.object(subprocess, "run", return_value=check) as sub:
+            self.act(self.updates(), dry_run=False)
+        env = sub.call_args.kwargs["env"]
+        self.assertNotIn("GH_TOKEN", env)
+        self.assertNotIn("GITHUB_TOKEN", env)
+        self.assertIn("PATH", env)
+
     def test_failing_check_is_an_issue_cause_with_its_tail(self):
         calls = []
         check = subprocess.CompletedProcess(["./check", "gen"], 1, stdout="## ruff (QA-3)\nE501 line too long\n")
