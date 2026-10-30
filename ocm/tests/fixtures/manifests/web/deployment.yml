@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: apps
+spec:
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      initContainers:
+        - name: migrate
+          image: ghcr.io/stefanprodan/podinfo:6.15.0@sha256:5a0d0ecb7fdc4fd1a3e2b3d4d0d6d4a1a32e3e4a1d6a2c0b7f1c8f0b6f1e2d3c
+      containers:
+        - name: web
+          image: ghcr.io/stefanprodan/podinfo:6.15.0@sha256:5a0d0ecb7fdc4fd1a3e2b3d4d0d6d4a1a32e3e4a1d6a2c0b7f1c8f0b6f1e2d3c
+        - name: cache
+          image: docker.io/library/redis:8.6.4-alpine@sha256:2cc044fc5a07c9b701f8f1255a309ae9ad7856e694ac03513bf3648c01e40763
