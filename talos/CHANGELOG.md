@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- One Kubernetes version for all component images of a node. Once the inventory sets the image of kubelet, kube-apiserver, kube-controller-manager, kube-scheduler or kube-proxy, every component image that is not set takes its tag, including components without a block, which now get one. Before, a missing image came from the generator's default (Kubernetes 1.37.1) and a missing block from Talos' runtime default, so a config pinned to 1.36.4 could carry kube-proxy 1.37.1. Set images with different tags fail the compile, naming the node and the components. Nodes that set no component image render as before.
+
 ## 1.1.0
 
 Built for Talos 1.14.3.

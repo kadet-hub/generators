@@ -30,6 +30,14 @@ IMAGES = {
     "scheduler": f"registry.k8s.io/kube-scheduler:{K8S_VERSION}",
     "proxy": f"registry.k8s.io/kube-proxy:{K8S_VERSION}",
 }
+# Where each component's block sits in the v1alpha1 config.
+COMPONENTS = {
+    "kubelet": ("machine", "kubelet"),
+    "apiServer": ("cluster", "apiServer"),
+    "controllerManager": ("cluster", "controllerManager"),
+    "scheduler": ("cluster", "scheduler"),
+    "proxy": ("cluster", "proxy"),
+}
 CONTROL_PLANE_LABEL = "node-role.kubernetes.io/control-plane"
 
 # Kinds Talos rejects on worker machines (ControlplaneOnlyDocument), plus the
@@ -700,6 +708,34 @@ def _node_config(node_cfg: dict, control_plane: bool) -> list:
     return [_doc("KubeNodeConfig", **node_cfg)]
 
 
+def _tag(image: str) -> str:
+    name = image.split("@", 1)[0]
+    last = name.rsplit("/", 1)[-1]
+    return last.rsplit(":", 1)[1] if ":" in last else ""
+
+
+def _component_images(node: str, config: dict) -> None:
+    """One Kubernetes version for all component images (docs/specs/talos.md TAL-1, TAL-2).
+
+    Once the inventory sets one component image, every component gets an
+    image of that tag, so neither this module's IMAGES nor Talos' runtime
+    default can mix in another version.
+    """
+    blocks = {key: (config.get(a) or {}).get(b) or {} for key, (a, b) in COMPONENTS.items()}
+    tags = {key: _tag(block["image"]) for key, block in blocks.items() if block.get("image")}
+    if not tags:
+        return
+    if len(set(tags.values())) > 1:
+        found = ", ".join(f"{key} {tag or '(no tag)'}" for key, tag in tags.items())
+        raise ValueError(f"talos: node {node}: Kubernetes component images disagree on the version: {found}")
+    (tag,) = set(tags.values())
+    for key, (a, b) in COMPONENTS.items():
+        if key not in tags:
+            block = config.setdefault(a, {}).setdefault(b, None) or {}
+            block["image"] = f"{IMAGES[key].rsplit(':', 1)[0]}:{tag}"
+            config[a][b] = block
+
+
 def split(node: str, config: dict) -> list:
     """Return [v1alpha1 config, documents...] for one node config.
 
@@ -707,6 +743,7 @@ def split(node: str, config: dict) -> list:
     in place.
     """
     config.pop("persist", None)  # deprecated: "Not supported anymore"
+    _component_images(node, config)
     machine = config.setdefault("machine", {})
     cluster = config.get("cluster") or {}
     features = machine.get("features") or {}
