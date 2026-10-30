@@ -4,8 +4,8 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 cert-manager.io:
   software: cert-manager
-  version: 1.21.2
-  source: https://github.com/cert-manager/cert-manager/tree/v1.21.2/deploy/crds
+  version: 1.21.3
+  source: https://github.com/cert-manager/cert-manager/tree/v1.21.3/deploy/crds
   license: Apache-2.0
 trust.cert-manager.io:
   software: trust-manager

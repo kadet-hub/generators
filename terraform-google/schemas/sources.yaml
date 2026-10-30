@@ -4,3 +4,4 @@ terraform/hashicorp/google:
   software: hashicorp/google
   version: 8.7.0
   source: https://registry.terraform.io/providers/hashicorp/google/8.7.0
+  license: MPL-2.0

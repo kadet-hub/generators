@@ -13,7 +13,7 @@ See: https://docs.cilium.io/en/stable/network/kubernetes/policy/
      https://docs.cilium.io/en/latest/network/l2-announcements/
 """
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 import logging
 from typing import Any
@@ -111,7 +111,7 @@ def _build_selector(selector: dict) -> dict:
 
 
 # Upstream DNS proxy rule for toFQDNs policies:
-# https://github.com/cilium/cilium/blob/v1.20.3/examples/policies/l3/fqdn/fqdn.yaml
+# https://github.com/cilium/cilium/blob/v1.20.4/examples/policies/l3/fqdn/fqdn.yaml
 _KUBE_DNS = {
     "k8s:io.kubernetes.pod.namespace": "kube-system",
     "k8s:k8s-app": "kube-dns",
@@ -472,7 +472,7 @@ class CiliumL2AnnouncementPolicy(CiliumBase):
         )
         # Both flags default to false upstream, so a policy without either
         # announces nothing:
-        # https://github.com/cilium/cilium/blob/v1.20.3/Documentation/network/l2-announcements.rst?plain=1#L158-L163
+        # https://github.com/cilium/cilium/blob/v1.20.4/Documentation/network/l2-announcements.rst?plain=1#L158-L163
         if "externalIPs" not in spec and "loadBalancerIPs" not in spec:
             spec.loadBalancerIPs = True
 

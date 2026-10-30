@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+Built for External Secrets Operator 2.14.0. The SecretStore and ClusterSecretStore schemas and CRDs rewrite six CEL rules on mutually exclusive provider fields (`crd` auth, `onepasswordSDK`, `openBao` auth and CA) from a filtered list to a sum of `has()` terms with the same limits. The ExternalSecret and ClusterExternalSecret CRDs change only in their controller-gen annotation. Validation and rendered output are unchanged.
+
 ## 1.0.5
 
 Built for External Secrets Operator 2.13.0. The upstream CRDs in `config/crds/bases` are unchanged against 2.12.0, so the shipped schemas, CRDs and rendered output are unchanged.

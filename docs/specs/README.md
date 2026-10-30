@@ -12,11 +12,17 @@ request, as its first commit.
 | Spec | Area |
 |---|---|
 | [check.md](check.md) | Gate check (`CHK-`) |
+| [images.md](images.md) | Default images (`IMG-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
+| [third-party.md](third-party.md) | Third-party licences and notices (`TP-`) |
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
+| [ocm.md](ocm.md) | ocm generator (`OCM-`) |
 | [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |
 | [kubernetes.md](kubernetes.md) | kubernetes generator (`K8S-`) |
 | [cloudnative-pg.md](cloudnative-pg.md) | cloudnative-pg generator (`CNPG-`) |
 | [rabbitmq.md](rabbitmq.md) | rabbitmq generator (`RMQ-`) |
 | [strimzi.md](strimzi.md) | strimzi generator (`STZ-`) |
+| [talos.md](talos.md) | talos generator (`TAL-`) |
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
+| [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |
+| [flux.md](flux.md) | flux generator (`FLX-`) |
