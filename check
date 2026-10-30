@@ -19,6 +19,20 @@ git -c advice.detachedHead=false clone -q --depth 1 --branch "$ref" https://gith
 reg=$work/registry
 echo "registry $(git -C "$reg" rev-parse --short HEAD)"
 
+echo "## schema licences (CHK-7)"
+sources=$gen/$(yq -r '.schemas // ""' -- "$gen/kapitan-generator.yaml")/sources.yaml
+if [[ -f $sources ]]; then
+  allowed=$(sed 's/#.*//' "$reg/policy/licenses.txt" | awk 'NF {print $1}')
+  bad=0
+  while read -r group license; do
+    if [[ -z $license ]] || ! grep -qxF -- "$license" <<<"$allowed"; then
+      echo "CHK-7: $group: license '${license}' is not in the registry's policy/licenses.txt"
+      bad=1
+    fi
+  done < <(yq -r 'to_entries[] | .key + " " + (.value.license // "")' -- "$sources")
+  [[ $bad == 0 ]] || exit 1
+fi
+
 echo "## sandbox image"
 docker build -q -t kadet-hub/sandbox "$reg/sandbox" >/dev/null
 
