@@ -19,7 +19,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 API_GROUP = "opentelemetry.io"
 TARGET_ALLOCATOR_LABEL = "opentelemetry.io/target-allocator"
@@ -198,8 +198,8 @@ class Instrumentation(OpenTelemetryResource):
     _FLAT_KEY_MAP = _flat_keys(
         """
         apacheHttpd defaults dotnet env exporter go imagePullPolicy
-        initContainerSecurityContext java nginx nodejs propagators python resource
-        sampler
+        initContainerSecurityContext java nginx nodejs php propagators python resource
+        ruby sampler
         """
     )
 
