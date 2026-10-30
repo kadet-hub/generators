@@ -238,6 +238,32 @@ out of step whenever a component was added or removed.
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_test_per_namespace`, `::test_chainsaw_test_uses_output_type`, `::test_no_chainsaw_test_for_cronjobs_only`; fixture target `complete`; `manual:` `chainsaw test --no-cluster` on the compiled fixture loads both Tests and their templates
   - Since: this change
 
+- K8S-13: `generators.kubernetes.chainsaw.workloads.<name>` with `kind`
+  and an optional `namespace` MUST render the same StepTemplate and Test
+  step as a component, for a workload that the generator does not
+  render, such as one from Kapitan's helm input.
+
+  `kind` is one of Deployment, StatefulSet, DaemonSet and Job; any other
+  value fails the compile. `namespace` defaults to `parameters.namespace`,
+  as for a component. A name that a component of the same namespace
+  already asserts fails the compile, because both write one file.
+
+  The generator does not know the replica count of such a workload, so
+  the assert reads it from the object. A Deployment or StatefulSet is
+  ready when it is rolled out as `kubectl rollout status` checks it:
+  `status.observedGeneration` has reached `metadata.generation`, and
+  `updatedReplicas` and `availableReplicas` (StatefulSet:
+  `readyReplicas`) have reached `spec.replicas`. The comparison is `>=`
+  and not `==`, because Chainsaw's `==` compares the literal `` `0` `` and
+  `spec.replicas` by type and never matches at 0 replicas. Because of
+  `updatedReplicas`, a StatefulSet
+  with the `OnDelete` update strategy counts as rolled out only once its
+  pods run the current revision. A DaemonSet is ready as for a
+  component, a Job when its `Complete` condition is `True`.
+
+  - Test: `kubernetes/tests/test_components.py::test_chainsaw_workloads_rendered_elsewhere`, `::test_chainsaw_workload_kind_must_be_known`, `::test_chainsaw_workload_and_component_of_one_name_fail`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind: the four kinds and a Deployment with 0 replicas pass, a Deployment and a StatefulSet with an image that does not exist fail
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
@@ -247,7 +273,7 @@ out of step whenever a component was added or removed.
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
-| Chainsaw Test | `kubernetes/generators.py` (`generate_chainsaw_asserts`) |
+| Chainsaw Test, external workloads | `kubernetes/generators.py` (`generate_chainsaw_asserts`, `_EXTERNAL_WORKLOADS`) |
 | Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
