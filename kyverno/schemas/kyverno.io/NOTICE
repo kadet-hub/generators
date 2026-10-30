@@ -1,0 +1,12 @@
+Kyverno
+Copyright The Kyverno Authors
+
+This product includes software developed by the Kyverno project
+(https://kyverno.io) and its contributors.
+
+The JSON Schema files in this directory are derived from the
+openAPIV3Schema of the CRDs of https://github.com/kyverno/kyverno at the
+version named in sources.yaml. Modification: every node with properties
+gets additionalProperties: false, except preserve-unknown-fields nodes,
+maps and allOf/anyOf/oneOf/not branches. The files under crds/ are the
+upstream CRDs, as compact JSON where named .json.

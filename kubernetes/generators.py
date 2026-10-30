@@ -897,12 +897,54 @@ def _ready_status(workload, component):
     return {"succeeded": spec.completions}
 
 
+# Kinds of generators.kubernetes.chainsaw.workloads and their readiness, for
+# workloads rendered elsewhere, whose replica count only the cluster knows (K8S-13).
+_EXTERNAL_WORKLOADS = {
+    # Rolled out as `kubectl rollout status` checks it. >= because == compares the
+    # literal 0 and spec.replicas by type and fails at 0 replicas.
+    "Deployment": ("apps/v1", {
+        "(status.observedGeneration >= metadata.generation && (status.updatedReplicas || `0`) >= spec.replicas"
+        " && (status.availableReplicas || `0`) >= spec.replicas)": True,
+    }),
+    "StatefulSet": ("apps/v1", {
+        "(status.observedGeneration >= metadata.generation && (status.updatedReplicas || `0`) >= spec.replicas"
+        " && (status.readyReplicas || `0`) >= spec.replicas)": True,
+    }),
+    "DaemonSet": ("apps/v1", {"status": {"(observedGeneration > `0` && numberReady == desiredNumberScheduled)": True}}),
+    "Job": ("batch/v1", {"status": {"(conditions[?type == 'Complete'])": [{"status": "True"}]}}),
+}
+
+
+def _external_asserts():
+    """(name, namespace, resource) of generators.kubernetes.chainsaw.workloads."""
+    for name, entry in (_generator_settings().get("chainsaw", {}).get("workloads") or {}).items():
+        kind = (entry or {}).get("kind")
+        if kind not in _EXTERNAL_WORKLOADS:
+            raise CompileError(
+                f"generators.kubernetes.chainsaw.workloads.{name}: kind {kind!r} is not one of {', '.join(_EXTERNAL_WORKLOADS)}"
+            )
+        api_version, ready = _EXTERNAL_WORKLOADS[kind]
+        namespace_name = entry.get("namespace", inv.parameters.get("namespace", "default"))
+        resource = {"apiVersion": api_version, "kind": kind, "metadata": {"name": name, "namespace": namespace_name}}
+        yield name, namespace_name, {**resource, **ready}
+
+
 def generate_chainsaw_asserts(input_params):
-    """One Chainsaw StepTemplate per component that asserts its workload is ready.
+    """One Chainsaw StepTemplate per component and per generators.kubernetes.chainsaw.workloads
+    entry that asserts its workload is ready, and one Chainsaw Test per namespace that runs them.
 
     A CronJob gets none: it starts no pod before its schedule.
     """
     obj = BaseObj()
+    steps = {}
+    # Kapitan names the files after the compile entry's output_type, yaml unless set (K8S-12).
+    entries = inv.parameters.get("kapitan", {}).get("compile", [])
+    yml = any(
+        e.get("input_params", {}).get("function") == "generate_chainsaw_asserts" and e.get("output_type") == "yml"
+        for e in entries
+    )
+    extension = "yml" if yml else "yaml"
+    asserts = []
     for name, component in get_components():
         if component.get("schedule"):
             continue
@@ -918,6 +960,8 @@ def generate_chainsaw_asserts(input_params):
             },
             "status": _ready_status(workload, component),
         }
+        asserts.append((name, namespace_name, resource))
+    for name, namespace_name, resource in [*asserts, *_external_asserts()]:
         _put(
             obj,
             f"{namespace_name}/{name}-assert",
@@ -926,6 +970,18 @@ def generate_chainsaw_asserts(input_params):
                 "kind": "StepTemplate",
                 "metadata": {"name": name},
                 "spec": {"try": [{"assert": {"resource": resource}}]},
+            },
+        )
+        steps.setdefault(namespace_name, []).append({"use": {"template": f"{name}-assert.{extension}"}})
+    for namespace_name, uses in steps.items():
+        _put(
+            obj,
+            f"{namespace_name}/chainsaw-test",
+            {
+                "apiVersion": "chainsaw.kyverno.io/v1alpha1",
+                "kind": "Test",
+                "metadata": {"name": namespace_name},
+                "spec": {"namespace": namespace_name, "steps": uses},
             },
         )
     return obj

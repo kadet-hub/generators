@@ -1,0 +1,13 @@
+name: ocm
+description: Writes an OCM component constructor for a target, with every container image of the manifests earlier compile entries wrote as an ociImage resource, an access template for mirrors and pull-through caches, and resources from the inventory for the rest.
+tags: [ci]
+license: Apache-2.0
+owners: [3042152]
+kapitan: ">=0.36.3,<0.37"
+dependencies: []
+binaries: []
+output_capabilities: []
+unparsed_outputs: []
+charts: []
+inventory_backends: [reclass-rs, omegaconf]
+fixtures: tests/fixtures

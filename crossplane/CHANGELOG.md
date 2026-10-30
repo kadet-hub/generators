@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+Ships the NOTICE of provider-upjet-aws with the `aws.m.upbound.io` schemas and CRDs it vendors, in their group directory. Rendered output is unchanged.
+
 ## 1.0.1
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.

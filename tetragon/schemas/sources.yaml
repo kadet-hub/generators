@@ -1,0 +1,9 @@
+# QA-7: JSON Schemas from the openAPIV3Schema of the upstream CRDs at this release (Apache-2.0),
+# closed like kubeconform strict mode: every node with properties gets
+# additionalProperties: false, except preserve-unknown-fields nodes, maps and
+# allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
+cilium.io:
+  software: Tetragon
+  version: 1.7.1
+  source: https://github.com/cilium/tetragon/tree/v1.7.1/pkg/k8s/apis/cilium.io/client/crds/v1alpha1
+  license: Apache-2.0
