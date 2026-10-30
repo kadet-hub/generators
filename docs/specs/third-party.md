@@ -36,7 +36,8 @@ the group's `sources.yaml` entry.
   is Apache-2.0). For a Terraform Registry source, the provider's
   repository at the version's tag decides.
 
-  - Test: manual: compare each entry with the API at its ref
+  - Test: CHK-7 (presence and allow list); manual: compare each entry
+    with the API at its ref
   - Since: this change
 
 ## Notices
