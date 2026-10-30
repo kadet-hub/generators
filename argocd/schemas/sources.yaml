@@ -6,6 +6,6 @@
 # the 1 MiB file limit; its content is unchanged.
 argoproj.io:
   software: Argo CD
-  version: 3.5.5
-  source: https://github.com/argoproj/argo-cd/tree/v3.5.5/manifests/crds
+  version: 3.5.6
+  source: https://github.com/argoproj/argo-cd/tree/v3.5.6/manifests/crds
   license: Apache-2.0

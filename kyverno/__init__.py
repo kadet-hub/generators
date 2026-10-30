@@ -13,7 +13,7 @@ Schema reference: kyverno.io/v1, kyverno.io/v2, policies.kyverno.io/v1beta1
 See: https://kyverno.io/docs/
 """
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 import logging
 import re
