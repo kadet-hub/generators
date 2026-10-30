@@ -214,15 +214,15 @@ def test_volume_mount_named_by_key():
     assert mounts({"data": {"mount_path": "/data"}}) == [{"name": "data", "mountPath": "/data"}]
 
 
-def chainsaw(components, output_type=None, workloads=None):
-    """generate_chainsaw_asserts over components and chainsaw.workloads, as {output key: manifest}."""
+def chainsaw(components, output_type=None, workloads=None, resources=None):
+    """generate_chainsaw_asserts over components, chainsaw.workloads and chainsaw.resources, as {output key: manifest}."""
     entry = {"input_params": {"function": "generate_chainsaw_asserts"}}
     if output_type:
         entry["output_type"] = output_type
     previous = utils.inventory
     utils.inventory = lambda: Box(parameters={
         "namespace": "demo", "components": components, "kapitan": {"compile": [{"output_type": "yml"}, entry]},
-        "generators": {"kubernetes": {"chainsaw": {"workloads": workloads}}} if workloads is not None else {},
+        "generators": {"kubernetes": {"chainsaw": {"workloads": workloads, "resources": resources}}},
     })
     try:
         return {key: value.to_dict() for key, value in generate_chainsaw_asserts({}).root.items()}
@@ -305,3 +305,50 @@ def test_chainsaw_workload_and_component_of_one_name_fail():  # K8S-13
         assert "produced twice" in str(e), str(e)
     else:
         raise AssertionError("rendered")
+
+
+CEPH_CLUSTER = {
+    "api_version": "ceph.rook.io/v1",
+    "kind": "CephCluster",
+    "name": "rook-ceph",
+    "namespace": "rook-ceph",
+    "status": {"phase": "Ready", "ceph": {"health": "HEALTH_OK"}},
+}
+
+
+def test_chainsaw_resource_status_assert():  # K8S-14
+    out = chainsaw({"web": component()}, workloads={"rook-ceph-operator": {"kind": "Deployment", "namespace": "rook-ceph"}},
+                   resources={"ceph-cluster": CEPH_CLUSTER, "pool": {"api_version": "ceph.rook.io/v1", "kind": "CephBlockPool", "status": {"phase": "Ready"}}})
+    assert out["rook-ceph/ceph-cluster-assert"] == {
+        "apiVersion": "chainsaw.kyverno.io/v1alpha1",
+        "kind": "StepTemplate",
+        "metadata": {"name": "ceph-cluster"},
+        "spec": {"try": [{"assert": {"resource": {
+            "apiVersion": "ceph.rook.io/v1",
+            "kind": "CephCluster",
+            "metadata": {"name": "rook-ceph", "namespace": "rook-ceph"},
+            "status": {"phase": "Ready", "ceph": {"health": "HEALTH_OK"}},
+        }}}]},
+    }
+    pool = out["demo/pool-assert"]["spec"]["try"][0]["assert"]["resource"]
+    assert pool["metadata"] == {"name": "pool", "namespace": "demo"}
+    assert out["rook-ceph/chainsaw-test"]["spec"]["steps"] == [
+        {"use": {"template": "rook-ceph-operator-assert.yaml"}},
+        {"use": {"template": "ceph-cluster-assert.yaml"}},
+    ]
+    assert out["demo/chainsaw-test"]["spec"]["steps"][-1] == {"use": {"template": "pool-assert.yaml"}}
+
+
+def test_chainsaw_resource_needs_kind_and_status():  # K8S-14
+    for entry in ({"kind": "CephCluster", "status": {"phase": "Ready"}}, {**CEPH_CLUSTER, "status": None},
+                  {**CEPH_CLUSTER, "status": "Ready"}):
+        try:
+            chainsaw({}, resources={"x": entry})
+        except Exception as e:
+            assert "chainsaw.resources.x" in str(e) and "status mapping" in str(e), str(e)
+        else:
+            raise AssertionError(f"{entry} rendered")
+
+
+def test_no_chainsaw_keys_render_as_before():  # K8S-14
+    assert chainsaw({"web": component()}) == chainsaw({"web": component()}, workloads={}, resources={})
