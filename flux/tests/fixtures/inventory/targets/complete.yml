@@ -108,3 +108,13 @@ parameters:
           spec:
             driftDetection:
               mode: enabled
+        podinfo-inline:
+          namespace: apps
+          # chart template of kind OCIRepository passes through (FLX-2)
+          spec:
+            chart:
+              kind: OCIRepository
+              spec:
+                url: oci://ghcr.io/stefanprodan/charts/podinfo
+                ref:
+                  semver: ">=6.0.0"

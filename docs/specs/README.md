@@ -25,3 +25,4 @@ request, as its first commit.
 | [talos.md](talos.md) | talos generator (`TAL-`) |
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
 | [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |
+| [flux.md](flux.md) | flux generator (`FLX-`) |
