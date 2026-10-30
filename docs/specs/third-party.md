@@ -51,7 +51,9 @@ the group's `sources.yaml` entry.
   attribution lines. Lines that list upstream's own dependencies, which
   the schemas do not contain, are left out (kyverno). crossplane carries
   provider-upjet-aws's CC0 note, although it attributes the provider's
-  Terraform components rather than the CRDs.
+  Terraform components rather than the CRDs. Its last paragraph names the
+  CRDs' Apache-2.0 licence, so the note's own CC0 header is not read as
+  theirs.
 
   - Test: manual: for each entry, `gh api
     repos/<owner>/<repo>/contents/?ref=<ref>` lists no NOTICE, or the

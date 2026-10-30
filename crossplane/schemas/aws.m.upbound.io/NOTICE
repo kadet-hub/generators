@@ -49,3 +49,7 @@ named in sources.yaml. Modification: every node with properties gets
 additionalProperties: false, except preserve-unknown-fields nodes, maps
 and allOf/anyOf/oneOf/not branches. The files under crds/ are the upstream
 CRDs, as compact JSON where named .json.
+
+The CRDs and the schemas derived from them are licensed under Apache-2.0,
+the licence of provider-upjet-aws. The CC0-1.0 identifier above is
+upstream's licence of this NOTICE text.
