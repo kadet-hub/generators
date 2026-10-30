@@ -1,0 +1,87 @@
+# Complete: both kinds, name override, labels and annotations, spec
+# passthrough with a flat key winning over it (options), and the namespace
+# of the entry before generators.tetragon.namespace
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/tetragon
+        output_path: manifests/
+
+  namespace: workloads
+  generators:
+    tetragon:
+      namespace: apps
+      tracing_policies:
+        sigkill-tmp:
+          name: kill-tmp-writes
+          labels:
+            team: platform
+          annotations:
+            example.com/owner: platform
+          options:
+            - name: disable-kprobe-multi
+              value: "1"
+          spec:
+            options:
+              - name: disable-kprobe-multi
+                value: "0"
+            kprobes:
+              - call: security_file_permission
+                syscall: false
+                args:
+                  - index: 0
+                    type: file
+                  - index: 1
+                    type: int
+                selectors:
+                  - matchArgs:
+                      - index: 0
+                        operator: Prefix
+                        values: ["/tmp/sigkill"]
+                    matchActions:
+                      - action: Sigkill
+          host_selector:
+            matchLabels:
+              node-role.kubernetes.io/worker: ""
+      tracing_policies_namespaced:
+        exec-shell:
+          pod_selector:
+            matchLabels:
+              app: web
+          container_selector:
+            matchExpressions:
+              - key: name
+                operator: In
+                values: [web]
+          tracepoints:
+            - subsystem: raw_syscalls
+              event: sys_enter
+              args:
+                - index: 4
+                  type: syscall64
+              selectors:
+                - matchArgs:
+                    - index: 4
+                      operator: Equal
+                      values: ["59"]
+        deny-open:
+          namespace: data
+          lsmhooks:
+            - hook: file_open
+              args:
+                - index: 0
+                  type: file
+              selectors:
+                - matchArgs:
+                    - index: 0
+                      operator: Equal
+                      values: ["/tmp/denied"]
+                  matchActions:
+                    - action: Override
+                      argError: -1
