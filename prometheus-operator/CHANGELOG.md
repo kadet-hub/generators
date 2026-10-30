@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4
+
+Built for Prometheus Operator 0.94.2. Its CRDs change only in the `operator.prometheus.io/version` annotation, so the shipped schemas and rendered output are unchanged. The upstream files the README cites are unchanged at v0.94.2 apart from version labels in the RBAC guide, and their links move to that tag.
+
 ## 1.1.3
 
 Ships the Kubernetes 1.37.1 ServiceAccount, ClusterRole and ClusterRoleBinding schemas instead of 1.35.0, matching the kube-apiserver v1.37.1 the gate dry-runs against (QA-10). Apart from descriptions, the only schema change is that ClusterRoleBinding `roleRef.apiGroup` is no longer required; the generator still sets it. Rendered output is unchanged.
