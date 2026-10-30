@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.0
+
+- `generators.kubernetes.chainsaw.workloads` adds Chainsaw readiness asserts and Test steps for workloads the generator does not render, such as those from a Helm chart, by name, `kind` and `namespace`. A Deployment or StatefulSet is ready once rolled out, read from the object's own `spec.replicas`.
+
+Output is unchanged for inventories without `chainsaw.workloads`.
+
 ## 1.10.0
 
 - The compile entry with `function: generate_chainsaw_asserts` also writes `<namespace>/chainsaw-test`, a Chainsaw Test per namespace that uses the namespace's StepTemplates. A project no longer keeps the list of templates in a hand-written test.

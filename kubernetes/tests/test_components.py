@@ -214,14 +214,15 @@ def test_volume_mount_named_by_key():
     assert mounts({"data": {"mount_path": "/data"}}) == [{"name": "data", "mountPath": "/data"}]
 
 
-def chainsaw(components, output_type=None):
-    """generate_chainsaw_asserts over components, as {output key: manifest}."""
+def chainsaw(components, output_type=None, workloads=None):
+    """generate_chainsaw_asserts over components and chainsaw.workloads, as {output key: manifest}."""
     entry = {"input_params": {"function": "generate_chainsaw_asserts"}}
     if output_type:
         entry["output_type"] = output_type
     previous = utils.inventory
     utils.inventory = lambda: Box(parameters={
         "namespace": "demo", "components": components, "kapitan": {"compile": [{"output_type": "yml"}, entry]},
+        "generators": {"kubernetes": {"chainsaw": {"workloads": workloads}}} if workloads is not None else {},
     })
     try:
         return {key: value.to_dict() for key, value in generate_chainsaw_asserts({}).root.items()}
@@ -257,3 +258,50 @@ def test_chainsaw_test_uses_output_type():  # K8S-12
 
 def test_no_chainsaw_test_for_cronjobs_only():  # K8S-12
     assert chainsaw({"backup": component(type="job", schedule="0 3 * * *")}) == {}
+
+
+def test_chainsaw_workloads_rendered_elsewhere():  # K8S-13
+    out = chainsaw({"web": component()}, workloads={
+        "operator": {"kind": "Deployment", "namespace": "storage"},
+        "mon": {"kind": "StatefulSet", "namespace": "storage"},
+        "csi-node": {"kind": "DaemonSet", "namespace": "storage"},
+        "setup": {"kind": "Job"},
+    })
+    operator = out["storage/operator-assert"]["spec"]["try"][0]["assert"]["resource"]
+    assert operator["apiVersion"] == "apps/v1"
+    assert operator["metadata"] == {"name": "operator", "namespace": "storage"}
+    [rollout] = [k for k in operator if k.startswith("(")]
+    assert "status.updatedReplicas" in rollout and "status.availableReplicas" in rollout and ">= spec.replicas" in rollout
+    mon = out["storage/mon-assert"]["spec"]["try"][0]["assert"]["resource"]
+    assert any("status.readyReplicas" in k for k in mon)
+    assert "status" in out["storage/csi-node-assert"]["spec"]["try"][0]["assert"]["resource"]
+    setup = out["demo/setup-assert"]["spec"]["try"][0]["assert"]["resource"]
+    assert (setup["apiVersion"], setup["status"]) == ("batch/v1", {"(conditions[?type == 'Complete'])": [{"status": "True"}]})
+    assert out["storage/chainsaw-test"]["spec"]["steps"] == [
+        {"use": {"template": "operator-assert.yaml"}},
+        {"use": {"template": "mon-assert.yaml"}},
+        {"use": {"template": "csi-node-assert.yaml"}},
+    ]
+    assert out["demo/chainsaw-test"]["spec"]["steps"] == [
+        {"use": {"template": "web-assert.yaml"}},
+        {"use": {"template": "setup-assert.yaml"}},
+    ]
+
+
+def test_chainsaw_workload_kind_must_be_known():  # K8S-13
+    for entry in ({"kind": "CronJob"}, {}):
+        try:
+            chainsaw({}, workloads={"x": entry})
+        except Exception as e:
+            assert "chainsaw.workloads.x" in str(e) and "Deployment" in str(e), str(e)
+        else:
+            raise AssertionError(f"{entry} rendered")
+
+
+def test_chainsaw_workload_and_component_of_one_name_fail():  # K8S-13
+    try:
+        chainsaw({"web": component()}, workloads={"web": {"kind": "Deployment"}})
+    except ValueError as e:
+        assert "produced twice" in str(e), str(e)
+    else:
+        raise AssertionError("rendered")
