@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.1
+
+Built for Vertical Pod Autoscaler 1.8.1. Its VerticalPodAutoscaler CRD is unchanged from 1.8.0, so the shipped schema and rendered output are unchanged.
+
 ## 1.11.0
 
 - `generators.kubernetes.chainsaw.workloads` adds Chainsaw readiness asserts and Test steps for workloads the generator does not render, such as those from a Helm chart, by name, `kind` and `namespace`. A Deployment or StatefulSet is ready once rolled out, read from the object's own `spec.replicas`.
