@@ -4,3 +4,4 @@ terraform/opentelekomcloud/opentelekomcloud:
   software: opentelekomcloud/opentelekomcloud
   version: 1.37.10
   source: https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.10
+  license: MPL-2.0

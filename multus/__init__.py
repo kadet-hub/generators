@@ -10,7 +10,7 @@ Schema reference: k8s.cni.cncf.io/v1
 See: https://github.com/k8snetworkplumbingwg/multus-cni
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 import json
 import logging
