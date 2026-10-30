@@ -2,7 +2,7 @@
 # Services, ConfigMaps, Secrets, RBAC, scaling, NetworkPolicies, volumes and
 # APIServices; Ingress with a GKE ManagedCertificate; Gateway API with the
 # services shorthand; standalone resources, cluster policy sections and
-# manifests; Chainsaw StepTemplates asserting the workloads.
+# manifests; Chainsaw StepTemplates asserting the workloads, also of chart-rendered ones.
 classes: []
 
 parameters:
@@ -39,6 +39,15 @@ parameters:
 
     kubernetes:
       namespace: shop
+      # Readiness asserts for workloads that a chart renders (K8S-13).
+      chainsaw:
+        workloads:
+          storage-operator:
+            kind: Deployment
+            namespace: storage
+          storage-mon:
+            kind: StatefulSet
+            namespace: storage
       configs:
         feature-flags:
           data:

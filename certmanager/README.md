@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/certmanager/) page.
 
-Kapitan kadet generator for [cert-manager](https://cert-manager.io/) and [trust-manager](https://cert-manager.io/docs/trust/trust-manager/) resources. Built for cert-manager 1.21.2 (`cert-manager.io/v1`) and trust-manager 0.25.0 (`trust.cert-manager.io/v1alpha1`):
+Kapitan kadet generator for [cert-manager](https://cert-manager.io/) and [trust-manager](https://cert-manager.io/docs/trust/trust-manager/) resources. Built for cert-manager 1.21.3 (`cert-manager.io/v1`) and trust-manager 0.25.0 (`trust.cert-manager.io/v1alpha1`):
 
 - **Certificate**: requests a certificate from an Issuer or ClusterIssuer and stores it in a Secret
 - **Issuer**: namespaced certificate authority (ACME, CA, self-signed, Vault, ...)
