@@ -20,3 +20,4 @@ request, as its first commit.
 | [rabbitmq.md](rabbitmq.md) | rabbitmq generator (`RMQ-`) |
 | [strimzi.md](strimzi.md) | strimzi generator (`STZ-`) |
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
+| [flux.md](flux.md) | flux generator (`FLX-`) |
