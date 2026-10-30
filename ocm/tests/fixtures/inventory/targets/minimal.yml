@@ -1,0 +1,27 @@
+# Minimal: one component, images scanned from the copied manifests, upstream access
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: minimal
+    compile:
+      - input_type: copy
+        input_paths:
+          - manifests/web
+        output_path: k8s/web
+      - input_type: kadet
+        input_paths:
+          - lib/ocm
+        output_path: .
+        output_type: plain
+        input_params:
+          components:
+            app:
+              name: example.org/acme/minimal
+              version: 1.0.0
+              provider:
+                name: acme
+              images:
+                scan:
+                  - k8s/**/*.yml
