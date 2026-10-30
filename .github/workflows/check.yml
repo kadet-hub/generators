@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read # UPD-6: the deployment branch policies of the environments
 
 jobs:
   check:
@@ -21,6 +22,10 @@ jobs:
         with:
           version: "0.13.0"
           enable-cache: false
+      - name: Jobs with secrets run in a main-only environment (UPD-6)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/workflow-policy
       - name: Tests of tools/upstream.py
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

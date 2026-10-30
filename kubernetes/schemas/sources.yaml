@@ -83,5 +83,5 @@ networking.gke.io:
 chainsaw.kyverno.io:
   software: Chainsaw
   version: 0.2.15
-  source: https://github.com/kyverno/chainsaw/blob/v0.2.15/.crds/chainsaw.kyverno.io_steptemplates.yaml
+  source: https://github.com/kyverno/chainsaw/blob/v0.2.15/.crds/chainsaw.kyverno.io_steptemplates.yaml https://github.com/kyverno/chainsaw/blob/v0.2.15/.crds/chainsaw.kyverno.io_tests.yaml
   license: Apache-2.0

@@ -14,6 +14,7 @@ request, as its first commit.
 | [check.md](check.md) | Gate check (`CHK-`) |
 | [images.md](images.md) | Default images (`IMG-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
+| [third-party.md](third-party.md) | Third-party licences and notices (`TP-`) |
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
 | [ocm.md](ocm.md) | ocm generator (`OCM-`) |
 | [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |
@@ -23,3 +24,4 @@ request, as its first commit.
 | [strimzi.md](strimzi.md) | strimzi generator (`STZ-`) |
 | [talos.md](talos.md) | talos generator (`TAL-`) |
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
+| [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |

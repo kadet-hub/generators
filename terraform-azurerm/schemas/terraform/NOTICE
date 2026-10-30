@@ -1,0 +1,10 @@
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Copyright IBM Corp. 2014, 2025
+
+hashicorp_azurerm_5.10.0.json is derived from the provider schema of
+hashicorp/azurerm at the version named in sources.yaml
+(https://github.com/hashicorp/terraform-provider-azurerm). Modification:
+the output of `terraform providers schema -json` is reduced to the
+provider configuration and the resource and data source types the
+generator emits.
