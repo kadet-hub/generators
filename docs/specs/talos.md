@@ -42,8 +42,12 @@ images for one version.
   The tag is the part after the last `:` of the image without its
   digest. The registry may differ per image, so mirrors stay possible.
 
+  A set image without a tag, such as `<repository>@sha256:<digest>`, fails
+  the compile as well. Its Kubernetes version is unknown, so TAL-2 has no
+  tag to give the other components.
+
   - Test: `talos/tests/test_multidoc.py::test_component_tags_must_agree`
-  - Since: this change
+  - Since: this change, #134 (image without a tag)
 
 - TAL-2: On such a node, every component image the inventory does not set
   MUST be rendered with the upstream repository of that component and the

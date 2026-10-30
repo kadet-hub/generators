@@ -6,6 +6,7 @@ Built for Talos 1.14.5.
 
 - The default images are pinned by digest. The five Kubernetes component images move from 1.37.1 to 1.37.2, the newest patch of the Kubernetes version Talos 1.14.5 defaults to, for its vulnerability fixes. The installer moves to `factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba:v1.14.5`, which drops a high Go stdlib advisory of v1.14.3. Images the generator derives from a tag the inventory sets (1.2.0) carry no digest.
 - Ships the Talos 1.14.5 schemas. Against 1.14.3 only the description of `KernelModuleConfig` changed.
+- A component image set without a tag, such as `registry.k8s.io/kube-apiserver@sha256:...`, fails the compile. Since 1.2.0 it rendered the other component images with an empty tag (`ghcr.io/siderolabs/kubelet:`).
 
 ## 1.2.0
 

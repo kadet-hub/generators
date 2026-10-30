@@ -21,14 +21,19 @@ def images(docs):
 
 
 def test_component_tags_must_agree():
-    c = config(apiServer={"image": "registry.k8s.io/kube-apiserver:v1.36.4@sha256:aa"}, proxy={"image": "mirror/kube-proxy:v1.37.1"})
-    try:
-        split("cp-1", c)
-    except ValueError as e:
-        for fragment in ("cp-1", "apiServer v1.36.4", "proxy v1.37.1"):
-            assert fragment in str(e), str(e)
-    else:
-        raise AssertionError("no ValueError")
+    cases = (
+        (config(apiServer={"image": "registry.k8s.io/kube-apiserver:v1.36.4@sha256:aa"}, proxy={"image": "mirror/kube-proxy:v1.37.1"}), ("apiServer v1.36.4", "proxy v1.37.1")),
+        # no tag gives no version to derive the other images from
+        (config(apiServer={"image": "registry.k8s.io/kube-apiserver@sha256:aa"}), ("apiServer (no tag)",)),
+    )
+    for c, fragments in cases:
+        try:
+            split("cp-1", c)
+        except ValueError as e:
+            for fragment in ("cp-1", *fragments):
+                assert fragment in str(e), str(e)
+        else:
+            raise AssertionError("no ValueError")
 
 
 def test_missing_images_take_the_tag():

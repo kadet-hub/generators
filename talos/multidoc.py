@@ -725,9 +725,9 @@ def _component_images(node: str, config: dict) -> None:
     tags = {key: _tag(block["image"]) for key, block in blocks.items() if block.get("image")}
     if not tags:
         return
-    if len(set(tags.values())) > 1:
+    if len(set(tags.values())) > 1 or "" in tags.values():
         found = ", ".join(f"{key} {tag or '(no tag)'}" for key, tag in tags.items())
-        raise ValueError(f"talos: node {node}: Kubernetes component images disagree on the version: {found}")
+        raise ValueError(f"talos: node {node}: Kubernetes component images need one common tag: {found}")
     (tag,) = set(tags.values())
     for key, (a, b) in COMPONENTS.items():
         if key not in tags:
