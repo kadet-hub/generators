@@ -44,7 +44,7 @@ All keys live under `parameters.generators.argocd`.
 
 Every entry accepts `name` (default: the entry key), `namespace`, `labels`, `annotations` and a `spec` dict that passes through to the resource `spec`. Precedence is generator defaults < `spec` < flat keys: a flat key wins over the same field in `spec` and logs `Flat key '<key>' overrides spec passthrough '<field>' for resource '<name>'`.
 
-`parameters.namespace` is not read: Argo CD reconciles these resources only in its control-plane namespace unless [apps in any namespace](https://github.com/argoproj/argo-cd/blob/v3.5.5/docs/operator-manual/app-any-namespace.md) is enabled.
+`parameters.namespace` is not read: Argo CD reconciles these resources only in its control-plane namespace unless [apps in any namespace](https://github.com/argoproj/argo-cd/blob/v3.5.6/docs/operator-manual/app-any-namespace.md) is enabled.
 
 Flat keys map to the camelCase CRD field of the same name; values pass through unchanged.
 
@@ -54,20 +54,20 @@ Flat keys map to the camelCase CRD field of the same name; values pass through u
 | ApplicationSet | `generators`, `template`, `template_patch`, `sync_policy`, `go_template`, `go_template_options`, `ignore_application_differences` |
 | AppProject | `source_repos`, `destinations`, `cluster_resource_whitelist`, `namespace_resource_blacklist`, `namespace_resource_whitelist`, `orphaned_resources`, `roles`, `finalizers` |
 
-`cascade_delete: true` adds the `resources-finalizer.argocd.argoproj.io` finalizer to an Application, so deleting it also deletes the resources it deployed ([app deletion](https://github.com/argoproj/argo-cd/blob/v3.5.5/docs/user-guide/app_deletion.md)). AppProjects get a finalizer only through `finalizers`.
+`cascade_delete: true` adds the `resources-finalizer.argocd.argoproj.io` finalizer to an Application, so deleting it also deletes the resources it deployed ([app deletion](https://github.com/argoproj/argo-cd/blob/v3.5.6/docs/user-guide/app_deletion.md)). AppProjects get a finalizer only through `finalizers`.
 
 ### Defaults and shorthands
 
 | Input | Result | Reason |
 |---|---|---|
 | `destination: <namespace>` | `destination: {namespace: <namespace>, server: https://kubernetes.default.svc}` | The common case, an Application in the cluster Argo CD runs in. |
-| a `destination` (flat or in `spec`) without `server` and `name` | `server: https://kubernetes.default.svc` | Argo CD rejects a destination without either ([`GetDestinationServer`](https://github.com/argoproj/argo-cd/blob/v3.5.5/util/argo/argo.go#L1089-L1111)). The address is Argo CD's [in-cluster server](https://github.com/argoproj/argo-cd/blob/v3.5.5/pkg/apis/application/v1alpha1/application_defaults.go#L30-L31). |
+| a `destination` (flat or in `spec`) without `server` and `name` | `server: https://kubernetes.default.svc` | Argo CD rejects a destination without either ([`GetDestinationServer`](https://github.com/argoproj/argo-cd/blob/v3.5.6/util/argo/argo.go#L1089-L1111)). The address is Argo CD's [in-cluster server](https://github.com/argoproj/argo-cd/blob/v3.5.6/pkg/apis/application/v1alpha1/application_defaults.go#L30-L31). |
 
-A destination with `name` keeps it and gets no `server`. The in-cluster address only works while `cluster.inClusterEnabled` in `argocd-cm` is on, which is the [default](https://github.com/argoproj/argo-cd/blob/v3.5.5/docs/operator-manual/argocd-cm.yaml#L364-L365).
+A destination with `name` keeps it and gets no `server`. The in-cluster address only works while `cluster.inClusterEnabled` in `argocd-cm` is on, which is the [default](https://github.com/argoproj/argo-cd/blob/v3.5.6/docs/operator-manual/argocd-cm.yaml#L364-L365).
 
 Deliberately not defaulted:
 
-- `project` has no default and the compile fails QA-7 without it. The `default` AppProject that ships with Argo CD permits every repository, cluster and resource kind ([projects](https://github.com/argoproj/argo-cd/blob/v3.5.5/docs/user-guide/projects.md#the-default-project)); write `project: default` to use it.
+- `project` has no default and the compile fails QA-7 without it. The `default` AppProject that ships with Argo CD permits every repository, cluster and resource kind ([projects](https://github.com/argoproj/argo-cd/blob/v3.5.6/docs/user-guide/projects.md#the-default-project)); write `project: default` to use it.
 - `sync_policy` is not set, so Applications sync manually. Automated sync with `prune` or `selfHeal` lets the Git repository delete and overwrite cluster resources; set it per Application.
 - AppProjects get no `source_repos` or `destinations`, which denies everything until the inventory lists them.
 - ApplicationSets keep Argo CD's template engine unless `go_template` is set; switching changes the placeholder syntax from `{{name}}` to `{{.name}}`.
