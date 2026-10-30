@@ -209,6 +209,35 @@ omegaconf interpolation and Kapitan's built-in `${merge:...}` resolver.
 A `roles` map on an `rbac` entry was proposed in #101 and not taken,
 because the inventory can already share these parts.
 
+## Chainsaw tests
+
+The compile entry with `function: generate_chainsaw_asserts` wrote one
+Chainsaw StepTemplate per component, and every project wrote the Test
+that runs them by hand. That Test only lists the templates, so it fell
+out of step whenever a component was added or removed.
+
+- K8S-12: `generate_chainsaw_asserts` MUST also write one Chainsaw Test
+  per namespace, at `<namespace>/chainsaw-test`, whose steps use that
+  namespace's StepTemplates in component order.
+
+  The Test is named after the namespace and sets `spec.namespace` to it.
+  Chainsaw then asserts in the namespace the workloads were applied to,
+  and creates no ephemeral namespace. A namespace whose components are
+  all CronJobs has no StepTemplate and gets no Test.
+
+  Kapitan names the files `.yml` when the compile entry sets
+  `output_type: yml` and `.yaml` otherwise, so the step paths take the
+  extension of the entry with `function: generate_chainsaw_asserts`.
+  Chainsaw 0.2.15 finds `chainsaw-test.yaml` or, without one,
+  `chainsaw-test.yml`, and resolves `use.template` relative to the
+  Test's directory.
+
+  The Test sets no timeouts: `chainsaw test --assert-timeout` or a
+  Chainsaw configuration sets them for a run.
+
+  - Test: `kubernetes/tests/test_components.py::test_chainsaw_test_per_namespace`, `::test_chainsaw_test_uses_output_type`, `::test_no_chainsaw_test_for_cronjobs_only`; fixture target `complete`; `manual:` `chainsaw test --no-cluster` on the compiled fixture loads both Tests and their templates
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
@@ -218,6 +247,7 @@ because the inventory can already share these parts.
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
+| Chainsaw Test | `kubernetes/generators.py` (`generate_chainsaw_asserts`) |
 | Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
