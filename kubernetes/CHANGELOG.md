@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0
+
+- `generators.kubernetes.chainsaw.resources` adds Chainsaw status asserts for custom resources, by `api_version`, `kind`, `name`, `namespace` and the expected `status`, such as a CephCluster with `phase: Ready`. The namespace's Chainsaw Test runs them after the readiness asserts.
+
+Output is unchanged for inventories without `chainsaw.resources`.
+
 ## 1.11.1
 
 Built for Vertical Pod Autoscaler 1.8.1. Its VerticalPodAutoscaler CRD is unchanged from 1.8.0, so the shipped schema and rendered output are unchanged.

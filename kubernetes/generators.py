@@ -929,9 +929,28 @@ def _external_asserts():
         yield name, namespace_name, {**resource, **ready}
 
 
+def _resource_asserts():
+    """(name, namespace, resource) of generators.kubernetes.chainsaw.resources (K8S-14)."""
+    for key, entry in (_generator_settings().get("chainsaw", {}).get("resources") or {}).items():
+        entry = entry or {}
+        missing = [k for k in ("api_version", "kind", "status") if not entry.get(k)]
+        if missing or not isinstance(entry.get("status"), dict):
+            raise CompileError(
+                f"generators.kubernetes.chainsaw.resources.{key}: needs api_version, kind and a status mapping"
+            )
+        namespace_name = entry.get("namespace", inv.parameters.get("namespace", "default"))
+        yield key, namespace_name, {
+            "apiVersion": entry["api_version"],
+            "kind": entry["kind"],
+            "metadata": {"name": entry.get("name", key), "namespace": namespace_name},
+            "status": entry["status"],
+        }
+
+
 def generate_chainsaw_asserts(input_params):
-    """One Chainsaw StepTemplate per component and per generators.kubernetes.chainsaw.workloads
-    entry that asserts its workload is ready, and one Chainsaw Test per namespace that runs them.
+    """One Chainsaw StepTemplate per component, per generators.kubernetes.chainsaw.workloads entry
+    and per chainsaw.resources entry that asserts it is ready, and one Chainsaw Test per namespace
+    that runs them.
 
     A CronJob gets none: it starts no pod before its schedule.
     """
@@ -961,7 +980,7 @@ def generate_chainsaw_asserts(input_params):
             "status": _ready_status(workload, component),
         }
         asserts.append((name, namespace_name, resource))
-    for name, namespace_name, resource in [*asserts, *_external_asserts()]:
+    for name, namespace_name, resource in [*asserts, *_external_asserts(), *_resource_asserts()]:
         _put(
             obj,
             f"{namespace_name}/{name}-assert",

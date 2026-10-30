@@ -238,6 +238,27 @@ parameters:
 
 Their replica count is read from the cluster: a Deployment or StatefulSet is ready once it is rolled out as `kubectl rollout status` checks it, with `observedGeneration`, `updatedReplicas` and the available or ready replicas at `spec.replicas`. A Job is ready when it is `Complete`.
 
+Custom resources whose operator reports readiness in `status` get a status assert through `generators.kubernetes.chainsaw.resources`, by `api_version`, `kind`, `name` (default the key), `namespace` (default `parameters.namespace`) and the expected `status`, which may use Chainsaw expressions:
+
+```yaml
+parameters:
+  generators:
+    kubernetes:
+      chainsaw:
+        resources:
+          ceph-cluster:
+            api_version: ceph.rook.io/v1
+            kind: CephCluster
+            name: rook-ceph
+            namespace: rook-ceph
+            status:
+              phase: Ready
+              ceph:
+                health: HEALTH_OK
+```
+
+The namespace's test runs these asserts after the readiness asserts.
+
 | Workload | Ready when |
 |---|---|
 | Deployment | `availableReplicas` equals `replicas`; with `hpa`, which leaves `replicas` unset, the `Available` condition is `True` |

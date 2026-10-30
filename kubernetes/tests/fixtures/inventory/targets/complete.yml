@@ -48,6 +48,16 @@ parameters:
           storage-mon:
             kind: StatefulSet
             namespace: storage
+        # Status asserts on custom resources (K8S-14).
+        resources:
+          storage-cluster:
+            api_version: ceph.rook.io/v1
+            kind: CephCluster
+            namespace: storage
+            status:
+              phase: Ready
+              ceph:
+                health: HEALTH_OK
       configs:
         feature-flags:
           data:
