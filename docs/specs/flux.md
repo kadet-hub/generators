@@ -46,10 +46,13 @@ rendered and the stored object.
   comes from `source` with a HelmRepository, GitRepository or Bucket, or
   from `spec.chart`. The CRD's CEL rules reject a `version` other than `*`
   and a `reconcileStrategy` other than `ChartVersion` on the
-  `OCIRepository` kind, so the generator adds neither there.
+  `OCIRepository` kind, so the generator adds neither there. A `chart` or
+  `chart.spec` that is not a mapping is no template and gets no defaults;
+  the gate's schema check rejects it as before.
 
   - Test: `flux/tests/test_defaults.py::test_helm_chart_template_defaults`,
-    `::test_oci_chart_template_passes_through`; `./check flux` (fixture
+    `::test_oci_chart_template_passes_through`,
+    `::test_non_mapping_chart_passes_through`; `./check flux` (fixture
     `complete`)
   - Since: #120
 

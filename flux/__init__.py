@@ -199,9 +199,11 @@ def _resource(section: str, name: str, config: dict, namespace: str, ref: dict |
     if section == "helm_releases" and ("chart" in spec) == ("chartRef" in spec):
         raise ValueError(f"flux: HelmRelease {namespace}/{name} needs exactly one of source, spec.chart or spec.chartRef")
     # CRD defaults of a HelmChart template until helm-controller 1.6 (FLX-2)
-    if section == "helm_releases" and "chart" in spec and spec["chart"].get("kind", "HelmChart") == "HelmChart":
-        chart_spec = {"version": "*", "reconcileStrategy": "ChartVersion", **(spec["chart"].get("spec") or {})}
-        spec["chart"] = {**spec["chart"], "spec": chart_spec}
+    chart = spec.get("chart") if section == "helm_releases" else None
+    inner = (chart.get("spec") or {}) if isinstance(chart, dict) else None
+    if isinstance(inner, dict) and chart.get("kind", "HelmChart") == "HelmChart":
+        chart_spec = {"version": "*", "reconcileStrategy": "ChartVersion", **inner}
+        spec["chart"] = {**chart, "spec": chart_spec}
 
     metadata = {"name": name, "namespace": namespace}
     for key in ("labels", "annotations"):

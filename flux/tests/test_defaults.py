@@ -36,3 +36,10 @@ def test_oci_chart_template_passes_through():
     chart = {"kind": "OCIRepository", "spec": {"url": "oci://r.example/charts/x", "ref": {"tag": "1.0.0"}}}
     out = render(helm_releases={"inline": {"spec": {"chart": chart}}})
     assert out["flux-system/inline-helmrelease"]["spec"]["chart"] == chart
+
+
+def test_non_mapping_chart_passes_through():
+    # no template, so no defaults; the gate's schema check reports it as before (FLX-2)
+    out = render(helm_releases={"bad": {"spec": {"chart": "podinfo"}}, "bad-spec": {"spec": {"chart": {"spec": "podinfo"}}}})
+    assert out["flux-system/bad-helmrelease"]["spec"]["chart"] == "podinfo"
+    assert out["flux-system/bad-spec-helmrelease"]["spec"]["chart"] == {"spec": "podinfo"}
