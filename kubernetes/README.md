@@ -175,6 +175,7 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 | `rbac` | `<name>-clusterrole`, `<name>-clusterrolebinding` without namespace directory; `role`, `rolebinding` in the namespace |
 | `manifests` | `<kind lowercased>`; no namespace directory without `namespace` |
 | component workload, compile entry with `function: generate_chainsaw_asserts` | `assert`; CronJobs get none |
+| namespace with at least one assert, compile entry with `function: generate_chainsaw_asserts` | `chainsaw-test` in the namespace directory |
 
 ## Chainsaw asserts
 
@@ -198,20 +199,26 @@ parameters:
           function: generate_chainsaw_asserts
 ```
 
-A test runs a template as a step, by its path relative to the test file. The assert takes the test's timeout; Chainsaw's default of 30 seconds is short for image pulls.
+Next to the templates, each namespace directory gets a `chainsaw-test` file: a Chainsaw Test named after the namespace that runs in it and uses its templates in component order, with the file extension of the compile entry's `output_type`. Run it after the manifests are applied, with an assert timeout that covers image pulls; Chainsaw's default of 30 seconds is short:
+
+```sh
+chainsaw test --test-dir compiled/prod/chainsaw --assert-timeout 3m
+```
 
 ```yaml
+# compiled/prod/chainsaw/shop/chainsaw-test.yml
 apiVersion: chainsaw.kyverno.io/v1alpha1
 kind: Test
 metadata:
   name: shop
 spec:
-  timeouts:
-    assert: 3m
+  namespace: shop
   steps:
     - use:
-        template: ../compiled/prod/chainsaw/shop/web-assert.yml
+        template: web-assert.yml
 ```
+
+A hand-written test can still use a template as a step, by its path relative to the test file, for checks beyond readiness.
 
 | Workload | Ready when |
 |---|---|
@@ -224,7 +231,7 @@ A DaemonSet is created with both counts at 0, so the assert also waits for `obse
 
 ## API versions and schemas
 
-Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`, `apiregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`, the Chainsaw StepTemplate `chainsaw.kyverno.io/v1alpha1`.
+Built-in kinds use the GA versions served by Kubernetes 1.37: `v1`, `apps/v1`, `batch/v1`, `autoscaling/v2`, `policy/v1`, `networking.k8s.io/v1`, `rbac.authorization.k8s.io/v1`, `storage.k8s.io/v1`, `node.k8s.io/v1`, `scheduling.k8s.io/v1`, `admissionregistration.k8s.io/v1`, `apiregistration.k8s.io/v1`. Gateway API kinds use their storage versions in the 1.6 standard channel, `gateway.networking.k8s.io/v1` for every kind except ReferenceGrant (`v1beta1`); a route's `api_version` overrides it. VerticalPodAutoscaler is `autoscaling.k8s.io/v1`, ManagedCertificate `networking.gke.io/v1`, BackendConfig `cloud.google.com/v1`, the Chainsaw StepTemplate and Test `chainsaw.kyverno.io/v1alpha1`.
 
 `schemas/` holds the JSON Schemas of these kinds: built-in kinds from [kubernetes-json-schema](https://github.com/yannh/kubernetes-json-schema) v1.37.1-standalone-strict, CRD kinds from the upstream CRDs at the versions above, closed against unknown fields. BackendConfig is not schema-checked, because GKE publishes no BackendConfig CRD file; kinds rendered through `manifests` are checked only where `schemas/` has their schema.
 

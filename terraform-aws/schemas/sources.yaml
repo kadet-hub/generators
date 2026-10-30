@@ -4,3 +4,4 @@ terraform/hashicorp/aws:
   software: hashicorp/aws
   version: 6.69.1
   source: https://registry.terraform.io/providers/hashicorp/aws/6.69.1
+  license: MPL-2.0

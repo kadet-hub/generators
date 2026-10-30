@@ -94,6 +94,24 @@ signatures with `freshclam`, or warns and scans with the shipped database.
     reports `read`
   - Since: #105 (CODEOWNERS), #108 (workflow)
 
+## Schema licences
+
+- CHK-7: `./check` MUST fail when an entry of the generator's
+  `sources.yaml` names no `license`, or one that is not an identifier in
+  the registry's `policy/licenses.txt`.
+
+  This is the licence gate for the vendored schemas (TP-1 of
+  [third-party.md](third-party.md)). The registry's list is the one the
+  gate applies to the generator's own licence (QA-2), read from the same
+  checkout at `REGISTRY_REF`. A copyleft licence on that list, such as
+  GPL-3.0-only, passes here as it passes there. The check runs before the
+  sandbox image is built, so a missing licence fails within seconds.
+
+  - Test: manual: in a throwaway copy of a generator, `./check` fails with
+    `license` removed from an entry and with `license: WTFPL`, and passes
+    with `license: GPL-3.0-only`
+  - Since: this change
+
 ## Open questions
 
 None.
@@ -107,3 +125,4 @@ None.
 | Scanner pins | registry `.github/actions/setup-gate/action.yml` (gitleaks), `scan/requirements.txt` (semgrep, GuardDog, ruff), `scan/static-scan` (ClamAV image digest) |
 | Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |
 | Review request | `.github/workflows/request-review.yml`, `pull_request` (CHK-6) |
+| Licence allow list | registry `policy/licenses.txt`, first column (CHK-7) |

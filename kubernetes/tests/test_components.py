@@ -4,7 +4,7 @@ from box import Box
 
 from .. import utils
 from ..base import Container, Workload
-from ..generators import _build_service_bundle, generate_gateway
+from ..generators import _build_service_bundle, generate_chainsaw_asserts, generate_gateway
 from ..webhooks import APIService, MutatingWebhookConfiguration, ValidatingWebhookConfiguration, _webhooks
 
 # The generator reads the target's inventory; these tests have none. The
@@ -212,3 +212,48 @@ def test_volume_mounts_of_one_volume():
 
 def test_volume_mount_named_by_key():
     assert mounts({"data": {"mount_path": "/data"}}) == [{"name": "data", "mountPath": "/data"}]
+
+
+def chainsaw(components, output_type=None):
+    """generate_chainsaw_asserts over components, as {output key: manifest}."""
+    entry = {"input_params": {"function": "generate_chainsaw_asserts"}}
+    if output_type:
+        entry["output_type"] = output_type
+    previous = utils.inventory
+    utils.inventory = lambda: Box(parameters={
+        "namespace": "demo", "components": components, "kapitan": {"compile": [{"output_type": "yml"}, entry]},
+    })
+    try:
+        return {key: value.to_dict() for key, value in generate_chainsaw_asserts({}).root.items()}
+    finally:
+        utils.inventory = previous
+
+
+def test_chainsaw_test_per_namespace():  # K8S-12
+    out = chainsaw({
+        "web": component(),
+        "db": component(type="statefulset", replicas=1),
+        "backup": component(type="job", schedule="0 3 * * *"),
+        "api": component(namespace="other"),
+    })
+    assert out["demo/chainsaw-test"] == {
+        "apiVersion": "chainsaw.kyverno.io/v1alpha1",
+        "kind": "Test",
+        "metadata": {"name": "demo"},
+        "spec": {"namespace": "demo", "steps": [
+            {"use": {"template": "web-assert.yaml"}},
+            {"use": {"template": "db-assert.yaml"}},
+        ]},
+    }
+    assert out["other/chainsaw-test"]["spec"]["steps"] == [{"use": {"template": "api-assert.yaml"}}]
+    assert "demo/backup-assert" not in out
+    assert {k for k in out if k.endswith("-assert")} == {"demo/web-assert", "demo/db-assert", "other/api-assert"}
+
+
+def test_chainsaw_test_uses_output_type():  # K8S-12
+    out = chainsaw({"web": component()}, output_type="yml")
+    assert out["demo/chainsaw-test"]["spec"]["steps"] == [{"use": {"template": "web-assert.yml"}}]
+
+
+def test_no_chainsaw_test_for_cronjobs_only():  # K8S-12
+    assert chainsaw({"backup": component(type="job", schedule="0 3 * * *")}) == {}

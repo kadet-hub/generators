@@ -5,7 +5,7 @@
 # - secret_v1.json: kubernetes-json-schema standalone-strict file of
 #   Kubernetes 1.37.1, unchanged (Apache-2.0).
 # - every *_v1alpha1.json: one Talos multi-document kind each, split from
-#   config.schema.json of Talos v1.14.3 (MPL-2.0, notice in core/NOTICE).
+#   config.schema.json of Talos v1.14.5 (MPL-2.0, notice in core/NOTICE).
 #   The upstream schema is already closed (additionalProperties: false on
 #   every object with properties); each file keeps the kind's definition and
 #   the $defs it references, unchanged.
@@ -18,7 +18,7 @@ core:
   license: Apache-2.0
 core/v1alpha1:
   software: Talos
-  version: 1.14.3
-  source: https://github.com/siderolabs/talos/blob/v1.14.3/pkg/machinery/config/schemas/config.schema.json
+  version: 1.14.5
+  source: https://github.com/siderolabs/talos/blob/v1.14.5/pkg/machinery/config/schemas/config.schema.json
   license: MPL-2.0
   copyright: "no copyright line upstream; the sources carry only the MPL-2.0 notice (Talos project, Sidero Labs)"
