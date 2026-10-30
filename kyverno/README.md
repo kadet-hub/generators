@@ -23,13 +23,13 @@ Kapitan kadet generator for [Kyverno](https://kyverno.io/) policy resources:
 
 Built for Kyverno 1.19.2.
 
-At 1.19.1 Kyverno marks every version of ClusterPolicy, Policy, PolicyException, ClusterCleanupPolicy and CleanupPolicy deprecated in favour of the CEL-based `policies.kyverno.io` kinds and plans to remove them in 1.20 ([ClusterPolicy][dep-cpol], [Policy][dep-pol], [PolicyException][dep-polex], [ClusterCleanupPolicy][dep-ccleanup], [CleanupPolicy][dep-cleanup], [migration guide](https://kyverno.io/docs/guides/migration-to-cel/)). For these legacy kinds the generator emits the storage versions `kyverno.io/v1` and `kyverno.io/v2`, and the API server prints a deprecation warning when they are applied. The `policies.kyverno.io` kinds are emitted at `v1beta1`, their storage version at 1.19.1; `v1` is served with the same schema and becomes the storage version in 1.20 ([storage version][storage]).
+At 1.19.2 Kyverno marks every version of ClusterPolicy, Policy, PolicyException, ClusterCleanupPolicy and CleanupPolicy deprecated in favour of the CEL-based `policies.kyverno.io` kinds and plans to remove them in 1.20 ([ClusterPolicy][dep-cpol], [Policy][dep-pol], [PolicyException][dep-polex], [ClusterCleanupPolicy][dep-ccleanup], [CleanupPolicy][dep-cleanup], [migration guide](https://kyverno.io/docs/guides/migration-to-cel/)). For these legacy kinds the generator emits the storage versions `kyverno.io/v1` and `kyverno.io/v2`, and the API server prints a deprecation warning when they are applied. The `policies.kyverno.io` kinds are emitted at `v1beta1`, their storage version at 1.19.2; `v1` is served with the same schema and becomes the storage version in 1.20 ([storage version][storage]).
 
-[dep-cpol]: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/kyverno/kyverno.io_clusterpolicies.yaml#L57-L61
-[dep-pol]: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/kyverno/kyverno.io_policies.yaml#L57-L61
-[dep-polex]: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/kyverno/kyverno.io_policyexceptions.yaml#L21-L24
-[dep-ccleanup]: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/kyverno/kyverno.io_clustercleanuppolicies.yaml#L28-L32
-[dep-cleanup]: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/kyverno/kyverno.io_cleanuppolicies.yaml#L28-L32
+[dep-cpol]: https://github.com/kyverno/kyverno/blob/v1.19.2/config/crds/kyverno/kyverno.io_clusterpolicies.yaml#L57-L61
+[dep-pol]: https://github.com/kyverno/kyverno/blob/v1.19.2/config/crds/kyverno/kyverno.io_policies.yaml#L57-L61
+[dep-polex]: https://github.com/kyverno/kyverno/blob/v1.19.2/config/crds/kyverno/kyverno.io_policyexceptions.yaml#L21-L24
+[dep-ccleanup]: https://github.com/kyverno/kyverno/blob/v1.19.2/config/crds/kyverno/kyverno.io_clustercleanuppolicies.yaml#L28-L32
+[dep-cleanup]: https://github.com/kyverno/kyverno/blob/v1.19.2/config/crds/kyverno/kyverno.io_cleanuppolicies.yaml#L28-L32
 [storage]: https://github.com/kyverno/website/blob/e388c9f1ef171b9414d0f5826fbf05ee0380c09a/src/content/docs/docs/policy-types/overview.md?plain=1#L57-L59
 
 ## Usage
@@ -112,12 +112,12 @@ Invalid values of `validation_failure_action`, `failure_policy` and `webhook_tim
 With the reclass-rs inventory backend, keys that start with `=` lose that character, because reclass treats `=` as its constant-key prefix. A Kyverno equality anchor `=(field)` in a pattern then becomes the conditional anchor `(field)` without any error, which changes what the policy checks. Use the omegaconf backend for policies with equality anchors, or write those checks as `validate.cel` or `deny` conditions.
 
 [match]: https://kyverno.io/docs/policy-types/cluster-policy/match-exclude/
-[match-types]: https://github.com/kyverno/kyverno/blob/v1.19.1/api/kyverno/v1/match_resources_types.go#L10-L20
-[vfa]: https://github.com/kyverno/kyverno/blob/v1.19.1/api/kyverno/v1/spec_types.go#L66-L69
+[match-types]: https://github.com/kyverno/kyverno/blob/v1.19.2/api/kyverno/v1/match_resources_types.go#L10-L20
+[vfa]: https://github.com/kyverno/kyverno/blob/v1.19.2/api/kyverno/v1/spec_types.go#L66-L69
 [discovery]: https://github.com/kubernetes/kubernetes/tree/v1.37.1/api/discovery
 [mig-ops]: https://github.com/kyverno/website/blob/e388c9f1ef171b9414d0f5826fbf05ee0380c09a/src/content/docs/docs/guides/migration-to-cel.md?plain=1#L56-L81
 [dpol-ops]: https://github.com/kyverno/website/blob/e388c9f1ef171b9414d0f5826fbf05ee0380c09a/src/content/docs/docs/policy-types/deleting-policy.mdx?plain=1#L113-L126
-[mc-required]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/cel/policies/vpol/validate.go#L32-L34
+[mc-required]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/cel/policies/vpol/validate.go#L32-L34
 [vpol-actions]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1alpha1/validating_policy.go#L210-L217
 [vpol-fp]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1beta1/validating_policy.go#L90-L98
 [mpol-fp]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1beta1/mutating_policy.go#L149-L157
@@ -130,14 +130,14 @@ With the reclass-rs inventory backend, keys that start with `=` lose that charac
 [mpol-existing]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1alpha1/mutating_policy.go#L222-L229
 [gpol-eval]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1alpha1/generating_policy.go#L127-L167
 [polex-report]: https://github.com/kyverno/api/blob/fb2785727f98db3dd0e263fc354d4b6443a8362e/api/policies.kyverno.io/v1alpha1/policy_exception.go#L52-L57
-[polex-scope]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/cel/engine/exception.go#L67-L84
+[polex-scope]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/cel/engine/exception.go#L67-L84
 [polex-flag]: https://github.com/kyverno/website/blob/e388c9f1ef171b9414d0f5826fbf05ee0380c09a/src/content/docs/docs/guides/exceptions.md?plain=1#L9
-[wh-get]: https://github.com/kyverno/kyverno/blob/v1.19.1/api/kyverno/v1/spec_types.go#L276-L296
-[wh-both]: https://github.com/kyverno/kyverno/blob/v1.19.1/api/kyverno/v1/spec_types.go#L343-L356
-[rule-action]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/engine/api/engineresponse.go#L246-L274
-[policy-action]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/engine/api/engineresponse.go#L276-L294
-[rule-fallback]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/engine/api/engineresponse.go#L296-L319
-[vi-spec]: https://github.com/kyverno/kyverno/blob/v1.19.1/pkg/validation/policy/validate.go#L350-L366
+[wh-get]: https://github.com/kyverno/kyverno/blob/v1.19.2/api/kyverno/v1/spec_types.go#L276-L296
+[wh-both]: https://github.com/kyverno/kyverno/blob/v1.19.2/api/kyverno/v1/spec_types.go#L343-L356
+[rule-action]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/engine/api/engineresponse.go#L246-L274
+[policy-action]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/engine/api/engineresponse.go#L276-L294
+[rule-fallback]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/engine/api/engineresponse.go#L296-L319
+[vi-spec]: https://github.com/kyverno/kyverno/blob/v1.19.2/pkg/validation/policy/validate.go#L386-L402
 
 ### Example
 
