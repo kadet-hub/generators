@@ -31,6 +31,11 @@ can fix.
   The repository part must contain a `/`, which also excludes fragments
   such as a tag joined to a registry prefix at runtime.
 
+  A literal without whitespace whose `@sha256:` is not followed by 64
+  lowercase hex digits up to its end fails the extraction, and with it
+  the scan (IMG-2). A mistyped digest would otherwise drop the image
+  from the scan while the literal still reads as pinned.
+
   - Test: `tools/test_default_images.py`; the scan's job summary lists
     every default image
   - Since: this change

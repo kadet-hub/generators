@@ -30,6 +30,17 @@ class Images(unittest.TestCase):
                 [("gen", f"example.org/b:v2{DIGEST}"), ("gen", f"kindest/node:v1.37.0{DIGEST}"), ("gen", f"registry.example.org/a:v1{DIGEST}")],
             )
 
+    def test_mistyped_digest_fails(self):
+        # an uppercase or non-hex digit would otherwise drop the image from the scan
+        for digest in ("@sha256:" + "A" * 64, "@sha256:" + "a" * 63 + "l", "@sha256:" + "a" * 63):
+            with self.subTest(digest=digest), tempfile.TemporaryDirectory() as d:
+                gen = Path(d, "gen")
+                gen.mkdir()
+                (gen / "kapitan-generator.yaml").write_text("name: gen\n")
+                (gen / "__init__.py").write_text(f'A = "registry.example.org/a:v1{digest}"\n')
+                with self.assertRaisesRegex(ValueError, "__init__.py:1: digest"):
+                    default_images.images(Path(d))
+
 
 if __name__ == "__main__":
     unittest.main()
