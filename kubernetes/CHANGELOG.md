@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.2
+
+Built for Vertical Pod Autoscaler 1.8.1. Its VerticalPodAutoscaler CRD is unchanged from 1.8.0, so the shipped schema and rendered output are unchanged.
+
 ## 1.9.1
 
 `__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.
