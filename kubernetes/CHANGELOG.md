@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.10.0
+
+- The compile entry with `function: generate_chainsaw_asserts` also writes `<namespace>/chainsaw-test`, a Chainsaw Test per namespace that uses the namespace's StepTemplates. A project no longer keeps the list of templates in a hand-written test.
+- Ships the schema of the Chainsaw 0.2.15 Test, with its CRD.
+
+The manifests compiled with `generate_manifests` are unchanged.
+
 ## 1.9.1
 
 `__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.

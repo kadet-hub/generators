@@ -898,11 +898,20 @@ def _ready_status(workload, component):
 
 
 def generate_chainsaw_asserts(input_params):
-    """One Chainsaw StepTemplate per component that asserts its workload is ready.
+    """One Chainsaw StepTemplate per component that asserts its workload is ready,
+    and one Chainsaw Test per namespace that runs them.
 
     A CronJob gets none: it starts no pod before its schedule.
     """
     obj = BaseObj()
+    steps = {}
+    # Kapitan names the files after the compile entry's output_type, yaml unless set (K8S-12).
+    entries = inv.parameters.get("kapitan", {}).get("compile", [])
+    yml = any(
+        e.get("input_params", {}).get("function") == "generate_chainsaw_asserts" and e.get("output_type") == "yml"
+        for e in entries
+    )
+    extension = "yml" if yml else "yaml"
     for name, component in get_components():
         if component.get("schedule"):
             continue
@@ -926,6 +935,18 @@ def generate_chainsaw_asserts(input_params):
                 "kind": "StepTemplate",
                 "metadata": {"name": name},
                 "spec": {"try": [{"assert": {"resource": resource}}]},
+            },
+        )
+        steps.setdefault(namespace_name, []).append({"use": {"template": f"{name}-assert.{extension}"}})
+    for namespace_name, uses in steps.items():
+        _put(
+            obj,
+            f"{namespace_name}/chainsaw-test",
+            {
+                "apiVersion": "chainsaw.kyverno.io/v1alpha1",
+                "kind": "Test",
+                "metadata": {"name": namespace_name},
+                "spec": {"namespace": namespace_name, "steps": uses},
             },
         )
     return obj
