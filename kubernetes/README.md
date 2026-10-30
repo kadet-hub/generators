@@ -220,6 +220,24 @@ spec:
 
 A hand-written test can still use a template as a step, by its path relative to the test file, for checks beyond readiness.
 
+Workloads that the generator does not render, such as those of a Helm chart compiled with Kapitan's helm input, get the same assert and step through `generators.kubernetes.chainsaw.workloads`, by name, `kind` (Deployment, StatefulSet, DaemonSet or Job) and `namespace` (default `parameters.namespace`):
+
+```yaml
+parameters:
+  generators:
+    kubernetes:
+      chainsaw:
+        workloads:
+          rook-ceph-operator:
+            kind: Deployment
+            namespace: rook-ceph
+          csi-rbdplugin:
+            kind: DaemonSet
+            namespace: rook-ceph
+```
+
+Their replica count is read from the cluster: a Deployment or StatefulSet is ready once it is rolled out as `kubectl rollout status` checks it, with `observedGeneration`, `updatedReplicas` and the available or ready replicas at `spec.replicas`. A Job is ready when it is `Complete`.
+
 | Workload | Ready when |
 |---|---|
 | Deployment | `availableReplicas` equals `replicas`; with `hpa`, which leaves `replicas` unset, the `Available` condition is `True` |
