@@ -14,14 +14,14 @@ from typing import Any
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 logger = logging.getLogger(__name__)
 
 PKG = "pkg.crossplane.io/v1"
 COMPOSITION = "apiextensions.crossplane.io/v1"
 XRD = "apiextensions.crossplane.io/v2"
-# spec.package CEL rule of the Provider and Function CRDs at v2.4.2
+# spec.package CEL rule of the Provider and Function CRDs at v2.4.3
 PACKAGE = re.compile(r"[^./]+(\.[^./]+)+(/[^/:@]+)+(:[^:@]+(@sha256.+)?|@sha256.+)")
 
 try:
