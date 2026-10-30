@@ -6,16 +6,16 @@
 # https://github.com/fluxcd/flux2/tree/v2.9.6/manifests/bases.
 source.toolkit.fluxcd.io:
   software: Flux source-controller
-  version: 1.10.0
-  source: https://github.com/fluxcd/source-controller/tree/v1.10.0/config/crd/bases
+  version: 1.10.1
+  source: https://github.com/fluxcd/source-controller/tree/v1.10.1/config/crd/bases
   license: Apache-2.0
 kustomize.toolkit.fluxcd.io:
   software: Flux kustomize-controller
-  version: 1.10.0
-  source: https://github.com/fluxcd/kustomize-controller/tree/v1.10.0/config/crd/bases
+  version: 1.10.1
+  source: https://github.com/fluxcd/kustomize-controller/tree/v1.10.1/config/crd/bases
   license: Apache-2.0
 helm.toolkit.fluxcd.io:
   software: Flux helm-controller
-  version: 1.7.0
-  source: https://github.com/fluxcd/helm-controller/tree/v1.7.0/config/crd/bases
+  version: 1.7.1
+  source: https://github.com/fluxcd/helm-controller/tree/v1.7.1/config/crd/bases
   license: Apache-2.0

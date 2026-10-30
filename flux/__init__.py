@@ -12,7 +12,7 @@ from typing import Any
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 logger = logging.getLogger(__name__)
 WARNING = "Flat key '%s' overrides spec passthrough '%s' for resource '%s'"
@@ -43,7 +43,8 @@ SECTIONS = {
         SOURCE,
         "OCIRepository",
         "ocirepository",
-        {"interval": "5m"},
+        # provider and timeout: CRD defaults until source-controller 1.9 (FLX-1)
+        {"interval": "5m", "provider": "generic", "timeout": "60s"},
         {
             "url": "url",
             "ref": "ref",
@@ -197,6 +198,10 @@ def _resource(section: str, name: str, config: dict, namespace: str, ref: dict |
         spec[field] = value
     if section == "helm_releases" and ("chart" in spec) == ("chartRef" in spec):
         raise ValueError(f"flux: HelmRelease {namespace}/{name} needs exactly one of source, spec.chart or spec.chartRef")
+    # CRD defaults of a HelmChart template until helm-controller 1.6 (FLX-2)
+    if section == "helm_releases" and "chart" in spec and spec["chart"].get("kind", "HelmChart") == "HelmChart":
+        chart_spec = {"version": "*", "reconcileStrategy": "ChartVersion", **(spec["chart"].get("spec") or {})}
+        spec["chart"] = {**spec["chart"], "spec": chart_spec}
 
     metadata = {"name": name, "namespace": namespace}
     for key in ("labels", "annotations"):

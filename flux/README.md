@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/flux/) page.
 
-Kapitan kadet generator for [Flux](https://fluxcd.io/flux/components/) sources and the objects that consume them. Built for Flux 2.9.6, which pins source-controller 1.10.0, kustomize-controller 1.10.0 and helm-controller 1.7.0 ([manifests/bases](https://github.com/fluxcd/flux2/tree/v2.9.6/manifests/bases)).
+Kapitan kadet generator for [Flux](https://fluxcd.io/flux/components/) sources and the objects that consume them. Built for Flux 2.10.0, which pins source-controller 1.10.1, kustomize-controller 1.10.1 and helm-controller 1.7.1 ([manifests/bases](https://github.com/fluxcd/flux2/tree/v2.10.0/manifests/bases)).
 
 - **GitRepository**, **OCIRepository**, **HelmRepository** (`source.toolkit.fluxcd.io/v1`)
 - **Kustomization** (`kustomize.toolkit.fluxcd.io/v1`): applies a directory of a Git or OCI source
@@ -35,7 +35,7 @@ All keys live under `parameters.generators.flux`.
 
 | Key | Kind | Output key |
 |---|---|---|
-| `namespace` | | Default namespace of all resources, `flux-system` if unset, as in the [Flux CLI](https://github.com/fluxcd/flux2/blob/v2.9.6/pkg/manifestgen/install/options.go#L45). |
+| `namespace` | | Default namespace of all resources, `flux-system` if unset, as in the [Flux CLI](https://github.com/fluxcd/flux2/blob/v2.10.0/pkg/manifestgen/install/options.go#L45). |
 | `git_repositories.<name>` | GitRepository | `<namespace>/<name>-gitrepository` |
 | `oci_repositories.<name>` | OCIRepository | `<namespace>/<name>-ocirepository` |
 | `helm_repositories.<name>` | HelmRepository | `<namespace>/<name>-helmrepository` |
@@ -76,29 +76,31 @@ The compile fails, with a message naming the resource, when:
 
 These rules exist because QA-7 and QA-10 do not evaluate the CRDs' CEL rules, such as "either chart or chartRef must be set".
 
-With `--no-cross-namespace-refs=true` on the controllers, a source must live in the namespace of its consumer ([Kustomization](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md?plain=1#L145-L146), [HelmRelease](https://github.com/fluxcd/helm-controller/blob/v1.6.5/docs/spec/v2/helmreleases.md?plain=1#L202-L205)).
+With `--no-cross-namespace-refs=true` on the controllers, a source must live in the namespace of its consumer ([Kustomization](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md?plain=1#L145-L146), [HelmRelease](https://github.com/fluxcd/helm-controller/blob/v1.7.1/docs/spec/v2/helmreleases.md?plain=1#L217-L220)).
 
 ### Defaults
 
 | Kind | Field | Default | Source |
 |---|---|---|---|
-| GitRepository | `interval` | `1m0s` | Kustomization [recommended settings](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md#recommended-settings) |
-| OCIRepository | `interval` | `5m` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.6.5/docs/spec/v2/helmreleases.md#recommended-settings) |
-| OCIRepository used as a HelmRelease chart | `layerSelector` | `{mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip, operation: copy}` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.6.5/docs/spec/v2/helmreleases.md#recommended-settings); without it the controller extracts the first layer ([layer selector](https://github.com/fluxcd/source-controller/blob/v1.9.6/docs/spec/v1/ocirepositories.md#layer-selector)) |
-| HelmRepository with an `oci://` URL | `type` | `oci` | [type](https://github.com/fluxcd/source-controller/blob/v1.9.6/docs/spec/v1/helmrepositories.md#type); the default type only reads HTTP/S repositories |
-| Kustomization | `interval`, `retryInterval`, `timeout`, `wait` | `60m0s`, `2m0s`, `3m0s`, `true` | Kustomization [recommended settings](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md#recommended-settings) |
-| Kustomization | `prune` | `false` | the CRD requires the field; `false` as in [`flux create kustomization`](https://github.com/fluxcd/flux2/blob/v2.9.6/cmd/flux/create_kustomization.go#L107) |
-| HelmRelease | `interval` | `30m` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.6.5/docs/spec/v2/helmreleases.md#recommended-settings) |
+| GitRepository | `interval` | `1m0s` | Kustomization [recommended settings](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md#recommended-settings) |
+| OCIRepository | `interval` | `5m` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.7.1/docs/spec/v2/helmreleases.md#recommended-settings) |
+| OCIRepository | `provider`, `timeout` | `generic`, `60s` | the CRD defaults until source-controller 1.9, which the controller now applies to an unset field ([provider](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/ocirepositories.md#provider), [timeout](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/ocirepositories.md#timeout)) |
+| OCIRepository used as a HelmRelease chart | `layerSelector` | `{mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip, operation: copy}` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.7.1/docs/spec/v2/helmreleases.md#recommended-settings); without it the controller extracts the first layer ([layer selector](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/ocirepositories.md#layer-selector)) |
+| HelmRepository with an `oci://` URL | `type` | `oci` | [type](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/helmrepositories.md#type); the default type only reads HTTP/S repositories |
+| Kustomization | `interval`, `retryInterval`, `timeout`, `wait` | `60m0s`, `2m0s`, `3m0s`, `true` | Kustomization [recommended settings](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md#recommended-settings) |
+| Kustomization | `prune` | `false` | the CRD requires the field; `false` as in [`flux create kustomization`](https://github.com/fluxcd/flux2/blob/v2.10.0/cmd/flux/create_kustomization.go#L107) |
+| HelmRelease | `interval` | `30m` | HelmRelease [recommended settings](https://github.com/fluxcd/helm-controller/blob/v1.7.1/docs/spec/v2/helmreleases.md#recommended-settings) |
+| HelmRelease with a HelmChart template (`source` with a HelmRepository, GitRepository or Bucket, or `spec.chart`) | `chart.spec.version`, `chart.spec.reconcileStrategy` | `*`, `ChartVersion` | the CRD defaults until helm-controller 1.6, which the controller now applies to an unset field ([chart template](https://github.com/fluxcd/helm-controller/blob/v1.7.1/docs/spec/v2/helmreleases.md#chart-template)); a template of kind `OCIRepository` gets neither |
 
-The `oci` HelmRepository type is in maintenance mode upstream ([type](https://github.com/fluxcd/source-controller/blob/v1.9.6/docs/spec/v1/helmrepositories.md?plain=1#L156-L158)); prefer an `oci_repositories` entry as the HelmRelease source.
+The `oci` HelmRepository type is in maintenance mode upstream ([type](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/helmrepositories.md?plain=1#L156-L158)); prefer an `oci_repositories` entry as the HelmRelease source.
 
-The `interval` defaults matter because the CRDs require the field for every kind except HelmRepository. Controller defaults (HelmRepository `interval` 1m, source `timeout` 60s, HelmRelease `timeout` 5m) are not emitted.
+The `interval` defaults matter because the CRDs require the field for every kind except HelmRepository. Other upstream defaults (HelmRepository `interval` 1m, GitRepository and HelmRepository `timeout` 60s, HelmRelease `timeout` 5m) are not emitted.
 
 Deliberately not defaulted:
 
-- `prune: true`. With pruning, a Kustomization deletes every object it applied once the object disappears from the source, and deleting the Kustomization deletes them all ([prune](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md#prune)). Set it per Kustomization together with a `path`; without `path` Flux applies the root of the source.
-- `ref`. Without it a GitRepository tracks `master` and an OCIRepository the `latest` tag ([Git reference](https://github.com/fluxcd/source-controller/blob/v1.9.6/docs/spec/v1/gitrepositories.md#reference), [OCI reference](https://github.com/fluxcd/source-controller/blob/v1.9.6/docs/spec/v1/ocirepositories.md#reference)).
-- `service_account_name`. Without it a Kustomization or HelmRelease applies as cluster admin ([role-based access control](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md#role-based-access-control)) unless the controllers run with `--default-service-account` ([enforcing impersonation](https://github.com/fluxcd/kustomize-controller/blob/v1.9.6/docs/spec/v1/kustomizations.md#enforcing-impersonation)). The account and its RBAC are cluster specific; set it for tenant objects.
+- `prune: true`. With pruning, a Kustomization deletes every object it applied once the object disappears from the source, and deleting the Kustomization deletes them all ([prune](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md#prune)). Set it per Kustomization together with a `path`; without `path` Flux applies the root of the source.
+- `ref`. Without it a GitRepository tracks `master` and an OCIRepository the `latest` tag ([Git reference](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/gitrepositories.md#reference), [OCI reference](https://github.com/fluxcd/source-controller/blob/v1.10.1/docs/spec/v1/ocirepositories.md#reference)).
+- `service_account_name`. Without it a Kustomization or HelmRelease applies as cluster admin ([role-based access control](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md#role-based-access-control)) unless the controllers run with `--default-service-account` ([enforcing impersonation](https://github.com/fluxcd/kustomize-controller/blob/v1.10.1/docs/spec/v1/kustomizations.md#enforcing-impersonation)). The account and its RBAC are cluster specific; set it for tenant objects.
 - HelmRelease `driftDetection`, `install`/`upgrade` strategies and `upgrade.crds`. The recommended `RetryOnFailure` suits stateful workloads, `RemediateOnFailure` stateless ones, and `CreateReplace` lets a chart replace cluster-wide CRDs; choose per release.
 
 ### Example
