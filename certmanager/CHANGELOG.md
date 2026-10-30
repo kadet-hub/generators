@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for cert-manager 1.21.3. The Certificate schema and CRD gain `status.acme.ari.certID`, a status field the generator does not set. The Issuer, ClusterIssuer and trust-manager Bundle schemas are unchanged. Rendered output is unchanged.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.

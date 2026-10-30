@@ -12,7 +12,9 @@ request, as its first commit.
 | Spec | Area |
 |---|---|
 | [check.md](check.md) | Gate check (`CHK-`) |
+| [images.md](images.md) | Default images (`IMG-`) |
 | [upstream.md](upstream.md) | Upstream schema updates (`UPD-`) |
+| [third-party.md](third-party.md) | Third-party licences and notices (`TP-`) |
 | [mutate.md](mutate.md) | mutate generator (`MUT-`) |
 | [ocm.md](ocm.md) | ocm generator (`OCM-`) |
 | [kubevirt.md](kubevirt.md) | kubevirt generator (`KV-`) |

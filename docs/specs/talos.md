@@ -42,8 +42,12 @@ images for one version.
   The tag is the part after the last `:` of the image without its
   digest. The registry may differ per image, so mirrors stay possible.
 
+  A set image without a tag, such as `<repository>@sha256:<digest>`, fails
+  the compile as well. Its Kubernetes version is unknown, so TAL-2 has no
+  tag to give the other components.
+
   - Test: `talos/tests/test_multidoc.py::test_component_tags_must_agree`
-  - Since: this change
+  - Since: this change, #134 (image without a tag)
 
 - TAL-2: On such a node, every component image the inventory does not set
   MUST be rendered with the upstream repository of that component and the
@@ -52,12 +56,15 @@ images for one version.
   The block is created, so the multi-document translation writes its
   document, or the image is set in a block that stays in the v1alpha1
   document. Control plane documents are dropped on workers as before.
+  The derived image carries no digest, because the generator knows the
+  digest only of its own default tag (TAL-4).
 
   - Test: `talos/tests/test_multidoc.py::test_missing_images_take_the_tag`
   - Since: this change
 
 - TAL-3: On a node where the inventory sets no component image, the
-  rendered config MUST be unchanged against 1.1.0.
+  rendered config MUST be unchanged against 1.1.0, apart from the default
+  image values of TAL-4.
 
   Talos then fills every image from its own default, one version for all.
 
@@ -65,10 +72,38 @@ images for one version.
     `./check talos` (fixture `minimal`)
   - Since: this change
 
+## Default images
+
+The default images were tags: the five component images at Kubernetes
+1.37.1, `constants.DefaultKubernetesVersion` of Talos 1.14.3, and the
+installer at Talos 1.14.3. A tag can be moved, and both versions had fixed
+releases. trivy 0.76.1 counted 28 advisory IDs in kube-apiserver v1.37.1
+and 19 in v1.37.2, and the installer v1.14.5 drops the one high Go stdlib
+advisory of v1.14.3. Talos 1.14.5 still names Kubernetes 1.37.1 as its
+default and supports 1.37.2.
+
+- TAL-4: The default component images and the default installer image
+  MUST be pinned by tag and digest. The component images MUST be the
+  newest patch release of the Kubernetes minor version Talos names as
+  `constants.DefaultKubernetesVersion` at the targeted release. The
+  installer MUST be the image `talosctl gen config` writes at that
+  release.
+
+  The digest is the multi-arch index digest of the tag. Each default is
+  one string literal `<repository>:<tag>@sha256:<digest>`. The targeted
+  release is Talos 1.14.5, so the component images are Kubernetes 1.37.2.
+
+  - Test: `talos/tests/test_multidoc.py::test_no_images_unchanged`;
+    manual: `talosctl gen config` of v1.14.5 writes the same installer
+    repository and tag; `reference.ParseNormalizedNamed` of
+    distribution/reference v0.6.0, which Talos' `VersionFromImageRef`
+    uses, reads the tag of each default
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
-| Code | `talos/multidoc.py` (`_component_images`, called from `split`) |
+| Code | `talos/multidoc.py` (`_component_images`, called from `split`; `IMAGES`), `talos/__init__.py` (`DEFAULT_INSTALLER_IMAGE`) |
 | Unit tests | `talos/tests/test_multidoc.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider talos/tests` |
 | Upstream repositories | `ghcr.io/siderolabs/kubelet`, `registry.k8s.io/kube-apiserver`, `registry.k8s.io/kube-controller-manager`, `registry.k8s.io/kube-scheduler`, `registry.k8s.io/kube-proxy` |

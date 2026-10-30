@@ -1,0 +1,10 @@
+Copyright 2016 Intel Corporation
+Copyright 2021 Multus Authors
+
+The JSON Schema files in this directory are derived from the
+openAPIV3Schema of the CRDs of
+https://github.com/k8snetworkplumbingwg/multus-cni at the version named in
+sources.yaml. Modification: every node with properties gets
+additionalProperties: false, except preserve-unknown-fields nodes, maps
+and allOf/anyOf/oneOf/not branches. The files under crds/ are the upstream
+CRDs, as compact JSON where named .json.

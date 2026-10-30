@@ -12,6 +12,7 @@ import argparse
 import base64
 import copy
 import json
+import os
 import re
 import subprocess
 import sys
@@ -341,7 +342,8 @@ def propose(gen, updates, pr, dry_run):
     (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
     readme = ROOT / gen / "README.md"
     readme.write_text(bump_readme(readme.read_text(), updates))
-    check = subprocess.run(["./check", gen], cwd=ROOT, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    env = {k: v for k, v in os.environ.items() if k not in ("GH_TOKEN", "GITHUB_TOKEN")}  # UPD-8
+    check = subprocess.run(["./check", gen], cwd=ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     print(check.stdout)
     tail = "\n".join(check.stdout.splitlines()[-30:])
     if check.returncode:
