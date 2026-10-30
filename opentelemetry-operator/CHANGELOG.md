@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+Built for OpenTelemetry Operator 0.162.0. The Instrumentation schema and CRD gain `php` and `ruby` auto-instrumentation. New flat keys `php` and `ruby` on instrumentations set them. The OpenTelemetryCollector schema and CRD bound `volumeClaimTemplates[].status.healthStatus.healthConditions`, a status field the generator does not set. Rendered output of existing inventories is unchanged. The upstream lines the README cites are unchanged at v0.162.0, and their links move to that tag.
+
 ## 1.1.0
 
 Built for OpenTelemetry Operator 0.161.0. The OpenTelemetryCollector and TargetAllocator schemas and CRDs gain `imagePullSecrets` and `revisionHistoryLimit`, also in the collector's embedded `targetAllocator`. New flat keys `image_pull_secrets` and `revision_history_limit` on collectors and TargetAllocators set them. Rendered output of existing inventories is unchanged.

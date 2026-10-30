@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4
+
+Built for Kyverno 1.19.2. The ClusterPolicy and Policy schemas and CRDs gain an optional `filter` on `imageExtractors` entries, in rules and in the autogen status; `image_extractors` passes it through. The `policies.kyverno.io` schemas are unchanged. Rendered output is unchanged. The upstream lines the README cites are unchanged at v1.19.2, and their links move to that tag.
+
 ## 1.1.3
 
 Ships the upstream NOTICE of the schemas and CRDs it vendors in their group directory (Apache-2.0 section 4(d)). Rendered output is unchanged.

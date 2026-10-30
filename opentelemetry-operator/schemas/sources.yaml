@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 opentelemetry.io:
   software: OpenTelemetry Operator
-  version: 0.161.0
-  source: https://github.com/open-telemetry/opentelemetry-operator/tree/v0.161.0/config/crd/bases
+  version: 0.162.0
+  source: https://github.com/open-telemetry/opentelemetry-operator/tree/v0.162.0/config/crd/bases
   license: Apache-2.0

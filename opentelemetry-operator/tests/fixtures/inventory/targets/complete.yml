@@ -148,6 +148,14 @@ parameters:
             env:
               - name: OTEL_EXPORTER_OTLP_ENDPOINT
                 value: http://localhost:4318
+          php:
+            env:
+              - name: OTEL_PHP_AUTOLOAD_ENABLED
+                value: "true"
+          ruby:
+            env:
+              - name: OTEL_RUBY_INSTRUMENTATION_ALL_ENABLED
+                value: "true"
       opamp_bridges:
         bridge:
           endpoint: ws://opamp-server.observability.svc:4320/v1/opamp

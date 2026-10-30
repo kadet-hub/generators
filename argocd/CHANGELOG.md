@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for Argo CD 3.5.6. The Application, ApplicationSet and AppProject CRDs are unchanged from 3.5.5, so the shipped schemas and rendered output are unchanged. The upstream files the README cites are identical at v3.5.6, and their links move to that tag.
+
 ## 1.0.3
 
 Built for Argo CD 3.5.5, a bug fix release whose Application, ApplicationSet and AppProject CRDs are unchanged from 3.5.4. Rendered output is unchanged.

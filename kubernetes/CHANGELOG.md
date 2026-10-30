@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.11.1
+
+Built for Vertical Pod Autoscaler 1.8.1. Its VerticalPodAutoscaler CRD is unchanged from 1.8.0, so the shipped schema and rendered output are unchanged.
+
+## 1.11.0
+
+- `generators.kubernetes.chainsaw.workloads` adds Chainsaw readiness asserts and Test steps for workloads the generator does not render, such as those from a Helm chart, by name, `kind` and `namespace`. A Deployment or StatefulSet is ready once rolled out, read from the object's own `spec.replicas`.
+
+Output is unchanged for inventories without `chainsaw.workloads`.
+
+## 1.10.0
+
+- The compile entry with `function: generate_chainsaw_asserts` also writes `<namespace>/chainsaw-test`, a Chainsaw Test per namespace that uses the namespace's StepTemplates. A project no longer keeps the list of templates in a hand-written test.
+- Ships the schema of the Chainsaw 0.2.15 Test, with its CRD.
+
+The manifests compiled with `generate_manifests` are unchanged.
+
 ## 1.9.1
 
 `__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.
