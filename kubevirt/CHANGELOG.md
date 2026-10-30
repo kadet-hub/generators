@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+Renders the CSI sidecars at current kubernetes-csi releases instead of the tags upstream pins at csi-driver e13603a, for their vulnerability fixes: csi-provisioner v6.4.0, csi-attacher v4.13.0, csi-resizer v2.3.0, livenessprobe v2.20.0 and csi-node-driver-registrar v2.18.0, each by digest. Their RBAC and the flags the generator passes are unchanged. csi-snapshotter and snapshot-controller stay at v8.7.0, the latest release.
+
 ## 1.3.2
 
 `__version__` now reports the release version, which still read 1.1.1. Rendered output is unchanged.

@@ -1,0 +1,8 @@
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+opentelekomcloud_opentelekomcloud_1.37.10.json is derived from the
+provider schema of opentelekomcloud/opentelekomcloud at the version named
+in sources.yaml (https://github.com/opentelekomcloud/terraform-provider-
+opentelekomcloud). Modification: the output of `terraform providers schema
+-json` is reduced to the provider configuration and the resource and data
+source types the generator emits.

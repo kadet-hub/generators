@@ -1,8 +1,12 @@
 # Changelog
 
-## 1.1.4
+## 1.1.5
 
 Built for Prometheus Operator 0.94.2. Its CRDs change only in the `operator.prometheus.io/version` annotation, so the shipped schemas and rendered output are unchanged. The upstream files the README cites are unchanged at v0.94.2 apart from version labels in the RBAC guide, and their links move to that tag.
+
+## 1.1.4
+
+Ships the upstream NOTICE of the schemas and CRDs it vendors in their group directory (Apache-2.0 section 4(d)). Rendered output is unchanged.
 
 ## 1.1.3
 
