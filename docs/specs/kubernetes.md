@@ -264,6 +264,22 @@ out of step whenever a component was added or removed.
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_workloads_rendered_elsewhere`, `::test_chainsaw_workload_kind_must_be_known`, `::test_chainsaw_workload_and_component_of_one_name_fail`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind: the four kinds and a Deployment with 0 replicas pass, a Deployment and a StatefulSet with an image that does not exist fail
   - Since: this change
 
+- K8S-14: `generators.kubernetes.chainsaw.resources.<key>` with
+  `api_version`, `kind` and a `status` mapping MUST render a StepTemplate
+  that asserts the object's status, and a step in its namespace's Test
+  after the readiness steps.
+
+  `name` defaults to the key and `namespace` to `parameters.namespace`.
+  `status` becomes the assert's `status` block unchanged, so it can hold
+  plain values or Chainsaw expressions, such as `phase: Ready` on a
+  CephCluster. An entry without `api_version`, `kind` or a `status`
+  mapping fails the compile. The kind's schema is not checked. A key that
+  a component or a `workloads` entry of the same namespace already uses
+  fails the compile, because both write one file.
+
+  - Test: `kubernetes/tests/test_components.py::test_chainsaw_resource_status_assert`, `::test_chainsaw_resource_needs_kind_and_status`, `::test_no_chainsaw_keys_render_as_before`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind against a custom resource: fails without status and with a wrong nested field, passes once the status matches
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
@@ -273,7 +289,7 @@ out of step whenever a component was added or removed.
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
-| Chainsaw Test, external workloads | `kubernetes/generators.py` (`generate_chainsaw_asserts`, `_EXTERNAL_WORKLOADS`) |
+| Chainsaw Test, external workloads | `kubernetes/generators.py` (`generate_chainsaw_asserts`, `_EXTERNAL_WORKLOADS`, `_resource_asserts`) |
 | Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
