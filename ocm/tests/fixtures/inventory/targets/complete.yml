@@ -1,0 +1,62 @@
+# Complete: inventory resources, scan plus refs, mirror access template,
+# upstream label, required digests, a renamed repository,
+# a second component and a custom output file
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: complete
+    compile:
+      - input_type: copy
+        input_paths:
+          - manifests/web
+        output_path: k8s/web
+      - input_type: kadet
+        input_paths:
+          - lib/ocm
+        output_path: .
+        output_type: plain
+        input_params:
+          file: ocm/component-constructor.yaml
+          components:
+            app:
+              name: example.org/acme/complete
+              version: 1.0.0
+              provider:
+                name: acme
+              labels:
+                - name: target
+                  value: complete
+              resources:
+                manifests:
+                  type: ociArtifact
+                  version: 1.0.0
+                  access:
+                    type: ociArtifact
+                    imageReference: registry.example.org/acme/complete-manifests:v1.0.0
+                ops:
+                  type: blob
+                  input:
+                    type: dir
+                    path: ops
+                    compress: true
+              images:
+                scan:
+                  - k8s/**/*.yml
+                refs:
+                  - ghcr.io/siderolabs/installer:v1.11.3@sha256:7b0fb6b2b8f1c7b8b6c2e5a3d1f0e9c8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f3e2
+                access: mirror.example.org/%registry%/%path%
+                label: upstream
+                require_digest: true
+                names:
+                  ghcr.io/siderolabs/installer: talos-installer
+            tools:
+              name: example.org/acme/tools
+              version: 1.0.0
+              provider:
+                name: acme
+              componentReferences:
+                - name: app
+                  componentName: example.org/acme/complete
+                  version: 1.0.0
