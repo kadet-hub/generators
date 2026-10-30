@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for Cilium 1.20.4. The schemas and CRDs of the four kinds it renders are unchanged from 1.20.3. The upstream files the README and code cite are identical at v1.20.4, and their links move to that tag. Rendered output is unchanged.
+
 ## 1.0.3
 
 Built for Cilium 1.20.3. The schemas and CRDs of the four kinds it renders are unchanged from 1.20.2; of the Cilium CRDs only CiliumLocalRedirectPolicy changed, which the generator does not render. Rendered output is unchanged.

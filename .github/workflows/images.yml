@@ -1,0 +1,42 @@
+name: images
+
+# IMG-2: reports the advisories of the default images; never a gate.
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      TRIVY_VERSION: 0.76.1
+      TRIVY_SHA256: c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install trivy
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/trivy.tar.gz" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "$TRIVY_SHA256  $RUNNER_TEMP/trivy.tar.gz" | sha256sum -c --quiet -
+          tar -xzf "$RUNNER_TEMP/trivy.tar.gz" -C "$RUNNER_TEMP" trivy
+      - name: Scan default images
+        run: |
+          {
+            echo "| Generator | Image | Critical | High | Medium | Low | Unknown |"
+            echo "|---|---|---|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/default_images.py > "$RUNNER_TEMP/images.txt"
+          while read -r gen image; do
+            "$RUNNER_TEMP/trivy" image --quiet --scanners vuln --format json --output "$RUNNER_TEMP/out.json" "$image"
+            jq -r --arg g "$gen" --arg i "$image" '[.Results[]?.Vulnerabilities[]?] as $v
+              | [$g, ($i | sub("@sha256:.*"; "")),
+                 ("CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN") as $s | ($v | map(select(.Severity == $s).VulnerabilityID) | unique | length)]
+              | "| " + (map(tostring) | join(" | ")) + " |"' "$RUNNER_TEMP/out.json" >> "$GITHUB_STEP_SUMMARY"
+          done < "$RUNNER_TEMP/images.txt"
+          echo "$(wc -l < "$RUNNER_TEMP/images.txt") images, unique advisory IDs per image" >> "$GITHUB_STEP_SUMMARY"
