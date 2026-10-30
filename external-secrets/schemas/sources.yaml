@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 external-secrets.io:
   software: External Secrets Operator
-  version: 2.13.0
-  source: https://github.com/external-secrets/external-secrets/tree/v2.13.0/config/crds/bases
+  version: 2.14.0
+  source: https://github.com/external-secrets/external-secrets/tree/v2.14.0/config/crds/bases
   license: Apache-2.0
