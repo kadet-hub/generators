@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for Rook 1.21.1. The schemas and CRDs gain CephCluster `monitoring.scrapeTimeoutSeconds`, CephObjectStore `gateway.service.trafficDistribution` and CephObjectStoreUser `secretTemplate`. The `spec` passthrough and the flat keys `monitoring` and `gateway` set them. CephBlockPool, CephFilesystem, CephNFS and CephObjectStore gain a bounded `status.message`, which the generator does not set. Rendered output of existing inventories is unchanged. The upstream files the README cites are unchanged at v1.21.1, and their links move to that tag. The example Ceph image is still `quay.io/ceph/ceph:v20.2.4`.
+
 ## 1.0.2
 
 Ships the CRDs of the custom resources it renders under `schemas/<group>/crds/`, so the kadet-hub gate dry-runs them on a kube-apiserver (QA-11). Rendered output is unchanged.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Built for RabbitMQ Cluster Operator 2.23.2 and Messaging Topology Operator 1.20.5. The User schema and CRD gain `usernameFromMeta`, which uses the User's name as the RabbitMQ username with a generated password. A `user.<name>` entry sets it through `spec`. The other `rabbitmq.com` schemas and CRDs are unchanged. Messaging Topology Operator 1.20.5 no longer generates a password for an `importCredentialsSecret` that holds only `username` and fails such a User. The README now says that a Secret named by `secret_name` needs `password` or `passwordHash`. Rendered output is unchanged. The upstream files the README cites are unchanged at the new tags apart from the user controller, which still generates a random username unless `usernameFromMeta` is set, and their links move to those tags.
+
 ## 1.1.0
 
 `name` on an entry of a custom resource section names its resource, its output file and, for the kinds with `spec.name`, the default of `spec.name`, which before always took the entry's key. A recipe that may write only keys of its own name can then keep a resource name, such as the RabbitmqCluster `production` whose StatefulSet, claims and Secrets carry its name. Two entries of a section with the same name in one namespace now fail the compile; before, the later one replaced the earlier output file. Output is unchanged for inventories without `name` on those sections and without such a collision.

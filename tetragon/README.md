@@ -2,12 +2,12 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/tetragon/) page.
 
-Kapitan kadet generator for [Tetragon](https://tetragon.io/) policies (`cilium.io/v1alpha1`). Built for Tetragon 1.7.1.
+Kapitan kadet generator for [Tetragon](https://tetragon.io/) policies (`cilium.io/v1alpha1`). Built for Tetragon 1.8.0.
 
 - **TracingPolicy**: cluster-wide policy, applies to every process on the selected nodes
 - **TracingPolicyNamespaced**: policy that applies only to the pods of its namespace
 
-Only these custom resources are rendered. The Tetragon install (DaemonSet, operator, RBAC) comes from the [Tetragon Helm chart](https://github.com/cilium/tetragon/tree/v1.7.1/install/kubernetes/tetragon) through the `helm` input. PodInfo is written by the Tetragon operator. The requirements are in [docs/specs/tetragon.md](../docs/specs/tetragon.md).
+Only these custom resources are rendered. The Tetragon install (DaemonSet, operator, RBAC) comes from the [Tetragon Helm chart](https://github.com/cilium/tetragon/tree/v1.8.0/install/kubernetes/tetragon) through the `helm` input. PodInfo is written by the Tetragon operator. The requirements are in [docs/specs/tetragon.md](../docs/specs/tetragon.md).
 
 ## Usage
 
@@ -43,9 +43,11 @@ Namespace of a TracingPolicyNamespaced: `namespace` on the entry, then `generato
 
 Every entry accepts `labels`, `annotations` and a `spec` dict that passes through to the resource `spec`. The flat keys below set the top-level `spec` field of the same name in camelCase. A flat key wins over the same field in `spec` and logs a warning.
 
-`kprobes`, `tracepoints`, `uprobes`, `usdts`, `lsmhooks`, `fentries`, `enforcers`, `lists`, `options`, `loader`, `pod_selector` (→ `podSelector`), `container_selector` (→ `containerSelector`), `host_selector` (→ `hostSelector`), `selectors_macros` (→ `selectorsMacros`)
+`kprobes`, `tracepoints`, `uprobes`, `usdts`, `lsmhooks`, `fentries`, `enforcers`, `lists`, `options`, `loader`, `pod_selector` (→ `podSelector`), `container_selector` (→ `containerSelector`), `host_selector` (→ `hostSelector`), `node_selector` (→ `nodeSelector`), `state`, `selectors_macros` (→ `selectorsMacros`)
 
-Values are written as in the [Tetragon policy reference](https://tetragon.io/docs/concepts/tracing-policy/), in CRD camelCase (`matchArgs`, `matchActions`), so upstream examples can be copied. The compiled output is validated against the 1.7.1 CRD schemas.
+Values are written as in the [Tetragon policy reference](https://tetragon.io/docs/concepts/tracing-policy/), in CRD camelCase (`matchArgs`, `matchActions`), so upstream examples can be copied. The compiled output is validated against the 1.8.0 CRD schemas.
+
+`node_selector` selects by label the nodes whose agents load the policy. On a TracingPolicy, `host_selector` takes only `{}`, which applies the policy to host processes. A `hostSelector` with `matchLabels` or `matchExpressions` fails the compile, because Tetragon rejects it.
 
 The `Override` action needs kernel support: on `kprobes` a kernel with `CONFIG_BPF_KPROBE_OVERRIDE`, on `lsmhooks` the `bpf` LSM. `Sigkill` works without either.
 
