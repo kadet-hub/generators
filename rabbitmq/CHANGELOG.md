@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+ConfigMaps and Secrets are checked against the Kubernetes 1.37.2 schemas instead of 1.37.1, which are the same files. Rendered output is unchanged.
+
 ## 1.1.1
 
 Built for RabbitMQ Cluster Operator 2.23.2 and Messaging Topology Operator 1.20.5. The User schema and CRD gain `usernameFromMeta`, which uses the User's name as the RabbitMQ username with a generated password. A `user.<name>` entry sets it through `spec`. The other `rabbitmq.com` schemas and CRDs are unchanged. Messaging Topology Operator 1.20.5 no longer generates a password for an `importCredentialsSecret` that holds only `username` and fails such a User. The README now says that a Secret named by `secret_name` needs `password` or `passwordHash`. Rendered output is unchanged. The upstream files the README cites are unchanged at the new tags apart from the user controller, which still generates a random username unless `usernameFromMeta` is set, and their links move to those tags.
