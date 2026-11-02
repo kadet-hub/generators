@@ -2032,6 +2032,11 @@
           "nullable": true,
           "type": "object"
         },
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
         "mirroringStatus": {
           "additionalProperties": false,
           "description": "MirroringStatus is the filesystem mirroring status",

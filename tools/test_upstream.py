@@ -169,7 +169,7 @@ class Sources(unittest.TestCase):
             "https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates": "Helm templates",
             "https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates/policy": "Helm templates",
             "https://registry.terraform.io/providers/hashicorp/aws/6.68.0": "Terraform extract",
-            "https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict": "kubernetes-json-schema",
+            "https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict": None,
             "https://github.com/argoproj/argo-cd/tree/v3.5.4/manifests/crds": None,
             "https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml": None,
             IRONCORE: None,
@@ -430,6 +430,67 @@ class OpenAPI(Repo):
     def test_json_without_components_does_not_reproduce(self):
         self.web.pages[f"{RAW}example/gizmos/v1.0.0/{OAPI}"] = {"$schema": "http://json-schema.org/draft-07/schema#", "type": "object"}
         self.assertEqual(upstream.gate(self.group, [OAPI_OLD], [OAPI_NEW]), (None, "does not reproduce: no CRD for gizmo_v1alpha1.json"))
+
+
+K8S_OLD, K8S_HEAD = "817113f21a2643311cbc3e992bb44ffe1c416c54", "e0c72a1bc5f409d1685c0e1323460c8a98cd7459"
+K8S_TREES = f"{GH}repos/yannh/kubernetes-json-schema/git/trees/"
+
+
+def k8s_source(sha, version):
+    return f"https://github.com/yannh/kubernetes-json-schema/tree/{sha}/v{version}-standalone-strict"
+
+
+def k8s_file(name, version):
+    """A standalone-strict file as upstream writes it, without a final newline."""
+    return json.dumps({"description": f"{name} of Kubernetes {version}"}, indent=2)
+
+
+class KubernetesJsonSchema(Repo):
+    """gen's core group, Secret and a Talos kind, and apps group, Deployment, from kubernetes-json-schema at Kubernetes 1.37.1."""
+
+    def setUp(self):
+        super().setUp()
+        self.sources.write_text(f"core:\n  software: Kubernetes\n  version: 1.37.1\n  source: {k8s_source(K8S_OLD, '1.37.1')}\n  license: Apache-2.0\n")
+        self.core, self.apps = self.root / "gen" / "schemas" / "core", self.root / "gen" / "schemas" / "apps"
+        self.core.mkdir()
+        self.apps.mkdir()
+        (self.core / "secret_v1.json").write_text(k8s_file("secret-v1.json", "1.37.1"))
+        (self.core / "machineconfig_v1alpha1.json").write_text("{}\n")
+        (self.apps / "deployment_v1.json").write_text(k8s_file("deployment-apps-v1.json", "1.37.1"))
+        self.web.pages[f"{GH}repos/kubernetes/kubernetes/releases?per_page=100"] = releases("v1.37.2", "v1.36.6", "v1.37.1")
+        self.web.pages[f"{GH}repos/yannh/kubernetes-json-schema/commits/HEAD"] = {"sha": K8S_HEAD}
+        self.web.pages[K8S_TREES + K8S_OLD] = {"tree": [{"path": "v1.37.1-standalone-strict", "sha": "dir-1.37.1"}]}
+        self.web.pages[K8S_TREES + K8S_HEAD] = {"tree": [{"path": "v1.37.1-standalone-strict", "sha": "dir-1.37.1"}, {"path": "v1.37.2-standalone-strict", "sha": "dir-1.37.2"}]}
+        for sha, version in ((K8S_OLD, "1.37.1"), (K8S_HEAD, "1.37.2")):
+            names = ("secret-v1.json", "secret.json", "deployment-apps-v1.json")
+            self.web.pages[K8S_TREES + f"dir-{version}"] = {"tree": [{"path": n} for n in names]}
+            for n in names:
+                self.web.pages[f"{RAW}yannh/kubernetes-json-schema/{sha}/v{version}-standalone-strict/{n}"] = k8s_file(n, version)
+
+    def gate(self, group):
+        return upstream.gate(group, [k8s_source(K8S_OLD, "1.37.1")], [k8s_source(K8S_HEAD, "1.37.2")])
+
+    def test_moves_to_the_newest_commit_and_copies_the_release_files_unchanged(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            (update,) = upstream.outdated("gen")
+        self.assertEqual(update["new"], [(k8s_source(K8S_HEAD, "1.37.2"), "1.37.2")])
+        self.assertIsNone(update["cause"])
+        self.assertEqual(update["files"], {"secret_v1.json": k8s_file("secret-v1.json", "1.37.2")})
+
+    def test_group_other_than_core_takes_its_first_label(self):
+        self.assertEqual(self.gate(self.apps), ({"deployment_v1.json": k8s_file("deployment-apps-v1.json", "1.37.2")}, None))
+
+    def test_edited_file_does_not_reproduce(self):
+        (self.core / "secret_v1.json").write_text(k8s_file("secret-v1.json", "1.37.1") + "\n")
+        self.assertEqual(self.gate(self.core), (None, "does not reproduce: secret_v1.json differs"))
+
+    def test_directory_not_yet_published_is_missing_at_the_new_release(self):
+        self.web.pages[K8S_TREES + K8S_HEAD]["tree"].pop()
+        self.assertEqual(self.gate(self.core), (None, "missing at the new release: secret_v1.json"))
+
+    def test_group_without_any_kubernetes_file_does_not_reproduce(self):
+        (self.core / "secret_v1.json").unlink()
+        self.assertEqual(self.gate(self.core), (None, "does not reproduce: no CRD for machineconfig_v1alpha1.json"))
 
 
 class Outdated(Repo):
