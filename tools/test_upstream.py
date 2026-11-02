@@ -168,7 +168,7 @@ class Sources(unittest.TestCase):
             "https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virt-operator/resource/generate/components/validations_generated.go": "Go code",
             "https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates": "Helm templates",
             "https://github.com/linkerd/linkerd2/tree/edge-26.6.3/charts/linkerd-crds/templates/policy": "Helm templates",
-            "https://registry.terraform.io/providers/hashicorp/aws/6.68.0": "Terraform extract",
+            "https://registry.terraform.io/providers/hashicorp/aws/6.68.0": None,
             "https://github.com/yannh/kubernetes-json-schema/tree/8df8a883b68a24a104b4a9e43c1288090ae60b3b/v1.35.0-standalone-strict": None,
             "https://github.com/argoproj/argo-cd/tree/v3.5.4/manifests/crds": None,
             "https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml": None,
@@ -430,6 +430,103 @@ class OpenAPI(Repo):
     def test_json_without_components_does_not_reproduce(self):
         self.web.pages[f"{RAW}example/gizmos/v1.0.0/{OAPI}"] = {"$schema": "http://json-schema.org/draft-07/schema#", "type": "object"}
         self.assertEqual(upstream.gate(self.group, [OAPI_OLD], [OAPI_NEW]), (None, "does not reproduce: no CRD for gizmo_v1alpha1.json"))
+
+
+TF_ADDRESS = "registry.terraform.io/example/cloud"
+TF_OLD = "https://registry.terraform.io/providers/example/cloud/1.0.0"
+TF_NEW = "https://registry.terraform.io/providers/example/cloud/1.1.0"
+TF_IMAGE = "hashicorp/terraform:1.16.6@sha256:" + "0" * 64
+
+
+def provider(version, types=("cloud_bucket", "cloud_net")):
+    """`terraform providers schema -json` of example/cloud: each type carries an attribute named after the version; cloud_zone and the functions are in no extract."""
+    def block():
+        return {"block": {"attributes": {"v" + version.replace(".", "_"): {"type": "string", "optional": True}}}, "version": 0}
+    return {"format_version": "1.0", "provider_schemas": {TF_ADDRESS: {
+        "provider": {"block": {"attributes": {"region": {"type": "string", "optional": True}}}, "version": 0},
+        "resource_schemas": {t: block() for t in (*types, "cloud_zone")},
+        "data_source_schemas": {"cloud_zone": block()},
+        "functions": {"cidr": {"return_type": "string"}},
+    }}}
+
+
+def extract(version):
+    """The extract of cloud_bucket and cloud_net at version, as the registry's tf_schema.py extract writes it."""
+    full = provider(version)["provider_schemas"][TF_ADDRESS]
+    part = {"provider": full["provider"], "resource_schemas": {t: full["resource_schemas"][t] for t in ("cloud_bucket", "cloud_net")}, "data_source_schemas": {}}
+    return json.dumps({"format_version": "1.0", "provider_schemas": {TF_ADDRESS: part}}, indent=1, sort_keys=True) + "\n"
+
+
+class Terraform(Repo):
+    """gen ships the example/cloud 1.0.0 extract in schemas/terraform; the registry knows 1.1.0."""
+
+    def setUp(self):
+        super().setUp()
+        self.sources.write_text(f"terraform/example/cloud:\n  software: example/cloud\n  version: 1.0.0\n  source: {TF_OLD}\n  license: MPL-2.0\n")
+        self.tf = self.root / "gen" / "schemas" / "terraform"
+        self.tf.mkdir()
+        (self.tf / "example_cloud_1.0.0.json").write_text(extract("1.0.0"))
+        (self.tf / "NOTICE").write_text("MPL-2.0\n")
+        (self.root / "gen" / "__init__.py").write_text('PROVIDER = {"source": "example/cloud", "version": "1.0.0"}\nREQUIRED = ">= 1.5.0"\n')
+        (self.root / "gen" / "README.md").write_text("Pinned to **1.0.0**.\n\n- [cloud_bucket](https://registry.terraform.io/providers/example/cloud/1.0.0/docs/resources/bucket)\n")
+        (self.root / "README.md").write_text("| [gen](gen/) | Cloud (example/cloud 1.0.0) |\n| [other](other/) | Other 1.0.0 |\n")
+        self.web.pages["https://registry.terraform.io/v1/providers/example/cloud"] = {"versions": ["1.0.0", "1.1.0"]}
+        self.providers = {"1.0.0": provider("1.0.0"), "1.1.0": provider("1.1.0")}
+        patch = mock.patch.object(upstream, "provider_schema", lambda source, version: self.providers[version])
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def test_reproduces_then_regenerates_at_the_new_version(self):
+        self.assertEqual(upstream.gate(self.tf, [TF_OLD], [TF_NEW]), ({"example_cloud_1.0.0.json": None, "example_cloud_1.1.0.json": extract("1.1.0")}, None))
+
+    def test_edited_extract_does_not_reproduce(self):
+        (self.tf / "example_cloud_1.0.0.json").write_text(extract("1.0.0").replace('"optional": true', '"required": true'))
+        self.assertEqual(upstream.gate(self.tf, [TF_OLD], [TF_NEW]), (None, "does not reproduce: example_cloud_1.0.0.json differs"))
+
+    def test_type_missing_at_the_new_version_is_an_issue_cause(self):
+        self.providers["1.1.0"] = provider("1.1.0", types=("cloud_net",))
+        self.assertEqual(upstream.gate(self.tf, [TF_OLD], [TF_NEW]), (None, "missing at the new release: example_cloud_1.0.0.json"))
+
+    def test_pull_request_replaces_the_extract_and_bumps_the_source(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            updates = upstream.outdated("gen")
+        self.assertEqual(updates[0]["new"], [(TF_NEW, "1.1.0")])
+        check = subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n")
+        with mock.patch.object(upstream, "run", lambda *cmd: None), mock.patch.object(subprocess, "run", return_value=check), contextlib.redirect_stdout(io.StringIO()):
+            upstream.act("gen", updates, {}, [], False)
+        self.assertEqual(sorted(p.name for p in self.tf.iterdir()), ["NOTICE", "example_cloud_1.1.0.json"])
+        self.assertEqual((self.tf / "example_cloud_1.1.0.json").read_text(), extract("1.1.0"))
+        self.assertIn(f"  version: 1.1.0\n  source: {TF_NEW}\n", self.sources.read_text())
+
+    def test_pull_request_moves_the_provider_pin(self):
+        init, readme, root = self.root / "gen" / "__init__.py", self.root / "gen" / "README.md", self.root / "README.md"
+        with contextlib.redirect_stdout(io.StringIO()):
+            updates = upstream.outdated("gen")
+        calls, check = [], subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n")
+        with mock.patch.object(upstream, "run", lambda *cmd: calls.append(cmd)), mock.patch.object(subprocess, "run", return_value=check), contextlib.redirect_stdout(io.StringIO()):
+            upstream.act("gen", updates, {}, [], False)
+        self.assertEqual(init.read_text(), 'PROVIDER = {"source": "example/cloud", "version": "1.1.0"}\nREQUIRED = ">= 1.5.0"\n')
+        self.assertEqual(readme.read_text(), "Pinned to **1.1.0**.\n\n- [cloud_bucket](https://registry.terraform.io/providers/example/cloud/1.1.0/docs/resources/bucket)\n")
+        self.assertEqual(root.read_text(), "| [gen](gen/) | Cloud (example/cloud 1.1.0) |\n| [other](other/) | Other 1.0.0 |\n")
+        self.assertIn(("git", "add", "--", "gen", "README.md"), calls)
+
+
+class ProviderSchema(unittest.TestCase):
+    def test_provider_runs_in_a_container_without_the_environment(self):
+        web = Web({upstream.TF_VERIFY: f"        env:\n          TERRAFORM_IMAGE: {TF_IMAGE}\n"})
+        done = subprocess.CompletedProcess([], 0, stdout='{"format_version": "1.0"}')
+        with mock.patch.object(upstream, "get", web), mock.patch.object(subprocess, "run", return_value=done) as sub:
+            self.assertEqual(upstream.provider_schema("example/cloud", "1.1.0"), {"format_version": "1.0"})
+        cmd = sub.call_args.args[0]
+        self.assertEqual(cmd[:6], ["docker", "run", "--rm", "--entrypoint", "sh", TF_IMAGE])
+        self.assertEqual(cmd[6], "-c")
+        self.assertEqual(json.loads(cmd[8]), {"terraform": {"required_providers": {"p": {"source": "example/cloud", "version": "1.1.0"}}}})
+        self.assertEqual(len(cmd), 9)
+
+    def test_image_without_digest_raises(self):
+        web = Web({upstream.TF_VERIFY: "          TERRAFORM_IMAGE: hashicorp/terraform:1.16.6\n"})
+        with mock.patch.object(upstream, "get", web), mock.patch.object(subprocess, "run", refuse), self.assertRaises(ValueError):
+            upstream.provider_schema("example/cloud", "1.1.0")
 
 
 K8S_OLD, K8S_HEAD = "817113f21a2643311cbc3e992bb44ffe1c416c54", "e0c72a1bc5f409d1685c0e1323460c8a98cd7459"

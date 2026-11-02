@@ -3,7 +3,8 @@
 
 Usage: tools/upstream.py [--dry-run]
 
-Needs gh with GH_TOKEN and git; a pull request also needs ./check (docker).
+Needs gh with GH_TOKEN, git, and docker for Terraform providers; a pull
+request also needs ./check.
 --dry-run does every read and prints the pull requests and issues it would
 open or update, without writing anything, ./check included.
 """
@@ -28,6 +29,8 @@ GITHUB = re.compile(r"https://github\.com/([^/]+/[^/]+)/(tree|blob)/([^/]+)/(.+)
 TERRAFORM = re.compile(r"https://registry\.terraform\.io/providers/([^/]+/[^/]+)/([^/]+)")
 ANNOTATIONS = ("$id", "$schema", "title", "description")
 COMPONENTS = "#/components/schemas/"
+TF_VERIFY = "https://raw.githubusercontent.com/kadet-hub/registry/main/.github/workflows/tf-schema-verify.yml"
+TF_KINDS = ("resource_schemas", "data_source_schemas")
 
 
 class Loader(getattr(yaml, "CSafeLoader", yaml.SafeLoader)):
@@ -83,8 +86,6 @@ def latest(row, repo, ref):
 
 def not_regenerable(row, url):
     """Why a source's schemas cannot be regenerated (UPD-4), None if they can."""
-    if row == "terraform":
-        return "Terraform extract"
     if url.endswith(".go"):
         return "Go code"
     if re.search(r"/templates(/|$)", url):
@@ -152,6 +153,35 @@ def openapi_schemas(url):
     return schemas
 
 
+def provider_schema(source, version):
+    """`terraform providers schema -json` of a provider version, in the registry's QA-9 Terraform image; a container keeps the job's environment from the provider (UPD-8)."""
+    if not (m := re.search(r"TERRAFORM_IMAGE: *(\S+@sha256:[0-9a-f]{64})", get(TF_VERIFY).decode())):
+        raise ValueError("no TERRAFORM_IMAGE pinned by digest in the registry's tf-schema-verify.yml")
+    module = json.dumps({"terraform": {"required_providers": {"p": {"source": source, "version": version}}}})
+    script = 'cd "$(mktemp -d)" && printf %s "$0" >main.tf.json && terraform init -backend=false -input=false -no-color >/dev/null && terraform providers schema -json'
+    return json.loads(subprocess.run(["docker", "run", "--rm", "--entrypoint", "sh", m[1], "-c", script, module], check=True, capture_output=True, text=True).stdout)
+
+
+def terraform_extracts(url, committed):
+    """{file: content} of the committed extracts of a Terraform Registry source at its version, written as the registry's tf_schema.py extract writes them.
+
+    The extract takes the version's file name, the committed file maps to None if that differs. An extract with a type the version lacks is left out.
+    """
+    source, version = TERRAFORM.fullmatch(url).groups()
+    prefix, files = source.replace("/", "_") + "_", {}
+    for name, text in committed.items():
+        if not re.fullmatch(re.escape(prefix) + r"\d+\.\d+\.\d+\.json", name):
+            continue
+        full = provider_schema(source, version)
+        schemas, wanted = full["provider_schemas"], json.loads(text)["provider_schemas"]
+        if any(t not in schemas.get(a, {}).get(k, {}) for a, part in wanted.items() for k in TF_KINDS for t in part.get(k, {})):
+            continue  # a type is missing at this version
+        reduced = {a: {"provider": schemas[a].get("provider", {}), **{k: {t: schemas[a][k][t] for t in part.get(k, {})} for k in TF_KINDS}} for a, part in wanted.items()}
+        files[name] = None
+        files[f"{prefix}{version}.json"] = json.dumps({"format_version": full.get("format_version"), "provider_schemas": reduced}, indent=1, sort_keys=True) + "\n"
+    return files
+
+
 def kubernetes_schemas(url, names, group):
     """{name: file} of the <kind>_<version>.json names whose file the kubernetes-json-schema directory at a source holds, unchanged."""
     repo, _, ref, path = GITHUB.fullmatch(url).groups()
@@ -168,7 +198,7 @@ def kubernetes_schemas(url, names, group):
 def moved(row, url, ref, tag):
     """A source URL at a newer release: the tag in place of the ref, for kubernetes-json-schema its newest commit and that release's directory."""
     if row != "kubernetes":
-        return url.replace(f"/{ref}/", f"/{tag}/", 1)
+        return re.sub(rf"/{re.escape(ref)}(?=/|$)", f"/{tag}", url, count=1)
     repo, kind, _, path = GITHUB.fullmatch(url).groups()
     head = json.loads(get(f"{API}repos/{repo}/commits/HEAD"))["sha"]
     return f"https://github.com/{repo}/{kind}/{head}/{re.sub(r'^v[0-9.]+', tag, path)}"
@@ -217,6 +247,9 @@ def regenerate(urls, committed, group):
     """
     schemas, crds, files = {}, {}, {}
     for url in urls:
+        if classify(url)[0] == "terraform":
+            files.update(terraform_extracts(url, committed))
+            continue
         if classify(url)[0] == "kubernetes":
             files.update(kubernetes_schemas(url, committed, group))
             continue
@@ -249,6 +282,11 @@ def gate(directory, old_urls, new_urls):
     return files, None
 
 
+def group_dir(gen, group):
+    """A group's schema directory; the Terraform extracts of a generator share schemas/terraform (registry QA-8)."""
+    return ROOT / gen / "schemas" / ("terraform" if group.startswith("terraform/") else group)
+
+
 def outdated(gen):
     """UPD-1 and UPD-2 for one generator: the groups with a newer release, each with files or cause."""
     sources = yaml.load((ROOT / gen / "schemas" / "sources.yaml").read_text(), Loader=yaml.BaseLoader)
@@ -275,7 +313,7 @@ def outdated(gen):
         cause = next((f"not regenerable: {r}" for r in reasons if r), None)
         files = None
         if not cause:
-            files, cause = gate(ROOT / gen / "schemas" / group, [u for u, _ in old], [u for u, _ in new])
+            files, cause = gate(group_dir(gen, group), [u for u, _ in old], [u for u, _ in new])
         print(f"{gen} {group}: {cause or 'regenerates and reproduces'}")
         updates.append({"group": group, "software": entry["software"], "old": old, "new": new, "files": files, "cause": cause})
     return updates
@@ -331,13 +369,13 @@ def bump_sources(text, update):
     return "".join(out)
 
 
-def bump_readme(text, updates):
-    """README text with the old versions on its "Built for" lines replaced by the new ones."""
+def bump_readme(text, updates, marker="Built for"):
+    """Text with the old versions replaced by the new ones on the lines that contain marker, a README's "Built for" lines by default."""
     lines = text.splitlines(keepends=True)
     for u in updates:
         for (_, old), (_, new) in zip(u["old"], u["new"]):
             pattern = re.compile(rf"(?<![\d.]){re.escape(old)}(?!\d|\.\d)")
-            lines = [pattern.sub(new, line) if "Built for" in line else line for line in lines]
+            lines = [pattern.sub(new, line) if marker in line else line for line in lines]
     return "".join(lines)
 
 
@@ -361,7 +399,7 @@ def propose(gen, updates, pr, dry_run):
         return None
     for u in updates:
         for name, text in u["files"].items():
-            path = ROOT / gen / "schemas" / u["group"] / name
+            path = group_dir(gen, u["group"]) / name
             if text is None:
                 path.unlink()
             else:
@@ -369,6 +407,10 @@ def propose(gen, updates, pr, dry_run):
     (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
     readme = ROOT / gen / "README.md"
     readme.write_text(bump_readme(readme.read_text(), updates))
+    if tf := [u for u in updates if u["group"].startswith("terraform/")]:  # UPD-3: the provider pin and every mention of its version
+        # shortcut: matches the version string, not the provider; narrow it to the pin when another version in these files collides
+        for path, marker in ((ROOT / gen / "__init__.py", ""), (readme, ""), (ROOT / "README.md", f"| [{gen}]({gen}/)")):
+            path.write_text(bump_readme(path.read_text(), tf, marker))
     env = {k: v for k, v in os.environ.items() if k not in ("GH_TOKEN", "GITHUB_TOKEN")}  # UPD-8
     check = subprocess.run(["./check", gen], cwd=ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     print(check.stdout)
@@ -378,7 +420,7 @@ def propose(gen, updates, pr, dry_run):
             u["cause"] = "`./check` fails"
         return tail
     run("git", "checkout", "-B", branch)
-    run("git", "add", "--", gen)
+    run("git", "add", "--", gen, "README.md")
     run("git", "commit", "-m", title)
     run("git", "push", "--force", "origin", branch)
     text = body(updates, tail, True)
