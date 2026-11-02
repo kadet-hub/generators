@@ -1,7 +1,7 @@
-# Provider schema extract for QA-8: terraform providers schema -json (Terraform 1.16.5)
+# Provider schema extract for QA-8: terraform providers schema -json (Terraform 1.16.6)
 # reduced with kadet-hub/registry sandbox/tf_schema.py extract to the types the fixtures emit.
 terraform/opentelekomcloud/opentelekomcloud:
   software: opentelekomcloud/opentelekomcloud
-  version: 1.37.10
-  source: https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.10
+  version: 1.37.11
+  source: https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11
   license: MPL-2.0
