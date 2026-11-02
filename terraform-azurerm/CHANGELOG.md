@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+Pins hashicorp/azurerm 5.12.0 instead of 5.10.0 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/azurerm 5.12.0". The provider block and the schemas of the seven resource types the generator emits are the same in both versions, and the release notes of 5.11.0 and 5.12.0 name none of these types. Their resource sources, `storage_container_resource.go` included, change only in the copyright year, so containers still go through Azure Resource Manager. `schemas/terraform/NOTICE` no longer names the extract's version. Rendered output differs only in the provider version.
+
 ## 0.1.3
 
 Ships the upstream licence and copyright notice of its provider schema extract: `license: MPL-2.0` in `schemas/sources.yaml` and `schemas/terraform/NOTICE`. Rendered output is unchanged.
