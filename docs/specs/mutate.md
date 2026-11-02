@@ -257,8 +257,13 @@ of another directory, which gets its own Application.
   exists already was written by an earlier entry outside its
   `output_path`, such as a second `mutate` entry moving to the same path.
 
-  - Test: `mutate/tests/test_mutations.py::test_move_target`
-  - Since: #174
+  The check follows symbolic links that exist when `mutate` runs. A `to`
+  whose resolved path lies at or below the resolved `output_path` of a
+  compile entry, or outside the target's compile directory, fails the same
+  way.
+
+  - Test: `mutate/tests/test_mutations.py::test_move_target`, `::test_move_target_symlink`
+  - Since: #174, #175
 
 ## Manifest and gate
 
