@@ -114,6 +114,21 @@ and CHANGELOG entry before merging.
   the new tag is an issue. An OpenAPI v3 source has no CRDs, so a CRD file
   in its group does not reproduce.
 
+  A kubernetes-json-schema source names the `v<version>-standalone-strict`
+  directory of one Kubernetes release at a commit. Its files are already
+  closed and are copied byte for byte: the group's `<kind>_<version>.json`
+  is the directory's `<kind>-<version>.json` for `core` and
+  `<kind>-<first label of the group>-<version>.json` otherwise, such as
+  `deployment-apps-v1.json`. At a newer release the source moves to the
+  repository's newest commit and that release's directory. Until
+  kubernetes-json-schema publishes the directory, every file is missing at
+  the new release.
+
+  A group directory can hold another entry's schemas next to these, as
+  talos `core/` holds the Talos kinds next to `secret_v1.json`. A committed
+  file that the directory lacks at the current commit belongs to the other
+  entry and stays as it is. At least one file has to reproduce.
+
   A Terraform Registry source has one extract per provider version,
   `<namespace>_<type>_<version>.json` in `schemas/terraform/`, the
   directory all providers of a generator share (registry QA-8).
@@ -135,7 +150,7 @@ and CHANGELOG entry before merging.
   to copy; their sources stay not regenerable (UPD-4).
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40, #43, #61, #160
+  - Since: #39, #40, #43, #61, #158, #160
 
 ## Pull requests and issues
 
@@ -166,13 +181,13 @@ and CHANGELOG entry before merging.
   A generator can have this issue and the pull request of UPD-3 at the same
   time. Several software versions in one title are joined with `, `. The
   causes are: the group does not reproduce (UPD-2), its source is not
-  regenerable (Go code, Helm templates, kubernetes-json-schema), a kind,
-  version, CRD or Terraform type is missing at the new tag, or `./check`
-  fails with the regenerated groups. The body names the
-  cause per group and, for a failing check, its tail.
+  regenerable (Go code, Helm templates), a kind, version, CRD or Terraform
+  type is missing at the new tag, or `./check` fails with the regenerated
+  groups. The body names the cause per group and, for a failing check, its
+  tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #61, #160
+  - Since: #39, #61, #158, #160
 
 ## Credentials
 
