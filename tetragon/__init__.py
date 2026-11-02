@@ -18,7 +18,7 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 API_VERSION = "cilium.io/v1alpha1"
 
@@ -37,6 +37,8 @@ FLAT_KEY_MAP = {
     "pod_selector": "podSelector",
     "container_selector": "containerSelector",
     "host_selector": "hostSelector",
+    "node_selector": "nodeSelector",
+    "state": "state",
     "selectors_macros": "selectorsMacros",
 }
 
@@ -107,6 +109,13 @@ class TetragonPolicy(k8s.Base):
                     self.kwargs.name,
                 )
             spec[crd_key] = config[flat_key]
+        # TET-8: Tetragon takes only null or {} here; nodeSelector selects nodes by label.
+        host = spec.get("hostSelector")
+        if isinstance(host, dict) and (host.get("matchLabels") is not None or host.get("matchExpressions") is not None):
+            raise ValueError(
+                f"tetragon: {self.KIND} '{self.kwargs.name}': hostSelector takes only {{}} (host processes), "
+                "not matchLabels or matchExpressions; select nodes with node_selector"
+            )
         self.root.spec = spec
 
 
