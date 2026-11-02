@@ -351,3 +351,16 @@ def test_move_target():
         os.makedirs(os.path.join(base, "compiled", "env", "prod", "k8s", "crds"))
         open(os.path.join(base, "compiled", "env", "prod", "k8s", "crds", "crds.yml"), "w").close()
         raises(lambda: move_target("m", "k8s/crds/crds.yml", here, entries, "env.prod"), "move.to k8s/crds/crds.yml exists")
+
+
+def test_move_target_symlink():
+    entries = [{"input_type": "kadet", "output_type": "plain", "input_params": {"mutations": {}}, "output_path": "k8s/podinfo"}]
+    with tempfile.TemporaryDirectory() as base:
+        top = os.path.join(base, "compiled", "env", "prod")
+        here = os.path.join(top, "k8s", "podinfo")
+        os.makedirs(here)
+        os.symlink("podinfo", os.path.join(top, "k8s", "link"))
+        os.symlink(base, os.path.join(top, "out"))
+        raises(lambda: move_target("m", "k8s/link/crds.yml", here, entries, "env.prod"), "mutation m:", "move.to k8s/link/crds.yml is below the output_path k8s/podinfo")
+        raises(lambda: move_target("m", "out/crds.yml", here, entries, "env.prod"), "mutation m:", "move.to out/crds.yml is outside the target's compile directory")
+        assert move_target("m", "k8s/crds/crds.yml", here, entries, "env.prod") == "../crds/crds.yml"

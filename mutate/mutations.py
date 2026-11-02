@@ -114,6 +114,16 @@ def move_target(mid, to, compile_path, entries, target):
             own = out
     if own is None:
         fail(mid, f"no compile entry passing mutations writes to {compile_path}")
+    # The string checks above miss symbolic links, so repeat them on resolved paths.
+    top = os.path.realpath(os.path.join(here, os.path.relpath(".", own)))
+    real = os.path.realpath(os.path.join(top, to))
+    if not real.startswith(top + os.sep):
+        fail(mid, f"move.to {to} is outside the target's compile directory")
+    for entry in entries:
+        out = os.path.normpath(entry.get("output_path") or ".")
+        resolved = os.path.realpath(os.path.join(top, out))
+        if real == resolved or real.startswith(resolved + os.sep):
+            fail(mid, f"move.to {to} is below the output_path {out} of a compile entry")
     rel = os.path.relpath(to, own)
     if os.path.exists(os.path.normpath(os.path.join(here, rel))):
         fail(mid, f"move.to {to} exists, written by an earlier compile entry")
