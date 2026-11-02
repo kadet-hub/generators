@@ -1,6 +1,7 @@
 # Complete: both kinds, name override, labels and annotations, spec
-# passthrough with a flat key winning over it (options), and the namespace
-# of the entry before generators.tetragon.namespace
+# passthrough with a flat key winning over it (options), node_selector next
+# to the only non-null host_selector Tetragon takes, and the namespace of the
+# entry before generators.tetragon.namespace
 classes: []
 
 parameters:
@@ -46,9 +47,10 @@ parameters:
                         values: ["/tmp/sigkill"]
                     matchActions:
                       - action: Sigkill
-          host_selector:
+          node_selector:
             matchLabels:
               node-role.kubernetes.io/worker: ""
+          host_selector: {}
       tracing_policies_namespaced:
         exec-shell:
           pod_selector:

@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 cilium.io:
   software: Tetragon
-  version: 1.7.1
-  source: https://github.com/cilium/tetragon/tree/v1.7.1/pkg/k8s/apis/cilium.io/client/crds/v1alpha1
+  version: 1.8.0
+  source: https://github.com/cilium/tetragon/tree/v1.8.0/pkg/k8s/apis/cilium.io/client/crds/v1alpha1
   license: Apache-2.0
