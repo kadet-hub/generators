@@ -55,7 +55,7 @@ Flat keys are the snake_case spelling of top-level CRD `spec` fields; their valu
 
 Two flat keys do more than rename. On CephCluster, `encrypted_device: true` sets `spec.storage.config.encryptedDevice: "true"`, the string Rook reads for dmcrypt OSDs; it applies to host-based OSDs only, OSDs on PVCs are encrypted with `encrypted: true` on their `storageClassDeviceSets` entry. On CephClient, `name` sets both `metadata.name` and `spec.name` (the CephX client name); `client_name` sets `spec.name` alone and wins over `name`.
 
-A CephCluster without `ceph_version.image` (or `spec.cephVersion.image`) fails the compile unless `external.enable` is set, so a generator update never changes the Ceph version. Rook 1.21.0 ships `quay.io/ceph/ceph:v20.2.4` in its example; multisite object stores need RGW settings applied before upgrading to that release ([ceph-upgrade.md](https://github.com/rook/rook/blob/v1.21.0/Documentation/Upgrade/ceph-upgrade.md#supported-versions)). `storage.useAllNodes` with `useAllDevices` lets Rook claim every empty raw disk on every node.
+A CephCluster without `ceph_version.image` (or `spec.cephVersion.image`) fails the compile unless `external.enable` is set, so a generator update never changes the Ceph version. Rook 1.21.1 ships `quay.io/ceph/ceph:v20.2.4` in its example; multisite object stores need RGW settings applied before upgrading to that release ([ceph-upgrade.md](https://github.com/rook/rook/blob/v1.21.1/Documentation/Upgrade/ceph-upgrade.md#supported-versions)). `storage.useAllNodes` with `useAllDevices` lets Rook claim every empty raw disk on every node.
 
 New CephNFS installs on Rook 1.21 declare a CephBlockPool with `spec.name: .nfs` themselves, since the operator no longer creates it ([release notes](https://github.com/rook/rook/releases/tag/v1.21.0)); deleting that CR deletes the pool and the NFS exports in it.
 
@@ -65,10 +65,10 @@ The generator fills these only where the inventory leaves them unset:
 
 | Kind | Default | Why |
 |---|---|---|
-| CephCluster | `dataDirHostPath: /var/lib/rook` | The CRD makes it optional, but Rook's example marks it "Must be specified"; without it the daemons keep mon data in an emptyDir ([cluster.yaml](https://github.com/rook/rook/blob/v1.21.0/deploy/examples/cluster.yaml#L37-L40), [spec.go](https://github.com/rook/rook/blob/v1.21.0/pkg/operator/ceph/controller/spec.go#L194-L200)). |
-| CephFilesystem | `metadataServer: {activeCount: 1, activeStandby: true}` | `metadataServer.activeCount` is required by the CRD; values from [filesystem.yaml](https://github.com/rook/rook/blob/v1.21.0/deploy/examples/filesystem.yaml). |
-| CephNFS | `server.active: 1` | Required by the CRD; [nfs.yaml](https://github.com/rook/rook/blob/v1.21.0/deploy/examples/nfs.yaml). |
-| CephRBDMirror | `count: 1` | Required by the CRD; [rbdmirror.yaml](https://github.com/rook/rook/blob/v1.21.0/deploy/examples/rbdmirror.yaml). |
+| CephCluster | `dataDirHostPath: /var/lib/rook` | The CRD makes it optional, but Rook's example marks it "Must be specified"; without it the daemons keep mon data in an emptyDir ([cluster.yaml](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/cluster.yaml#L37-L40), [spec.go](https://github.com/rook/rook/blob/v1.21.1/pkg/operator/ceph/controller/spec.go#L194-L200)). |
+| CephFilesystem | `metadataServer: {activeCount: 1, activeStandby: true}` | `metadataServer.activeCount` is required by the CRD; values from [filesystem.yaml](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/filesystem.yaml). |
+| CephNFS | `server.active: 1` | Required by the CRD; [nfs.yaml](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/nfs.yaml). |
+| CephRBDMirror | `count: 1` | Required by the CRD; [rbdmirror.yaml](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/rbdmirror.yaml). |
 
 Mon and mgr counts, the msgr2 requirement and other settings the operator defaults are not emitted. CephClient `caps` has no default, since it grants access to the cluster; an entry without it fails schema validation. Rook's example also sets `security.cephx.csi.keyType: aes` for nodes with a Linux kernel older than 7.0; the generator leaves it to the inventory because it depends on the node kernel.
 
@@ -154,4 +154,4 @@ parameters:
 | `<namespace>/<name>-rbdmirror` | `ceph.rook.io/v1` CephRBDMirror |
 | `<namespace>/<name>-client` | `ceph.rook.io/v1` CephClient |
 
-`v1` is the served storage version of every kind at Rook 1.21.0; none is deprecated. The compiled output is validated against the upstream CRD schemas in `schemas/ceph.rook.io/`.
+`v1` is the served storage version of every kind at Rook 1.21.1; none is deprecated. The compiled output is validated against the upstream CRD schemas in `schemas/ceph.rook.io/`.
