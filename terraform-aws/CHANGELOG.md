@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+Pins hashicorp/aws 6.71.0 instead of 6.69.1 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/aws 6.71.0". The release notes of 6.70.0 and 6.71.0 change none of the 15 resource types the generator emits. Between the two extracts only the provider's `endpoints` block gains `bedrockdataautomation` and `securityir`. `schemas/terraform/NOTICE` no longer names the extract's version. Rendered output differs only in the provider version.
+
 ## 0.1.3
 
 Ships the upstream licence and copyright notice of its provider schema extract: `license: MPL-2.0` in `schemas/sources.yaml` and `schemas/terraform/NOTICE`. Rendered output is unchanged.
