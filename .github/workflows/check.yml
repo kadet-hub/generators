@@ -28,14 +28,14 @@ jobs:
         run: tools/workflow-policy
       - name: Tests of tools/upstream.py
         env:
-          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.before }} # CHK-4
         run: |
           if git diff --name-only "$BASE" HEAD | grep -qE '^(tools/|\.github/)'; then
             uv run --with pyyaml==6.0.3 python3 -m unittest discover -s tools
           fi
       - name: Gate checks for changed generators
         env:
-          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.before }} # CHK-4
         run: |
           changed=$(git diff --name-only "$BASE" HEAD)
           if grep -qE '^(check$|\.github/)' <<<"$changed"; then
