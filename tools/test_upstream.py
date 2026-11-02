@@ -467,6 +467,9 @@ class Terraform(Repo):
         self.tf.mkdir()
         (self.tf / "example_cloud_1.0.0.json").write_text(extract("1.0.0"))
         (self.tf / "NOTICE").write_text("MPL-2.0\n")
+        (self.root / "gen" / "__init__.py").write_text('PROVIDER = {"source": "example/cloud", "version": "1.0.0"}\nREQUIRED = ">= 1.5.0"\n')
+        (self.root / "gen" / "README.md").write_text("Pinned to **1.0.0**.\n\n- [cloud_bucket](https://registry.terraform.io/providers/example/cloud/1.0.0/docs/resources/bucket)\n")
+        (self.root / "README.md").write_text("| [gen](gen/) | Cloud (example/cloud 1.0.0) |\n| [other](other/) | Other 1.0.0 |\n")
         self.web.pages["https://registry.terraform.io/v1/providers/example/cloud"] = {"versions": ["1.0.0", "1.1.0"]}
         self.providers = {"1.0.0": provider("1.0.0"), "1.1.0": provider("1.1.0")}
         patch = mock.patch.object(upstream, "provider_schema", lambda source, version: self.providers[version])
@@ -494,6 +497,18 @@ class Terraform(Repo):
         self.assertEqual(sorted(p.name for p in self.tf.iterdir()), ["NOTICE", "example_cloud_1.1.0.json"])
         self.assertEqual((self.tf / "example_cloud_1.1.0.json").read_text(), extract("1.1.0"))
         self.assertIn(f"  version: 1.1.0\n  source: {TF_NEW}\n", self.sources.read_text())
+
+    def test_pull_request_moves_the_provider_pin(self):
+        init, readme, root = self.root / "gen" / "__init__.py", self.root / "gen" / "README.md", self.root / "README.md"
+        with contextlib.redirect_stdout(io.StringIO()):
+            updates = upstream.outdated("gen")
+        calls, check = [], subprocess.CompletedProcess(["./check", "gen"], 0, stdout="check passed\n")
+        with mock.patch.object(upstream, "run", lambda *cmd: calls.append(cmd)), mock.patch.object(subprocess, "run", return_value=check), contextlib.redirect_stdout(io.StringIO()):
+            upstream.act("gen", updates, {}, [], False)
+        self.assertEqual(init.read_text(), 'PROVIDER = {"source": "example/cloud", "version": "1.1.0"}\nREQUIRED = ">= 1.5.0"\n')
+        self.assertEqual(readme.read_text(), "Pinned to **1.1.0**.\n\n- [cloud_bucket](https://registry.terraform.io/providers/example/cloud/1.1.0/docs/resources/bucket)\n")
+        self.assertEqual(root.read_text(), "| [gen](gen/) | Cloud (example/cloud 1.1.0) |\n| [other](other/) | Other 1.0.0 |\n")
+        self.assertIn(("git", "add", "--", "gen", "README.md"), calls)
 
 
 class ProviderSchema(unittest.TestCase):

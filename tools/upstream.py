@@ -369,13 +369,13 @@ def bump_sources(text, update):
     return "".join(out)
 
 
-def bump_readme(text, updates):
-    """README text with the old versions on its "Built for" lines replaced by the new ones."""
+def bump_readme(text, updates, marker="Built for"):
+    """Text with the old versions replaced by the new ones on the lines that contain marker, a README's "Built for" lines by default."""
     lines = text.splitlines(keepends=True)
     for u in updates:
         for (_, old), (_, new) in zip(u["old"], u["new"]):
             pattern = re.compile(rf"(?<![\d.]){re.escape(old)}(?!\d|\.\d)")
-            lines = [pattern.sub(new, line) if "Built for" in line else line for line in lines]
+            lines = [pattern.sub(new, line) if marker in line else line for line in lines]
     return "".join(lines)
 
 
@@ -407,6 +407,10 @@ def propose(gen, updates, pr, dry_run):
     (ROOT / gen / "schemas" / "sources.yaml").write_text(sources)
     readme = ROOT / gen / "README.md"
     readme.write_text(bump_readme(readme.read_text(), updates))
+    if tf := [u for u in updates if u["group"].startswith("terraform/")]:  # UPD-3: the provider pin and every mention of its version
+        # shortcut: matches the version string, not the provider; narrow it to the pin when another version in these files collides
+        for path, marker in ((ROOT / gen / "__init__.py", ""), (readme, ""), (ROOT / "README.md", f"| [{gen}]({gen}/)")):
+            path.write_text(bump_readme(path.read_text(), tf, marker))
     env = {k: v for k, v in os.environ.items() if k not in ("GH_TOKEN", "GITHUB_TOKEN")}  # UPD-8
     check = subprocess.run(["./check", gen], cwd=ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     print(check.stdout)
@@ -416,7 +420,7 @@ def propose(gen, updates, pr, dry_run):
             u["cause"] = "`./check` fails"
         return tail
     run("git", "checkout", "-B", branch)
-    run("git", "add", "--", gen)
+    run("git", "add", "--", gen, "README.md")
     run("git", "commit", "-m", title)
     run("git", "push", "--force", "origin", branch)
     text = body(updates, tail, True)
