@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for Linkerd `edge-26.10.3`. The `linkerd-crds` chart and the policy controller files the README cites are unchanged since `edge-26.10.2`, so the shipped schemas and the rendered output stay the same. The README links move to `edge-26.10.3`.
+
 ## 1.0.3
 
 Built for Linkerd `edge-26.10.2`. The `linkerd-crds` chart and the policy controller files the README cites are unchanged since `edge-26.10.1`, so the shipped schemas and the rendered output stay the same. The README links move to `edge-26.10.2`.
