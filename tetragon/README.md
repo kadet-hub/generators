@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/tetragon/) page.
 
-Kapitan kadet generator for [Tetragon](https://tetragon.io/) policies (`cilium.io/v1alpha1`). Built for Tetragon 1.7.1.
+Kapitan kadet generator for [Tetragon](https://tetragon.io/) policies (`cilium.io/v1alpha1`). Built for Tetragon 1.8.0.
 
 - **TracingPolicy**: cluster-wide policy, applies to every process on the selected nodes
 - **TracingPolicyNamespaced**: policy that applies only to the pods of its namespace
