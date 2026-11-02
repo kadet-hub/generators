@@ -94,6 +94,19 @@ parameters:
         delete: true
 ```
 
+`move` takes documents out of the chart's directory. Here the CRDs go to a sibling directory that its own Argo CD Application syncs before the chart; `to` is relative to the target's compile directory (`compiled/<target>`):
+
+```yaml
+parameters:
+  kube_prometheus_stack:
+    mutations:
+      crds-first:
+        match:
+          kind: CustomResourceDefinition
+        move:
+          to: k8s/kube-prometheus-stack-crds/kube-prometheus-stack-crds.yml
+```
+
 The fixture target [`complete`](tests/fixtures/inventory/targets/complete.yml) uses every action on a vendored podinfo render.
 
 ## Mutation schema
@@ -106,9 +119,10 @@ The fixture target [`complete`](tests/fixtures/inventory/targets/complete.yml) u
 | `json6902` | List of JSON Patch operations `{op, path, value}` or `{op, from, path}` |
 | `delete` | `true` |
 | `images` | Map of image name to `{name, tag, digest}`, at least one of the three |
+| `move` | `{to: <path>}`, a `.yaml` or `.yml` path relative to the target's compile directory |
 | `expects` | `"1+"` (default), `"0+"` or an integer |
 
-A mutation has exactly one of `merge`, `json6902`, `delete` and `images`. Unknown keys fail the compile. `input_params` takes `mutations` only.
+A mutation has exactly one of `merge`, `json6902`, `delete`, `images` and `move`. Unknown keys fail the compile. `input_params` takes `mutations` only.
 
 ## Semantics
 
@@ -123,7 +137,8 @@ A mutation has exactly one of `merge`, `json6902`, `delete` and `images`. Unknow
 | `json6902` | RFC 6902 `add`, `remove`, `replace`, `move`, `copy`, `test`, in order. Paths are RFC 6901 pointers (`~1` for `/`, `~0` for `~`, `-` appends). A failing `test` or a missing path fails. `test` compares as JSON: `1` equals `1.0`, `true` does not equal `1`. |
 | `delete` | Removes the matched documents. A file left without documents becomes `# all objects removed by mutation <ids>`. |
 | `images` | Kustomize `images` semantics on `containers` and `initContainers` of a Pod and of the Pod template of a Deployment, StatefulSet, DaemonSet, Job or CronJob. The key is the image as written without `@digest` and without the `:tag` after the last `/`: `docker.io/redis:8.8.0` has the name `docker.io/redis`, and `redis` does not match it. `name` replaces the name and keeps tag and digest; `tag` sets the tag and drops the digest; `digest` sets the digest and drops the tag; `tag` with `digest` gives `name:tag@digest`. |
-| Output | Only files with a changed or deleted document are written; the others keep the chart's bytes. Written files keep document and key order, use literal blocks for multi-line strings and lose comments such as Helm's `# Source:` lines. |
+| `move` | Removes the matched documents from their files and appends them to `to`, in file and document order; mutations moving to one file append in id order. Later mutations match the moved documents in their new file, and a delete removes them there. A file left without documents becomes the comment line, as after `delete`. `to` must not lie at or below any compile entry's `output_path`, the chart's own included, and must not exist yet, so a move cannot overwrite another entry's output. |
+| Output | Only files with a changed, deleted or moved document are written; the others keep the chart's bytes. Written files keep document and key order, use literal blocks for multi-line strings and lose comments such as Helm's `# Source:` lines. |
 
 ## Failure modes
 
@@ -136,7 +151,9 @@ Every error starts with `mutate: mutation <id>:` and names the file when one doc
 | `images [...] match no container` | The documents matched, but no container image has that name; compare with the image as rendered, registry prefix included. |
 | `json6902 test of '<path>' failed`, `json6902 path '<path>' does not exist` | The rendered document differs from what the patch assumes. |
 | `result lost apiVersion, kind or metadata.name` | A `merge` or `json6902` removed the object's identity. |
-| `needs exactly one of ...`, `unknown keys ...`, `match must be a non-empty map` | The mutation is malformed. |
+| `needs exactly one of ...`, `unknown keys ...`, `match must be a non-empty map`, `move.to must be ...` | The mutation is malformed. |
+| `move.to <path> is below the output_path <dir> of a compile entry` | A compile entry writes to that directory; `mutate` cannot tell which files a later entry writes, so it refuses all of them. Move to a directory no entry has as `output_path`. |
+| `move.to <path> exists, written by an earlier compile entry` | Another entry wrote that file, for example a second `mutate` entry moving to the same path. |
 | `the compile entry for <path> needs output_type: plain` | The kadet entry passing `mutations` has another `output_type`. With the default `yaml` Kapitan would write `deployment.yaml.yaml` next to the unmutated original; with `auto` the comment line of an emptied file would become a quoted string. |
 | `<file>: not YAML` | A `.yaml` or `.yml` file below `output_path` does not parse. |
 
@@ -156,12 +173,13 @@ From kgenlib's `mutations` (kapicorp/generators):
 | lists in a patch are appended (`box_merge_lists="extend"`), so containers get duplicated | lists replace; `merge_lists` merges them by key |
 | `delete` removes objects while iterating and can skip the next one | `delete` removes every match, after all other mutations |
 | a mutation that matches nothing passes | `expects`, `"1+"` by default |
-| `regex_patch`, `bundle`, `prune` | not supported: no text patching, files keep their names |
+| `bundle` | `move`, to one fixed path per mutation |
+| `regex_patch`, `prune` | not supported: no text patching |
 
 ## Not supported
 
-Templating, regular expressions on the rendered text, Python hooks, rendering charts, moving objects between files or renaming files, and strategic merge patch.
+Templating, regular expressions on the rendered text, Python hooks, rendering charts, renaming files, and strategic merge patch.
 
 ## Output
 
-The files of the earlier entry, the changed ones rewritten. The manifest carries the `kubernetes` tag; `schemas/` holds the Kubernetes 1.37.2 schemas of the kinds in the fixture output (Deployment, Service, ConfigMap, Pod, HorizontalPodAutoscaler).
+The files of the earlier entry, the changed ones rewritten, and the files `move` writes. The manifest carries the `kubernetes` tag; `schemas/` holds the Kubernetes 1.37.2 schemas of the kinds in the fixture output (Deployment, Service, ConfigMap, Pod, HorizontalPodAutoscaler).

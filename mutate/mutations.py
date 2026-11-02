@@ -5,7 +5,7 @@ import os
 
 import yaml
 
-ACTIONS = ("merge", "json6902", "delete", "images")
+ACTIONS = ("merge", "json6902", "delete", "images", "move")
 MUTATION_KEYS = {"match", "expects", "merge_lists", *ACTIONS}
 MATCH_KEYS = {"apiVersion", "kind", "name", "namespace", "labels"}
 IMAGE_KEYS = {"name", "tag", "digest"}
@@ -100,6 +100,26 @@ def check_entries(entries):
             )
 
 
+def move_target(mid, to, compile_path, entries, target):
+    """move.to, relative to the target's compile directory, as a path relative to compile_path."""
+    to = os.path.normpath(to)
+    here = os.path.normpath(compile_path)
+    own = None
+    for entry in entries:
+        out = os.path.normpath(entry.get("output_path") or ".")
+        if out == "." or to == out or to.startswith(out + os.sep):
+            fail(mid, f"move.to {to} is below the output_path {out} of a compile entry")
+        # Kapitan compiles target a.b to <compiled>/a/b/<output_path>
+        if "mutations" in (entry.get("input_params") or {}) and here.endswith(os.sep + os.path.join(*target.split("."), out)):
+            own = out
+    if own is None:
+        fail(mid, f"no compile entry passing mutations writes to {compile_path}")
+    rel = os.path.relpath(to, own)
+    if os.path.exists(os.path.normpath(os.path.join(here, rel))):
+        fail(mid, f"move.to {to} exists, written by an earlier compile entry")
+    return rel
+
+
 def fail(mid, message, file=None):
     where = f" {file}:" if file else ""
     raise MutationError(f"mutate: mutation {mid}:{where} {message}")
@@ -160,6 +180,13 @@ def check(mid, m):
                 fail(mid, f"images.{name} takes one or more of name, tag, digest")
             if not all(isinstance(v, str) and v for v in new.values()):
                 fail(mid, f"images.{name}: values must be non-empty strings")
+    if action == "move":
+        move = m["move"]
+        if not isinstance(move, dict) or set(move) != {"to"} or not isinstance(move["to"], str):
+            fail(mid, "move takes exactly to, a path")
+        to = os.path.normpath(move["to"])
+        if os.path.isabs(to) or to.split(os.sep)[0] == ".." or not to.endswith((".yaml", ".yml")):
+            fail(mid, f"move.to must be a .yaml or .yml path inside the target's compile directory, not {move['to']!r}")
 
 
 def matches(match, doc):
@@ -372,8 +399,11 @@ def identity(doc):
     )
 
 
-def apply(files, mutations):
-    """Apply mutations to {path: [documents]}; return {path: text} of every touched file."""
+def apply(files, mutations, place=lambda mid, to: os.path.normpath(to)):
+    """Apply mutations to {path: [documents]}; return {path: text} of every touched file.
+
+    place(mid, to) gives the key of a move's target file.
+    """
     if not isinstance(mutations, dict):
         raise MutationError("mutate: mutations must be a map of id to mutation")
     for mid, m in mutations.items():
@@ -384,17 +414,22 @@ def apply(files, mutations):
     touched, deleted_by = set(), {}
     for mid in order:
         m = mutations[mid]
-        count, used = 0, set()
+        count, used, moved = 0, set(), []
+        dest = place(mid, m["move"]["to"]) if "move" in m else None
         for path in sorted(files):
             docs = files[path]
             for i, doc in list(enumerate(docs)):
                 if not matches(m["match"], doc):
                     continue
                 count += 1
-                if "delete" in m:
+                if path == dest:  # already in the file it moves to
+                    continue
+                if "delete" in m or "move" in m:
                     touched.add(path)
                     docs[i] = None
                     deleted_by.setdefault(path, set()).add(str(mid))
+                    if "move" in m:
+                        moved.append(doc)
                     continue
                 before = copy.deepcopy(doc)
                 if "merge" in m:
@@ -409,6 +444,9 @@ def apply(files, mutations):
                     touched.add(path)
                 docs[i] = doc
             files[path] = [d for d in docs if d is not None]
+        if moved:
+            files.setdefault(dest, []).extend(moved)
+            touched.add(dest)
         expects = m.get("expects", "1+")
         if (expects == "1+" and count < 1) or (type(expects) is int and count != expects):
             fail(mid, f"expects {expects}, matched {count}")
