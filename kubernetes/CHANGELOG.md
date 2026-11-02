@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.1
+
+Built for Gateway API 1.7.0. Its standard channel has the same kinds and storage versions as 1.6.3, so the generator keeps `gateway.networking.k8s.io/v1` for every kind and `v1beta1` for ReferenceGrant. HTTPRoute rules gain `retry`, and HTTPRoute and GRPCRoute reject two rules with the same `name`. The generator sets neither, so rendered output is unchanged.
+
+In the ingress-nginx migration table, session persistence points to the experimental `XBackend`, because 1.7.0 deprecates the rule's `sessionPersistence`. What the README takes from the other Gateway API files holds at v1.7.0, so their links move to that tag, the two `httproute_types.go` anchors to the lines' new position.
+
 ## 1.12.0
 
 - `generators.kubernetes.chainsaw.resources` adds Chainsaw status asserts for custom resources, by `api_version`, `kind`, `name`, `namespace` and the expected `status`, such as a CephCluster with `phase: Ready`. The namespace's Chainsaw Test runs them after the readiness asserts.
