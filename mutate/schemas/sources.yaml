@@ -3,16 +3,16 @@
 # whatever the earlier compile entry rendered; these cover the podinfo fixture.
 core:
   software: Kubernetes
-  version: 1.37.1
-  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  version: 1.37.2
+  source: https://github.com/yannh/kubernetes-json-schema/tree/e0c72a1bc5f409d1685c0e1323460c8a98cd7459/v1.37.2-standalone-strict
   license: Apache-2.0
 apps:
   software: Kubernetes
-  version: 1.37.1
-  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  version: 1.37.2
+  source: https://github.com/yannh/kubernetes-json-schema/tree/e0c72a1bc5f409d1685c0e1323460c8a98cd7459/v1.37.2-standalone-strict
   license: Apache-2.0
 autoscaling:
   software: Kubernetes
-  version: 1.37.1
-  source: https://github.com/yannh/kubernetes-json-schema/tree/817113f21a2643311cbc3e992bb44ffe1c416c54/v1.37.1-standalone-strict
+  version: 1.37.2
+  source: https://github.com/yannh/kubernetes-json-schema/tree/e0c72a1bc5f409d1685c0e1323460c8a98cd7459/v1.37.2-standalone-strict
   license: Apache-2.0
