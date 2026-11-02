@@ -2,7 +2,7 @@
 
 Status: Draft
 Code: `tetragon/`
-Verified against: main @ 1ea7e4e
+Verified against: main @ ecb722d
 
 ## Problem and decision
 
@@ -75,26 +75,43 @@ policy examples could no longer be copied.
 
 - TET-6: The flat keys `kprobes`, `tracepoints`, `uprobes`, `usdts`,
   `lsmhooks`, `fentries`, `enforcers`, `lists`, `options`, `loader`,
-  `pod_selector`, `container_selector`, `host_selector` and
-  `selectors_macros` MUST set the top-level `spec` field of the same name
-  in camelCase, with the value unchanged. A flat key MUST win over the same
-  field in `spec` and log a warning.
+  `pod_selector`, `container_selector`, `host_selector`, `node_selector`,
+  `state` and `selectors_macros` MUST set the top-level `spec` field of the
+  same name in camelCase, with the value unchanged. A flat key MUST win over
+  the same field in `spec` and log a warning.
 
-  - Test: `tetragon/tests/test_tetragon.py::test_spec_and_flat_keys`
-  - Since: #138
+  These are all top-level `spec` fields of both kinds at Tetragon 1.8.0,
+  which added `nodeSelector` and `state`.
+
+  - Test: `tetragon/tests/test_tetragon.py::test_spec_and_flat_keys`,
+    `::test_flat_keys_are_the_spec_fields`
+  - Since: #138, this change
 
 - TET-7: Compiled output MUST validate against the closed JSON schemas of
-  the TracingPolicy and TracingPolicyNamespaced CRDs of Tetragon 1.7.1.
+  the TracingPolicy and TracingPolicyNamespaced CRDs of Tetragon 1.8.0.
 
   - Test: the kadet-hub gate (registry QA-7, QA-11) through `./check
     tetragon`, fixture targets `minimal` and `complete`
-  - Since: #138
+  - Since: #138, this change
+
+- TET-8: A `hostSelector` with `matchLabels` or `matchExpressions`, set
+  through `host_selector` or `spec`, MUST fail the compile, naming the
+  resource and `node_selector`.
+
+  Tetragon supports only null and `{}` in `hostSelector`. `{}` applies a
+  loaded policy to host processes. The agent refuses to load a policy with
+  labels there, and 1.8.0 adds a CRD validation rule, so the API server now
+  rejects it already. Selecting nodes by label is what `nodeSelector`,
+  new in 1.8.0, does: it decides on which nodes the agents load the policy.
+
+  - Test: `tetragon/tests/test_tetragon.py::test_host_selector_with_labels_fails`
+  - Since: this change
 
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
-| Generator | `tetragon/__init__.py` (`main`, `SECTIONS`, `FLAT_KEY_MAP`) |
+| Generator | `tetragon/__init__.py` (`main`, `SECTIONS`, `FLAT_KEY_MAP`, `TetragonPolicy.body` for TET-8) |
 | Unit tests | `tetragon/tests/test_tetragon.py` with `conftest.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider tetragon/tests` |
 | Fixtures | `tetragon/tests/fixtures`, targets `minimal` and `complete` |
-| Schemas | `tetragon/schemas/cilium.io/`, source in `tetragon/schemas/sources.yaml` (Tetragon 1.7.1, `pkg/k8s/apis/cilium.io/client/crds/v1alpha1`) |
+| Schemas | `tetragon/schemas/cilium.io/`, source in `tetragon/schemas/sources.yaml` (Tetragon 1.8.0, `pkg/k8s/apis/cilium.io/client/crds/v1alpha1`) |
