@@ -289,10 +289,14 @@ no Application for that file. Argo CD's `CreateNamespace=true` then
 creates the namespace without its labels and annotations, and Pod
 Security labels never reach the cluster.
 
-- K8S-15: With `generators.kubernetes.namespaces_in_own_directory: true`,
-  every entry of `generators.kubernetes.namespaces` MUST be written to
-  `<name>/namespace`. Without the key, or with a false value, it MUST
-  stay at `<name>-namespace`.
+- K8S-15: An entry of `generators.kubernetes.namespaces` MUST be written
+  to `<name>/namespace` when its `in_own_directory` is true, or when it
+  has no `in_own_directory` and
+  `generators.kubernetes.namespaces_in_own_directory` is true. Otherwise
+  it MUST stay at `<name>-namespace`.
+
+  `in_own_directory: null` counts as unset, so a target can drop a
+  class's value and inherit the default.
 
   The Namespace is then applied by the Application of its directory,
   with the namespace's other resources. Argo CD sync options such as
@@ -302,14 +306,17 @@ Security labels never reach the cluster.
   compile entry's `output_type`, so the file is `namespace.yml` with
   `output_type: yml`.
 
-  - Test: `kubernetes/tests/test_components.py::test_namespaces_in_own_directory`; `manual:` Kapitan 0.36.3 compiles fixture target `complete` with the key to `payments/namespace`, and without it to the same output as 1.12.2
+  - Test: `kubernetes/tests/test_components.py::test_namespaces_in_own_directory`; `manual:` Kapitan 0.36.3 compiles fixture target `complete` with `namespaces_in_own_directory: true` to `payments/namespace`, and without both keys to the same output as 1.12.2
   - Since: #173
 
-DEC-4: The key is one switch for the target, not a key per `namespaces`
-entry. Where the output goes follows from how the project deploys it,
-and a key per entry that one Namespace lacks brings the problem back for
-that namespace without an error. A key per entry would allow a mixed
-layout, which #93 does not ask for.
+DEC-4: `generators.kubernetes.namespaces_in_own_directory` sets the
+layout for the target, and an entry's `in_own_directory` overrides it.
+The target-wide key is the default because where the output goes follows
+from how the project deploys it. A key that existed only per entry would
+bring the problem back without an error for a Namespace that lacks it.
+The entry key covers the exceptions, such as a project that moves its
+Namespaces one Application at a time. It drops the `namespaces_` prefix
+because it already sits below `namespaces`.
 
 ## Implementation inventory
 
