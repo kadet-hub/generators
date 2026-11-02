@@ -67,8 +67,8 @@ storage.k8s.io:
   license: Apache-2.0
 gateway.networking.k8s.io:
   software: Gateway API
-  version: 1.6.3
-  source: https://github.com/kubernetes-sigs/gateway-api/tree/v1.6.3/config/crd/standard
+  version: 1.7.0
+  source: https://github.com/kubernetes-sigs/gateway-api/tree/v1.7.0/config/crd/standard
   license: Apache-2.0
 autoscaling.k8s.io:
   software: Vertical Pod Autoscaler

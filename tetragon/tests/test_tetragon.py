@@ -1,10 +1,14 @@
 """Unit tests of the tetragon generator (docs/specs/tetragon.md); command in the spec's implementation inventory."""
 
+import json
 import logging
+from pathlib import Path
 
 from box import Box
 
-from .. import inv, main
+from .. import FLAT_KEY_MAP, inv, main
+
+SCHEMAS = Path(__file__).parents[1] / "schemas" / "cilium.io"
 
 KPROBE = {"call": "security_file_permission", "syscall": False}
 
@@ -81,3 +85,25 @@ def test_spec_and_flat_keys(caplog):
         "selectorsMacros": {"m": [{"matchBinaries": []}]},
     }
     assert "Flat key 'pod_selector' overrides spec passthrough 'podSelector'" in caplog.text
+
+
+def test_flat_keys_are_the_spec_fields():
+    for kind in ("tracingpolicy", "tracingpolicynamespaced"):
+        schema = json.loads((SCHEMAS / f"{kind}_v1alpha1.json").read_text())
+        assert sorted(FLAT_KEY_MAP.values()) == sorted(schema["properties"]["spec"]["properties"]), kind
+
+
+def test_host_selector_with_labels_fails():
+    for selector in ({"matchLabels": {"node-role.kubernetes.io/worker": ""}}, {"matchExpressions": []}):
+        for entry in ({"host_selector": selector}, {"spec": {"hostSelector": selector}}):
+            try:
+                render(tracing_policies={"p": entry})
+            except ValueError as e:
+                assert str(e) == (
+                    "tetragon: TracingPolicy 'p': hostSelector takes only {} (host processes), "
+                    "not matchLabels or matchExpressions; select nodes with node_selector"
+                )
+            else:
+                raise AssertionError(f"{entry} compiled")
+    out = render(tracing_policies={"p": {"host_selector": {}, "node_selector": {"matchLabels": {"gpu": "true"}}}})
+    assert out["p-tracingpolicy"]["spec"] == {"hostSelector": {}, "nodeSelector": {"matchLabels": {"gpu": "true"}}}
