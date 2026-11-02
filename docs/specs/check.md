@@ -67,8 +67,21 @@ signatures with `freshclam`, or warns and scans with the shipped database.
 - CHK-4: The `check` workflow MUST run `./check` for each generator a pull
   request or a push to `main` changes, and for every generator when `check`
   or `.github/` changes.
-  - Test: manual: the job log names the generators it checks (`generators: ...`)
-  - Since: #28
+
+  What a pull request changes is the diff between the merge commit that
+  `actions/checkout` checks out and its first parent, the `main` commit
+  GitHub merged the pull request into. `pull_request.base.sha` is the
+  `main` commit the pull request was last synchronised with. On a pull
+  request behind `main` it is older, and the diff against it also holds
+  everything `main` changed since, up to every generator when that
+  touches `check` or `.github/` (#142). A push to `main` diffs against
+  `github.event.before`. The tests of `tools/upstream.py` use the same
+  base.
+
+  - Test: manual: the job log names the generators it checks
+    (`generators: ...`); on a pull request behind `main` only those the
+    pull request changes
+  - Since: #28, this change
 
 - CHK-5: The `check` workflow MUST NOT use workflow caches, as the
   registry's GI-10 requires for its own workflows.
