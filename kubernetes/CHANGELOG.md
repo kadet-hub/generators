@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.0
+
+- `generators.kubernetes.namespaces_in_own_directory: true` writes each Namespace of `generators.kubernetes.namespaces` to `<name>/namespace` instead of `<name>-namespace`. An Argo CD Application per namespace directory then applies the Namespace with its labels and annotations.
+
+Output is unchanged without the key.
+
 ## 1.12.2
 
 Built for Kubernetes 1.37.2, a patch release without API changes. kubernetes-json-schema has the same files for 1.37.2 as for 1.37.1, so the shipped schemas and rendered output are unchanged.

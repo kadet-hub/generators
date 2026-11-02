@@ -83,7 +83,7 @@ This renders `shop/web-deploy.yml` (Deployment with the ConfigMap volume, mount 
 | `generators.kubernetes.routes.<name>` | one route attached to Gateways outside the inventory, see below |
 | `generators.kubernetes.configs`, `secrets`, `services`, `service_accounts`, `persistent_volumes`, `persistent_volume_claims` | standalone ConfigMap, Secret, Service (see below), ServiceAccount, PersistentVolume, PersistentVolumeClaim |
 | `generators.kubernetes.storage_classes`, `ingress_classes`, `runtime_classes`, `priority_classes`, `limit_ranges`, `resource_quotas` | the matching kind; flat keys are the snake_case spec fields, `default: true` sets the default-class annotation on StorageClass and IngressClass |
-| `generators.kubernetes.namespaces` | Namespace (`labels`, `annotations`) |
+| `generators.kubernetes.namespaces` | Namespace (`labels`, `annotations`); `generators.kubernetes.namespaces_in_own_directory: true` writes them into their namespace directory, see [Output files](#output-files) |
 | `generators.kubernetes.rbac.<name>` | one role and its bindings, see below |
 | `generators.kubernetes.manifests.<name>` | any kind: `api_version`, `kind`, `name`, `namespace`, `labels`, `annotations` and the remaining fields under `body` |
 | `generators.kubernetes.namespace`, `namespace` | default namespace (Gateway API resources check `generators.kubernetes.namespace` first), else `default` |
@@ -171,11 +171,13 @@ Each resource set goes to `<namespace>/<name>-<suffix>.yml` below the compile `o
 | standalone `persistent_volumes`, PVs from `create_pv` | `<name>-pv`, no namespace directory |
 | `storage_classes`, `ingress_classes`, `runtime_classes`, `priority_classes` | `<name>-sc`, `-ingressclass`, `-runtimeclass`, `-pc` |
 | `limit_ranges`, `resource_quotas` | `limits`, `quota` |
-| `namespaces` | `<name>-namespace`, no namespace directory |
+| `namespaces` | `<name>-namespace`, no namespace directory; `<name>/namespace` with `namespaces_in_own_directory: true` |
 | `rbac` | `<name>-clusterrole`, `<name>-clusterrolebinding` without namespace directory; `role`, `rolebinding` in the namespace |
 | `manifests` | `<kind lowercased>`; no namespace directory without `namespace` |
 | component workload, compile entry with `function: generate_chainsaw_asserts` | `assert`; CronJobs get none |
 | namespace with at least one assert, compile entry with `function: generate_chainsaw_asserts` | `chainsaw-test` in the namespace directory |
+
+`generators.kubernetes.namespaces_in_own_directory: true` is for projects that apply each namespace directory with its own Argo CD Application. That Application then applies the Namespace with its labels and annotations, which `CreateNamespace=true` leaves out. Sync options such as `argocd.argoproj.io/sync-options: Prune=false,Delete=false` go into the entry's `annotations`. If another Application already applies the Namespaces from their old files, add `Prune=false` to their `annotations` and sync before turning the key on. With pruning on, that Application otherwise deletes a Namespace whose file it no longer finds, and everything in it.
 
 ## Chainsaw asserts
 

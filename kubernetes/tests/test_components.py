@@ -4,7 +4,7 @@ from box import Box
 
 from .. import utils
 from ..base import Container, Workload
-from ..generators import _build_service_bundle, generate_chainsaw_asserts, generate_gateway
+from ..generators import _build_service_bundle, generate_chainsaw_asserts, generate_gateway, generate_resource_manifests
 from ..webhooks import APIService, MutatingWebhookConfiguration, ValidatingWebhookConfiguration, _webhooks
 
 # The generator reads the target's inventory; these tests have none. The
@@ -352,3 +352,21 @@ def test_chainsaw_resource_needs_kind_and_status():  # K8S-14
 
 def test_no_chainsaw_keys_render_as_before():  # K8S-14
     assert chainsaw({"web": component()}) == chainsaw({"web": component()}, workloads={}, resources={})
+
+
+def resources(settings):
+    """generate_resource_manifests with generators.kubernetes set to settings, as {output key: manifest}."""
+    previous = utils.inventory
+    utils.inventory = lambda: Box(parameters={"namespace": "shop", "generators": {"kubernetes": settings}})
+    try:
+        return {key: value.root.to_dict() for key, value in generate_resource_manifests({}).root.items()}
+    finally:
+        utils.inventory = previous
+
+
+def test_namespaces_in_own_directory():  # K8S-15
+    namespaces = {"payments": {"labels": {"pod-security.kubernetes.io/enforce": "restricted"}}}
+    moved = resources({"namespaces": namespaces, "namespaces_in_own_directory": True})
+    assert list(moved) == ["payments/namespace"]
+    for settings in ({}, {"namespaces_in_own_directory": False}):
+        assert resources({"namespaces": namespaces, **settings}) == {"payments-namespace": moved["payments/namespace"]}
