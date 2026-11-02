@@ -81,7 +81,7 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   - Test: manual: the job log names the generators it checks
     (`generators: ...`); on a pull request behind `main` only those the
     pull request changes
-  - Since: #28, this change
+  - Since: #28, #159
 
 - CHK-5: The `check` workflow MUST NOT use workflow caches, as the
   registry's GI-10 requires for its own workflows.
