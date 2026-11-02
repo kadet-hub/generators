@@ -83,8 +83,8 @@ def latest(row, repo, ref):
 
 def not_regenerable(row, url):
     """Why a source's schemas cannot be regenerated (UPD-4), None if they can."""
-    if row in ("terraform", "kubernetes"):
-        return {"terraform": "Terraform extract", "kubernetes": "kubernetes-json-schema"}[row]
+    if row == "terraform":
+        return "Terraform extract"
     if url.endswith(".go"):
         return "Go code"
     if re.search(r"/templates(/|$)", url):
@@ -152,6 +152,28 @@ def openapi_schemas(url):
     return schemas
 
 
+def kubernetes_schemas(url, names, group):
+    """{name: file} of the <kind>_<version>.json names whose file the kubernetes-json-schema directory at a source holds, unchanged."""
+    repo, _, ref, path = GITHUB.fullmatch(url).groups()
+    root = {e["path"]: e["sha"] for e in json.loads(get(f"{API}repos/{repo}/git/trees/{ref}"))["tree"]}
+    listed = {e["path"] for e in json.loads(get(f"{API}repos/{repo}/git/trees/{root[path]}"))["tree"]} if path in root else set()
+    infix = "" if group == "core" else "-" + group.split(".")[0]
+    files = {}
+    for n in names:
+        if (m := re.fullmatch(r"([a-z0-9]+)_(v\w+)\.json", n)) and (f := f"{m[1]}{infix}-{m[2]}.json") in listed:
+            files[n] = get(f"https://raw.githubusercontent.com/{repo}/{ref}/{path}/{f}").decode()
+    return files
+
+
+def moved(row, url, ref, tag):
+    """A source URL at a newer release: the tag in place of the ref, for kubernetes-json-schema its newest commit and that release's directory."""
+    if row != "kubernetes":
+        return url.replace(f"/{ref}/", f"/{tag}/", 1)
+    repo, kind, _, path = GITHUB.fullmatch(url).groups()
+    head = json.loads(get(f"{API}repos/{repo}/commits/HEAD"))["sha"]
+    return f"https://github.com/{repo}/{kind}/{head}/{re.sub(r'^v[0-9.]+', tag, path)}"
+
+
 def close(schema):
     """additionalProperties: false on every node with properties, like kubeconform strict mode."""
     if not isinstance(schema, dict):
@@ -193,12 +215,15 @@ def regenerate(urls, committed, group):
 
     A crds/<plural> file whose CRD has the other form (QA-12) at urls maps to None, next to the file in that form.
     """
-    schemas, crds = {}, {}
+    schemas, crds, files = {}, {}, {}
     for url in urls:
+        if classify(url)[0] == "kubernetes":
+            files.update(kubernetes_schemas(url, committed, group))
+            continue
         more, more_crds = (openapi_schemas(url), {}) if url.endswith(".json") else crd_schemas(url)
         schemas.update(more)
         crds.update(more_crds)
-    files = {n: render(schemas[n], text) for n, text in committed.items() if n in schemas}
+    files.update((n, render(schemas[n], text)) for n, text in committed.items() if n in schemas)
     for n in committed:
         if n.startswith("crds/") and (crd := crds.get((group, Path(n).stem))):
             files[n] = None
@@ -213,6 +238,8 @@ def gate(directory, old_urls, new_urls):
         return None, f"no schema files in {directory.name}"
     committed |= {f"crds/{p.name}": p.read_bytes().decode() for p in sorted(directory.glob("crds/*")) if p.is_file()}
     files, missing = regenerate(old_urls, committed, directory.name)
+    if files and classify(old_urls[0])[0] == "kubernetes":
+        committed, missing = {n: committed[n] for n in files}, []  # the rest is another entry's, as the Talos kinds in talos core/
     differ = [f"no CRD for {n}" for n in missing] + [f"{n} differs" for n, text in committed.items() if n in files and files[n] != text]
     if differ:
         return None, "does not reproduce: " + ", ".join(differ)
@@ -240,7 +267,7 @@ def outdated(gen):
             else:
                 print(f"{gen} {group}: current {version}, latest {tag}")
             if tag and ((cur := semver(version)) is None or semver(tag, tag_prefix(c[0], c[2])) > cur):
-                new.append((url.replace(f"/{c[2]}/", f"/{tag}/", 1), tag if version == c[2] else re.fullmatch(r"\D*(.*)", tag)[1]))
+                new.append((moved(c[0], url, c[2], tag), tag if version == c[2] else re.fullmatch(r"\D*(.*)", tag)[1]))
             else:
                 new.append((url, version))
         if new == old:
