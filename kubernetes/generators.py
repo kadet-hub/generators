@@ -199,8 +199,12 @@ def generate_resource_manifests(input_params):
     for section, (_, _, suffix, namespaced, _) in POLICY_SECTIONS.items():
         for name, namespace, config in _iter_section(section):
             key = f"{namespace}/{name}-{suffix}" if namespaced else f"{name}-{suffix}"
-            if section == "namespaces" and _generator_settings().get("namespaces_in_own_directory"):
-                key = f"{name}/namespace"
+            if section == "namespaces":
+                own = config.get("in_own_directory")  # the entry wins; unset or null inherits
+                if own is None:
+                    own = _generator_settings().get("namespaces_in_own_directory")
+                if own:
+                    key = f"{name}/namespace"
             _put(
                 obj,
                 key,

@@ -3,8 +3,9 @@
 ## 1.13.0
 
 - `generators.kubernetes.namespaces_in_own_directory: true` writes each Namespace of `generators.kubernetes.namespaces` to `<name>/namespace` instead of `<name>-namespace`. An Argo CD Application per namespace directory then applies the Namespace with its labels and annotations.
+- An entry's `in_own_directory` overrides that default for its Namespace.
 
-Output is unchanged without the key.
+Output is unchanged without both keys.
 
 ## 1.12.2
 

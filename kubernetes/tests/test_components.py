@@ -365,8 +365,16 @@ def resources(settings):
 
 
 def test_namespaces_in_own_directory():  # K8S-15
-    namespaces = {"payments": {"labels": {"pod-security.kubernetes.io/enforce": "restricted"}}}
-    moved = resources({"namespaces": namespaces, "namespaces_in_own_directory": True})
+    labels = {"labels": {"pod-security.kubernetes.io/enforce": "restricted"}}
+    moved = resources({"namespaces": {"payments": labels}, "namespaces_in_own_directory": True})
     assert list(moved) == ["payments/namespace"]
-    for settings in ({}, {"namespaces_in_own_directory": False}):
-        assert resources({"namespaces": namespaces, **settings}) == {"payments-namespace": moved["payments/namespace"]}
+    top = {"payments-namespace": moved["payments/namespace"]}
+    # (target default, entry keys, output): the entry's in_own_directory wins, null inherits
+    for default, entry, expected in (
+        ({}, {}, top),
+        ({"namespaces_in_own_directory": False}, {}, top),
+        ({"namespaces_in_own_directory": True}, {"in_own_directory": None}, moved),
+        ({"namespaces_in_own_directory": False}, {"in_own_directory": True}, moved),
+        ({"namespaces_in_own_directory": True}, {"in_own_directory": False}, top),
+    ):
+        assert resources({"namespaces": {"payments": {**labels, **entry}}, **default}) == expected, (default, entry)
