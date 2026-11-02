@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for trust-manager 0.26.0. Its Bundle CRD changes only in the `controller-gen.kubebuilder.io/version` annotation, so the shipped schema and rendered output are unchanged. The release removes the compromised eMudhra roots from the default CA package that `useDefaultCAs` selects. That package comes with the trust-manager installation, which the generator does not render.
+
 ## 1.0.3
 
 Built for cert-manager 1.21.3. The Certificate schema and CRD gain `status.acme.ari.certID`, a status field the generator does not set. The Issuer, ClusterIssuer and trust-manager Bundle schemas are unchanged. Rendered output is unchanged.
