@@ -1,4 +1,4 @@
-# Provider schema extract for QA-8: terraform providers schema -json (Terraform 1.16.6)
+# Provider schema extract for QA-8: terraform providers schema -json
 # reduced with kadet-hub/registry sandbox/tf_schema.py extract to the types the fixtures emit.
 terraform/hashicorp/aws:
   software: hashicorp/aws
