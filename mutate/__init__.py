@@ -2,9 +2,9 @@
 
 import json
 
-from kapitan.inputs.kadet import BaseObj, inventory
+from kapitan.inputs.kadet import BaseObj, current_target, inventory
 
-from .mutations import MutationError, apply, check_entries, read_files
+from .mutations import MutationError, apply, check_entries, move_target, read_files
 
 
 def main(input_params):
@@ -14,8 +14,10 @@ def main(input_params):
     mutations = json.loads(json.dumps(params.pop("mutations", None) or {}))
     if params:
         raise MutationError(f"mutate: unknown input_params {sorted(params)}")
-    check_entries(inventory().parameters.kapitan.compile)
+    entries = inventory().parameters.kapitan.compile
+    check_entries(entries)
+    target = current_target.get()
     out = BaseObj()
-    for rel, text in apply(read_files(root), mutations).items():
+    for rel, text in apply(read_files(root), mutations, lambda mid, to: move_target(mid, to, root, entries, target)).items():
         out.root[rel] = text
     return out
