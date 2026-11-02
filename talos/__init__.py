@@ -78,7 +78,7 @@ except ImportError:
     # For testing outside Kapitan context
     inv = None  # type: ignore[assignment]
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __all__ = ["TalosNodeConfig", "generate_talos_config", "main", "inv"]
 
 logger = logging.getLogger(__name__)

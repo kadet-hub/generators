@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+Ships the Kubernetes 1.37.2 Secret schema instead of 1.37.1. kubernetes-json-schema has the same file for both releases, so validation and rendered output are unchanged.
+
 ## 1.3.0
 
 Built for Talos 1.14.5.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12.2
+
+Built for Kubernetes 1.37.2, a patch release without API changes. kubernetes-json-schema has the same files for 1.37.2 as for 1.37.1, so the shipped schemas and rendered output are unchanged.
+
 ## 1.12.1
 
 Built for Gateway API 1.7.0. Its standard channel has the same kinds and storage versions as 1.6.3, so the generator keeps `gateway.networking.k8s.io/v1` for every kind and `v1beta1` for ReferenceGrant. HTTPRoute rules gain `retry`, and HTTPRoute and GRPCRoute reject two rules with the same `name`. The generator sets neither, so rendered output is unchanged.

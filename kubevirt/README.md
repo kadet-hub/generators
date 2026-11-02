@@ -281,4 +281,4 @@ parameters:
 
 ## Schemas
 
-`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the three `snapshot.storage.k8s.io` CRDs of external-snapshotter 8.7.0 with the VolumeSnapshotClass schema, and the Kubernetes 1.37.1 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.
+`schemas/` holds the CRD schemas of KubeVirt 1.9.1 and CDI 1.66.1, the three `snapshot.storage.k8s.io` CRDs of external-snapshotter 8.7.0 with the VolumeSnapshotClass schema, and the Kubernetes 1.37.2 schemas of the built-in kinds the CSI driver uses (all Apache-2.0); `schemas/sources.yaml` lists the pinned sources.

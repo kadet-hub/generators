@@ -217,4 +217,4 @@ Each node file is a multi-document YAML stream: the `v1alpha1` document first, t
 
 ## Schemas
 
-The kadet-hub gate validates every Talos multi-document kind against the schema of Talos 1.14.5 and the userdata Secret against Kubernetes 1.37.1 (QA-7). The Talos schemas under `schemas/core/*_v1alpha1.json` are split per kind from the upstream `config.schema.json`; they are MPL-2.0 (see `schemas/core/NOTICE`), the generator code is Apache-2.0. The `v1alpha1` base document has no `apiVersion`/`kind` and is not schema-checked.
+The kadet-hub gate validates every Talos multi-document kind against the schema of Talos 1.14.5 and the userdata Secret against Kubernetes 1.37.2 (QA-7). The Talos schemas under `schemas/core/*_v1alpha1.json` are split per kind from the upstream `config.schema.json`; they are MPL-2.0 (see `schemas/core/NOTICE`), the generator code is Apache-2.0. The `v1alpha1` base document has no `apiVersion`/`kind` and is not schema-checked.

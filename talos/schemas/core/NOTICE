@@ -10,5 +10,5 @@ MPL-2.0 notice. Modification: the file is split into one schema per
 multi-document kind, each holding a $ref to the kind's definition and the
 $defs it references; definitions are unchanged.
 
-secret_v1.json is not covered by this notice: it is the Kubernetes 1.37.1
+secret_v1.json is not covered by this notice: it is the Kubernetes 1.37.2
 Secret schema from kubernetes-json-schema, Apache-2.0.
