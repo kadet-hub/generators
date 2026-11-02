@@ -114,6 +114,20 @@ and CHANGELOG entry before merging.
   the new tag is an issue. An OpenAPI v3 source has no CRDs, so a CRD file
   in its group does not reproduce.
 
+  A Terraform Registry source has one extract per provider version,
+  `<namespace>_<type>_<version>.json` in `schemas/terraform/`, the
+  directory all providers of a generator share (registry QA-8).
+  Regeneration runs `terraform init` and `terraform providers schema
+  -json` for the provider at the version in the `TERRAFORM_IMAGE` that
+  the registry's `tf-schema-verify` workflow pins on `main`. QA-9
+  recomputes the extract with that image, so both use the same Terraform
+  version. Regeneration keeps the provider configuration and the resource
+  and data source types of the committed extract and writes them as the
+  registry's `sandbox/tf_schema.py extract` does: indent 1, sorted keys,
+  final newline. At a newer version the extract takes that version's file
+  name and replaces the old file. A type missing at the new version is an
+  issue.
+
   The registry gate compares neither JSON Schemas nor CRD files with
   upstream, so the reproduction is what ties a committed CRD file to its
   source before a new release replaces it. CRDs that upstream keeps only
@@ -121,7 +135,7 @@ and CHANGELOG entry before merging.
   to copy; their sources stay not regenerable (UPD-4).
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40, #43, #61
+  - Since: #39, #40, #43, #61, this change
 
 ## Pull requests and issues
 
@@ -137,6 +151,11 @@ and CHANGELOG entry before merging.
   these versions is left alone; a newer release force-pushes the branch,
   replacing commits pushed to it.
 
+  A Terraform generator pins its provider version in its code, which the
+  pull request leaves alone. Until the reviewer moves the pin, `./check`
+  prints `review: ... no schema for <provider> <old version>` and
+  validates nothing against the new extract (QA-8).
+
   - Test: `tools/test_upstream.py`; manual: dispatch the workflow
   - Since: #39, #61
 
@@ -147,13 +166,13 @@ and CHANGELOG entry before merging.
   A generator can have this issue and the pull request of UPD-3 at the same
   time. Several software versions in one title are joined with `, `. The
   causes are: the group does not reproduce (UPD-2), its source is not
-  regenerable (Go code, Helm templates, Terraform extracts,
-  kubernetes-json-schema), a kind, version or CRD is missing at the new
-  tag, or `./check` fails with the regenerated groups. The body names the
+  regenerable (Go code, Helm templates, kubernetes-json-schema), a kind,
+  version, CRD or Terraform type is missing at the new tag, or `./check`
+  fails with the regenerated groups. The body names the
   cause per group and, for a failing check, its tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #61
+  - Since: #39, #61, this change
 
 ## Credentials
 
@@ -199,8 +218,8 @@ and CHANGELOG entry before merging.
     `gh api repos/kadet-hub/generators/actions/secrets` lists neither secret
   - Since: #87
 
-- UPD-8: The workflow MUST run `./check` without `GH_TOKEN` and
-  `GITHUB_TOKEN` in its environment.
+- UPD-8: The workflow MUST run `./check` and the Terraform providers of
+  UPD-2 without `GH_TOKEN` and `GITHUB_TOKEN` in their environment.
 
   `./check` runs the registry's scripts from `REGISTRY_REF`, which is
   `main` and not pinned here (CHK-1), and builds and runs containers. With
@@ -208,8 +227,14 @@ and CHANGELOG entry before merging.
   repository and open pull requests and issues. `./check` needs no token,
   because it clones the public registry anonymously.
 
-  - Test: `tools/test_upstream.py` (`test_check_runs_without_the_token`)
-  - Since: this change
+  A provider is third-party code, which the registry runs only in a job
+  without write permissions (QA-9). Here it runs in the job that holds the
+  App token, so `terraform` and the provider run in a container, which
+  gets none of the job's environment and does not see its processes.
+
+  - Test: `tools/test_upstream.py` (`test_check_runs_without_the_token`,
+    `test_provider_runs_in_a_container_without_the_environment`)
+  - Since: #136, this change
 
 ## Branches and tags
 
@@ -246,6 +271,7 @@ None.
 |---|---|
 | Script | `tools/upstream.py`, tests `tools/test_upstream.py`, run by the `check` workflow when `tools/` or `.github/` changes |
 | Workflow | `.github/workflows/upstream.yml`, cron weekly Monday 03:00 UTC, `workflow_dispatch` |
+| Terraform image | `TERRAFORM_IMAGE` in the registry's `.github/workflows/tf-schema-verify.yml` on `main`, run with docker |
 | Branch | `upstream/<generator>` |
 | Issue title | `[upstream] <generator>: <software> <version>` |
 | Secrets | `APP_CLIENT_ID`, `APP_PRIVATE_KEY` (GitHub App) in the environment `upstream`, deployment branch `main` only |
