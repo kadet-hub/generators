@@ -105,6 +105,15 @@ parameters:
           endpoints:
             - port: http-metrics
               interval: 30s
+    # Move: the chart's test Pods into a sibling directory, beside podinfo/
+    # rather than below it; images and team-label still match them there,
+    # the emptied files in templates/tests/ become comment lines
+    helm-tests:
+      match:
+        kind: Pod
+      expects: 3
+      move:
+        to: podinfo-tests/podinfo-tests.yml
     # Delete: hpa.yaml becomes a comment line
     no-hpa:
       match:

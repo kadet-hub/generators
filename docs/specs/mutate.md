@@ -43,10 +43,9 @@ short-circuits the other conditions, lists are appended, deleting while
 iterating skips objects, and zero matches pass.
 
 Not in scope: templating, regular expressions on text, Python hooks,
-rendering charts, moving objects between files or renaming files, and
-strategic merge patch. A Kustomize post-render stage was considered; the
-sandbox image carries no `kustomize` binary, and a binary would need
-`binaries` in the manifest.
+rendering charts, renaming files, and strategic merge patch. A Kustomize
+post-render stage was considered; the sandbox image carries no
+`kustomize` binary, and a binary would need `binaries` in the manifest.
 
 ## Files
 
@@ -63,8 +62,9 @@ sandbox image carries no `kustomize` binary, and a binary would need
   - Since: #91
 
 - MUT-2: `mutate` MUST return a file under its relative path, and only when
-  a mutation changed or deleted a document in it; the documents keep their
-  order and are written with `---` between them.
+  a mutation changed, deleted or moved a document in it or moved one into
+  it; the documents keep their order and are written with `---` between
+  them.
 
   Other files are not returned, so Kapitan leaves the earlier entry's bytes
   in place, also for documents a mutation matched without changing them,
@@ -73,19 +73,20 @@ sandbox image carries no `kustomize` binary, and a binary would need
   as literal blocks, so a returned file changes its formatting, not its
   content, and loses the comments Helm writes (`# Source: ...`).
 
-  - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`, `::test_matched_but_unchanged_files_are_not_returned`; fixture targets `minimal`, `complete`
-  - Since: #91
+  - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`, `::test_matched_but_unchanged_files_are_not_returned`, `::test_move`; fixture targets `minimal`, `complete`
+  - Since: #91, #174
 
-- MUT-3: A file whose documents are all deleted MUST be returned as the
-  single line `# all objects removed by mutation <ids>`, with the ids of the
-  delete mutations that removed them, sorted and separated by `, `.
+- MUT-3: A file whose documents are all deleted or moved away MUST be
+  returned as the single line `# all objects removed by mutation <ids>`,
+  with the ids of the delete and move mutations that removed them, sorted
+  and separated by `, `.
 
   An empty file would not do: Kapitan's YAML writer skips empty output, so
   the earlier entry's file would stay. `kubectl apply -f <dir>` accepts a
   file that holds only a comment.
 
-  - Test: `mutate/tests/test_mutations.py::test_file_emptied_by_delete_is_a_comment`; fixture target `complete` (`podinfo/templates/hpa.yaml`)
-  - Since: #91
+  - Test: `mutate/tests/test_mutations.py::test_file_emptied_by_delete_is_a_comment`, `::test_move`; fixture target `complete` (`podinfo/templates/hpa.yaml`, `podinfo/templates/tests/`)
+  - Since: #91, #174
 
 - MUT-4: The compile entry that runs `mutate` MUST have
   `output_type: plain`; `mutate` MUST fail the compile when an entry of the
@@ -118,12 +119,12 @@ lists. `input_params` takes no other key besides Kapitan's `compile_path`.
   - Since: #91
 
 - MUT-6: A mutation MUST have a non-empty `match` and exactly one action
-  of `merge`, `json6902`, `delete` and `images`, and MAY have `expects`
-  and, with `merge` only, `merge_lists`. Any other key, here or inside
-  `match`, `images` entries and `json6902` operations, MUST fail the
-  compile, naming the mutation id.
+  of `merge`, `json6902`, `delete`, `images` and `move`, and MAY have
+  `expects` and, with `merge` only, `merge_lists`. Any other key, here or
+  inside `match`, `images` entries, `json6902` operations and `move`, MUST
+  fail the compile, naming the mutation id.
   - Test: `mutate/tests/test_mutations.py::test_invalid_mutations_fail`
-  - Since: #91
+  - Since: #91, #174
 
 - MUT-7: Every document a mutation changed MUST still have string
   `apiVersion`, `kind` and `metadata.name`; otherwise the compile fails,
@@ -217,6 +218,47 @@ not load Kadet module: mutate`.
 
   - Test: `mutate/tests/test_mutations.py::test_images`
   - Since: #91
+
+## Moving documents
+
+A chart rendered with the `helm` input writes its CustomResourceDefinitions
+into the same directory as the objects that use them. With one Argo CD
+Application per output directory, the CRDs sync together with the chart,
+and Applications that sync earlier but already use those kinds fail their
+dry run until the CRDs exist. `move` puts the matched documents into a file
+of another directory, which gets its own Application.
+
+- MUT-16: `move: {to: <path>}` MUST remove every matched document from its
+  file and append it to the file `to`, in file and document order;
+  mutations that move to the same file append in sorted id order.
+
+  `to` is relative to the target's compile directory
+  (`compiled/<target>`), not to the entry's `output_path`, so it can name
+  a sibling directory. It ends in `.yaml` or `.yml` and stays inside that
+  directory; an absolute path or one that leaves it fails as malformed.
+  `mutate` returns the file under its path relative to `compile_path`,
+  such as `../podinfo-crds/crds.yml`, and Kapitan creates it there. The
+  documents keep their content and are written as in MUT-2.
+
+  A move counts as a non-delete mutation for MUT-5: later mutations match
+  the moved documents in their new file, and a delete removes them there.
+  A document already in the file `to` stays where it is.
+
+  - Test: `mutate/tests/test_mutations.py::test_move`; fixture target `complete` (`podinfo-tests/podinfo-tests.yml`)
+  - Since: #174
+
+- MUT-17: `move` MUST fail the compile when `to` lies at or below the
+  `output_path` of any compile entry of the target, or names a file that
+  exists when `mutate` runs.
+
+  `mutate` cannot see which files a later entry will write, only its
+  `output_path`, so every directory a compile entry writes to is closed
+  to `move`, the one of the chart `mutate` patches included. A file that
+  exists already was written by an earlier entry outside its
+  `output_path`, such as a second `mutate` entry moving to the same path.
+
+  - Test: `mutate/tests/test_mutations.py::test_move_target`
+  - Since: #174
 
 ## Manifest and gate
 

@@ -3,7 +3,7 @@
 import os
 import tempfile
 
-from mutations import MutationError, apply, check_entries, load, read_files
+from mutations import MutationError, apply, check_entries, load, move_target, read_files
 
 DEPLOYMENT = {
     "apiVersion": "apps/v1",
@@ -132,6 +132,11 @@ def test_invalid_mutations_fail():
         ({"match": {"kind": "Service"}, "json6902": [{"op": "drop", "path": "/a"}]}, "needs op"),
         ({"match": {"kind": "Deployment"}, "images": {"busybox": {"version": "1"}}}, "takes one or more"),
         ({"match": {"labels": {"app": 1}}, "delete": True}, "match.labels"),
+        ({"match": {"kind": "Service"}, "move": "x.yml"}, "move takes exactly to"),
+        ({"match": {"kind": "Service"}, "move": {"to": "x.yml", "mode": "append"}}, "move takes exactly to"),
+        ({"match": {"kind": "Service"}, "move": {"to": "a/../../x.yml"}}, "move.to must be"),
+        ({"match": {"kind": "Service"}, "move": {"to": "/x.yml"}}, "move.to must be"),
+        ({"match": {"kind": "Service"}, "move": {"to": "x.json"}}, "move.to must be"),
     ]
     for mutation, fragment in cases:
         raises(lambda: run({"m1": mutation}), "mutation m1:", fragment)
@@ -299,3 +304,50 @@ def test_matched_but_unchanged_files_are_not_returned():
     assert out == {}
     _, out = run({"i": {"match": {"kind": "*"}, "images": {"busybox": {"tag": "1"}}}})
     assert list(out) == ["web/deployment.yaml"]
+
+
+def test_move():
+    # one mutation moves in file and document order, the emptied file becomes a comment
+    docs, out = run({"m": {"match": {"labels": {"app": "web"}}, "move": {"to": "out/./web.yml"}}})
+    assert docs["out/web.yml"] == [DEPLOYMENT, SERVICE]
+    assert docs["web/service.yaml"] == [CONFIGMAP]
+    assert out["web/deployment.yaml"] == "# all objects removed by mutation m\n"
+    # moves to one file append in id order; later mutations see the moved
+    # documents there, a document already in the file stays in place
+    docs, out = run(
+        {
+            "a-svc": {"match": {"kind": "Service"}, "move": {"to": "out/web.yml"}},
+            "b-web": {"match": {"name": "web"}, "move": {"to": "out/web.yml"}, "expects": 2},
+            "c-label": {"match": {"kind": "Service"}, "merge": {"metadata": {"labels": {"moved": "yes"}}}},
+        }
+    )
+    svc = {**SERVICE, "metadata": {**SERVICE["metadata"], "labels": {"app": "web", "moved": "yes"}}}
+    assert docs["out/web.yml"] == [svc, DEPLOYMENT]
+    assert out["web/deployment.yaml"] == "# all objects removed by mutation b-web\n"
+    # a delete removes moved documents from the new file
+    _, out = run({"m": {"match": {"kind": "Service"}, "move": {"to": "out/web.yml"}}, "d": {"match": {"kind": "Service"}, "delete": True}})
+    assert out["out/web.yml"] == "# all objects removed by mutation d\n"
+    # expects as for every action; nothing moved, nothing written
+    raises(lambda: run({"m": {"match": {"kind": "Secret"}, "move": {"to": "out/web.yml"}}}), "mutation m:", "expects 1+, matched 0")
+    assert run({"m": {"match": {"kind": "Secret"}, "move": {"to": "out/web.yml"}, "expects": "0+"}})[1] == {}
+
+
+def test_move_target():
+    mutate = {"input_type": "kadet", "output_type": "plain", "input_params": {"mutations": {}}}
+    entries = [
+        {"input_type": "helm", "output_path": "k8s/podinfo"},
+        {**mutate, "output_path": "podinfo"},
+        {**mutate, "output_path": "k8s/podinfo"},
+        {"input_type": "jsonnet", "output_path": "k8s/later"},
+    ]
+    with tempfile.TemporaryDirectory() as base:
+        # Kapitan compiles target env.prod to compiled/env/prod; the entry is found by that suffix
+        here = os.path.join(base, "compiled", "env", "prod", "k8s", "podinfo")
+        assert move_target("m", "k8s/podinfo-crds/crds.yml", here, entries, "env.prod") == "../podinfo-crds/crds.yml"
+        assert move_target("m", "crds.yml", here, entries, "env.prod") == "../../crds.yml"
+        for to in ("k8s/podinfo/crds.yml", "k8s/later/crds.yml", "podinfo/x/crds.yml"):
+            raises(lambda: move_target("m", to, here, entries, "env.prod"), "mutation m:", f"move.to {to} is below the output_path")
+        raises(lambda: move_target("m", "crds.yml", here, [*entries, {"input_type": "copy", "output_path": "."}], "env.prod"), "below the output_path .")
+        os.makedirs(os.path.join(base, "compiled", "env", "prod", "k8s", "crds"))
+        open(os.path.join(base, "compiled", "env", "prod", "k8s", "crds", "crds.yml"), "w").close()
+        raises(lambda: move_target("m", "k8s/crds/crds.yml", here, entries, "env.prod"), "move.to k8s/crds/crds.yml exists")
