@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6
+
+Ships the Kubernetes 1.37.2 ServiceAccount, ClusterRole and ClusterRoleBinding schemas instead of 1.37.1. kubernetes-json-schema has the same files for both releases. The three files no longer end in a newline, so they match upstream byte for byte. Rendered output is unchanged.
+
 ## 1.1.5
 
 Built for Prometheus Operator 0.94.2. Its CRDs change only in the `operator.prometheus.io/version` annotation, so the shipped schemas and rendered output are unchanged. The upstream files the README cites are unchanged at v0.94.2 apart from version labels in the RBAC guide, and their links move to that tag.
