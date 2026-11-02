@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+`move` now resolves symbolic links before it checks `to`. A `to` that reaches a compile entry's `output_path` or leaves the target's compile directory through a link fails the compile, as the same path written without the link already did.
+
 ## 0.2.0
 
 Adds the `move` action: `move: {to: <path>}` takes the matched documents out of their files and appends them to a file relative to the target's compile directory, such as a sibling directory for a chart's CRDs. Mutations moving to one file append in id order, and a file left without documents becomes the comment line, as after `delete`. A `to` at or below any compile entry's `output_path`, or naming a file that exists, fails the compile. Output of inventories without `move` is unchanged.
