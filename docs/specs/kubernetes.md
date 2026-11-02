@@ -280,6 +280,37 @@ out of step whenever a component was added or removed.
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_resource_status_assert`, `::test_chainsaw_resource_needs_kind_and_status`, `::test_no_chainsaw_keys_render_as_before`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind against a custom resource: fails without status and with a wrong nested field, passes once the status matches
   - Since: this change
 
+## Namespaces in their namespace directory
+
+A Namespace of `generators.kubernetes.namespaces` is cluster-scoped, so it
+goes to `<name>-namespace` at the top of the compile `output_path`. A
+project that deploys one Argo CD Application per namespace directory has
+no Application for that file. Argo CD's `CreateNamespace=true` then
+creates the namespace without its labels and annotations, and Pod
+Security labels never reach the cluster.
+
+- K8S-15: With `generators.kubernetes.namespaces_in_own_directory: true`,
+  every entry of `generators.kubernetes.namespaces` MUST be written to
+  `<name>/namespace`. Without the key, or with a false value, it MUST
+  stay at `<name>-namespace`.
+
+  The Namespace is then applied by the Application of its directory,
+  with the namespace's other resources. Argo CD sync options such as
+  `Prune=false,Delete=false` go into the entry's `annotations`. Only this
+  section moves: a Namespace from `manifests` and the cluster-scoped
+  kinds of `rbac` keep their paths. Kapitan adds the extension of the
+  compile entry's `output_type`, so the file is `namespace.yml` with
+  `output_type: yml`.
+
+  - Test: `kubernetes/tests/test_components.py::test_namespaces_in_own_directory`; `manual:` Kapitan 0.36.3 compiles fixture target `complete` with the key to `payments/namespace`, and without it to the same output as 1.12.2
+  - Since: #173
+
+DEC-4: The key is one switch for the target, not a key per `namespaces`
+entry. Where the output goes follows from how the project deploys it,
+and a key per entry that one Namespace lacks brings the problem back for
+that namespace without an error. A key per entry would allow a mixed
+layout, which #93 does not ask for.
+
 ## Implementation inventory
 
 | Item | Value |
@@ -291,5 +322,6 @@ out of step whenever a component was added or removed.
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
 | Chainsaw Test, external workloads | `kubernetes/generators.py` (`generate_chainsaw_asserts`, `_EXTERNAL_WORKLOADS`, `_resource_asserts`) |
 | Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
+| Namespace output path | `kubernetes/generators.py` (`generate_resource_manifests`) |
 | Unit tests | `kubernetes/tests/test_components.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider kubernetes/tests` (bytecode in the tree fails SEC-5) |
 | Fixture | `kubernetes/tests/fixtures`, targets `minimal` and `complete` |
