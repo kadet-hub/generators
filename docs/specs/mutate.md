@@ -74,7 +74,7 @@ post-render stage was considered; the sandbox image carries no
   content, and loses the comments Helm writes (`# Source: ...`).
 
   - Test: `mutate/tests/test_mutations.py::test_untouched_files_are_not_returned`, `::test_matched_but_unchanged_files_are_not_returned`, `::test_move`; fixture targets `minimal`, `complete`
-  - Since: #91, this change
+  - Since: #91, #174
 
 - MUT-3: A file whose documents are all deleted or moved away MUST be
   returned as the single line `# all objects removed by mutation <ids>`,
@@ -86,7 +86,7 @@ post-render stage was considered; the sandbox image carries no
   file that holds only a comment.
 
   - Test: `mutate/tests/test_mutations.py::test_file_emptied_by_delete_is_a_comment`, `::test_move`; fixture target `complete` (`podinfo/templates/hpa.yaml`, `podinfo/templates/tests/`)
-  - Since: #91, this change
+  - Since: #91, #174
 
 - MUT-4: The compile entry that runs `mutate` MUST have
   `output_type: plain`; `mutate` MUST fail the compile when an entry of the
@@ -124,7 +124,7 @@ lists. `input_params` takes no other key besides Kapitan's `compile_path`.
   inside `match`, `images` entries, `json6902` operations and `move`, MUST
   fail the compile, naming the mutation id.
   - Test: `mutate/tests/test_mutations.py::test_invalid_mutations_fail`
-  - Since: #91, this change
+  - Since: #91, #174
 
 - MUT-7: Every document a mutation changed MUST still have string
   `apiVersion`, `kind` and `metadata.name`; otherwise the compile fails,
@@ -245,7 +245,7 @@ of another directory, which gets its own Application.
   A document already in the file `to` stays where it is.
 
   - Test: `mutate/tests/test_mutations.py::test_move`; fixture target `complete` (`podinfo-tests/podinfo-tests.yml`)
-  - Since: this change
+  - Since: #174
 
 - MUT-17: `move` MUST fail the compile when `to` lies at or below the
   `output_path` of any compile entry of the target, or names a file that
@@ -258,7 +258,7 @@ of another directory, which gets its own Application.
   `output_path`, such as a second `mutate` entry moving to the same path.
 
   - Test: `mutate/tests/test_mutations.py::test_move_target`
-  - Since: this change
+  - Since: #174
 
 ## Manifest and gate
 
