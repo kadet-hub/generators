@@ -135,7 +135,7 @@ and CHANGELOG entry before merging.
   to copy; their sources stay not regenerable (UPD-4).
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #40, #43, #61, this change
+  - Since: #39, #40, #43, #61, #160
 
 ## Pull requests and issues
 
@@ -172,7 +172,7 @@ and CHANGELOG entry before merging.
   cause per group and, for a failing check, its tail.
 
   - Test: `tools/test_upstream.py`
-  - Since: #39, #61, this change
+  - Since: #39, #61, #160
 
 ## Credentials
 
@@ -234,7 +234,7 @@ and CHANGELOG entry before merging.
 
   - Test: `tools/test_upstream.py` (`test_check_runs_without_the_token`,
     `test_provider_runs_in_a_container_without_the_environment`)
-  - Since: #136, this change
+  - Since: #136, #160
 
 ## Branches and tags
 
