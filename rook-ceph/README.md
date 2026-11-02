@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/rook-ceph/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/rook-ceph/) page.
 
-Kapitan kadet generator for [Rook](https://rook.io/) Ceph resources (`ceph.rook.io/v1`). Built for Rook 1.21.0. It renders the custom resources the Rook operator reconciles into a Ceph cluster and its storage: CephCluster, CephBlockPool, CephFilesystem, CephObjectStore, CephObjectStoreUser, CephNFS, CephRBDMirror and CephClient. The operator itself, its CRDs and the CSI drivers come from Rook's Helm chart or `deploy/examples`; StorageClasses and ObjectBucketClaims belong in the `kubernetes` generator.
+Kapitan kadet generator for [Rook](https://rook.io/) Ceph resources (`ceph.rook.io/v1`). Built for Rook 1.21.1. It renders the custom resources the Rook operator reconciles into a Ceph cluster and its storage: CephCluster, CephBlockPool, CephFilesystem, CephObjectStore, CephObjectStoreUser, CephNFS, CephRBDMirror and CephClient. The operator itself, its CRDs and the CSI drivers come from Rook's Helm chart or `deploy/examples`; StorageClasses and ObjectBucketClaims belong in the `kubernetes` generator.
 
 ## Usage
 
