@@ -166,13 +166,20 @@ and CHANGELOG entry before merging.
   these versions is left alone; a newer release force-pushes the branch,
   replacing commits pushed to it.
 
-  A Terraform generator pins its provider version in its code, which the
-  pull request leaves alone. Until the reviewer moves the pin, `./check`
-  prints `review: ... no schema for <provider> <old version>` and
-  validates nothing against the new extract (QA-8).
+  For a Terraform provider the pull request MUST also move the provider
+  pin in the generator's code, so that `./check` validates the fixtures
+  against the new extract (QA-8). With the old pin `./check` prints
+  `review: ... no schema for <provider> <old version>` and validates
+  nothing against it. The pull request replaces the old provider version
+  everywhere in the generator's `__init__.py`, which holds the pin, and
+  its `README.md`, and in the generator's row of the repository README.
+  The replacement goes by the version string, so another version in these
+  files that equals it moves too.
 
-  - Test: `tools/test_upstream.py`; manual: dispatch the workflow
-  - Since: #39, #61
+  - Test: `tools/test_upstream.py`
+    (`test_pull_request_moves_the_provider_pin`); manual: dispatch the
+    workflow
+  - Since: #39, #61, #160
 
 - UPD-4: For the groups of a generator whose newer release cannot be
   proposed in a pull request, the workflow MUST open one issue, or update
