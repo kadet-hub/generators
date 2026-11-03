@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.0
+
+- `tty` and `stdin` on a component, and on its `additional_containers` and `init_containers`, render as the container fields of the same name. A recipe can then render what a chart sets there, such as `tty: true` on the main container of the Open WebUI chart 17.5.0. `null` renders neither, so a target can drop a class's value.
+
+Output is unchanged for inventories without `tty` and `stdin`.
+
 ## 1.13.0
 
 - `generators.kubernetes.namespaces_in_own_directory: true` writes each Namespace of `generators.kubernetes.namespaces` to `<name>/namespace` instead of `<name>-namespace`. An Argo CD Application per namespace directory then applies the Namespace with its labels and annotations.
