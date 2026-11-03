@@ -723,6 +723,10 @@ class Container(BaseObj):
             self.root.args = args
         if container.get("command"):
             self.root.command = container.get("command")
+        # Only when set, so inventories without them render as before (K8S-16).
+        for field in ("stdin", "tty"):
+            if container.get(field) is not None:
+                self.root[field] = container.get(field)
         self.root.securityContext = container.get("security_context", {})
         self.add_volume_mounts_from_configs()
         self.add_volume_mounts(container.get("volume_mounts", {}))

@@ -93,7 +93,7 @@ Component keys, by what they produce:
 | Area | Keys |
 |---|---|
 | workload | `type` (`deployment` default, `statefulset`, `daemonset`, `job`), `schedule` (makes a Job a CronJob), `replicas`, `update_strategy`, `revision_history_limit`, `min_ready_seconds`, `deployment_progress_deadline_seconds`, `backoff_limit`, `completions`, `parallelism`, `active_deadline_seconds`, `ttl_seconds_after_finished`, `concurrency_policy`, `suspend`, `starting_deadline_seconds`, `labels`, `annotations`, `pod_labels`, `pod_annotations`, `recommended_labels` |
-| containers | `image`, `pull_policy`, `command`, `args`, `env`, `env_from`, `ports`, `healthcheck` (`startup`, `liveness`, `readiness`; type `http`, `tcp`, `command`, `grpc`), `resources`, `lifecycle`, `security_context`, `volume_mounts`, `additional_containers`, `init_containers` |
+| containers | `image`, `pull_policy`, `command`, `args`, `env`, `env_from`, `ports`, `healthcheck` (`startup`, `liveness`, `readiness`; type `http`, `tcp`, `command`, `grpc`), `resources`, `lifecycle`, `security_context`, `volume_mounts`, `tty`, `stdin`, `additional_containers`, `init_containers` |
 | pod | `volumes`, `volume_claims` (StatefulSet templates), `service_account`, `automount_service_account_token`, `enable_service_links`, `image_pull_secrets`, `dns_policy`, `grace_period`, `restart_policy`, `node_selector`, `tolerations`, `affinity`, `prefer_pods_in_different_nodes`, `prefer_pods_in_different_zones`, `prefer_pods_in_node_with_expression`, `priority_class_name`, `resource_claims`, `host_network`, `host_pid`, `host_ipc` |
 | security | `security_profile` (`baseline`, `restricted`), `read_only_root_filesystem`, `workload_security_context`, `network_policies` |
 | config | `config_maps`, `secrets` (`data`, `string_data` from `value`, `template` or `file`; `items`, `mount`, `versioned`) |
@@ -105,6 +105,8 @@ Component keys, by what they produce:
 `labels` go on the workload, its Services, HPA and VPA. The pod template carries the `name` label, the recommended labels and `pod_labels`. The workload's `matchLabels` use the `name` label only; Service, PodDisruptionBudget and NetworkPolicy selectors take all pod template labels, `pod_labels` included. Every object has a `name` label with its own name, so a name must be a valid label value: at most 63 characters of letters, digits, `-`, `_` and `.`, without `:`. ConfigMaps, Secrets, the PodDisruptionBudget, NetworkPolicies, the ServiceAccount, Roles, ClusterRoles, their bindings, webhook configurations and the APIService carry only that label. `service_account.create` renders a ServiceAccount, `service_account.enabled` only sets `serviceAccountName`; either sets it, to `service_account.name` or the component name, and Role and ClusterRole bindings bind that name.
 
 A `volume_mounts` key names the volume it mounts. With `volume` set, the key names only the mount, so one volume can be mounted at several paths, each with its own `sub_path`.
+
+`tty` and `stdin` render as the container fields of the same name, on the main container and on `additional_containers` and `init_containers`. A container without them, or with `null`, renders neither.
 
 `args` is a list, or a mapping whose values render in the mapping's order: a string as one argument, a list as several, `null` as none. The keys only name the arguments, so a target can override or drop one that a class sets; a mapping value fails the compile. Container ports render sorted by name.
 

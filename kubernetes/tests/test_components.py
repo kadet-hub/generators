@@ -62,6 +62,29 @@ def test_args_mapping_value_mapping_fails():
         raise AssertionError("no ValueError")
 
 
+def pod_containers(**keys):
+    """The main, additional and init container of one workload, each with keys."""
+    comp = component(additional_containers={"sidecar": {"image": "x/side:1.0", **keys}},
+                     init_containers={"setup": {"image": "x/setup:1.0", **keys}}, **keys)
+    spec = Workload(name="web", component=comp).root.spec.template.spec.to_dict()
+    containers = spec["containers"] + spec["initContainers"]
+    assert [c["name"] for c in containers] == ["web", "sidecar", "setup"], containers
+    return containers
+
+
+def test_tty_and_stdin():  # K8S-16
+    for container in pod_containers(tty=True, stdin=True):
+        assert container["tty"] is True and container["stdin"] is True, container
+    for container in pod_containers(tty=False):
+        assert container["tty"] is False and "stdin" not in container, container
+
+
+def test_no_tty_or_stdin_renders_as_before():  # K8S-16
+    for keys in ({}, {"tty": None, "stdin": None}):
+        for container in pod_containers(**keys):
+            assert "tty" not in container and "stdin" not in container, container
+
+
 def test_null_service_on_statefulset():
     workload = Workload(name="web", component=component(type="statefulset", service=None)).root
     assert workload.spec.serviceName == "web"

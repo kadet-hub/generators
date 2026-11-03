@@ -568,6 +568,9 @@ parameters:
       type: job
       image: registry.example.com/shop/web:1.4.2
       command: [/app/migrate]
+      # Rendered only where set: the other containers have neither field
+      tty: true
+      stdin: true
       ttl_seconds_after_finished: 3600
       resources:
         requests:
@@ -583,6 +586,7 @@ parameters:
         pull-web:
           image: registry.example.com/shop/web:1.4.2
           command: [/bin/true]
+          tty: true
           resources:
             requests:
               cpu: 1m
