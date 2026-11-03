@@ -212,7 +212,7 @@ same container code.
   `false` and a missing key give the same object.
 
   - Test: `kubernetes/tests/test_components.py::test_tty_and_stdin`, `::test_no_tty_or_stdin_renders_as_before`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys to the same output as 1.13.0, with both inventory backends
-  - Since: this change
+  - Since: #177
 
 ## RBAC for one workload
 
