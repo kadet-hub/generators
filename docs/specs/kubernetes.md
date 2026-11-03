@@ -192,6 +192,28 @@ claim `nextcloud-main` at six paths, each with its own `subPath`.
   - Test: `kubernetes/tests/test_components.py::test_volume_mounts_of_one_volume`, `::test_volume_mount_named_by_key`
   - Since: #109
 
+## Container tty and stdin
+
+The Open WebUI chart 17.5.0 sets `tty: true` on its main container, with
+no value that turns it off. The generator had no key for the field, so a
+recipe could not render it, and `check` of kadet-hub/recipes reported it
+as a difference it does not accept. `stdin` is the field the API reference
+pairs with `tty`. Both keys apply to the main container,
+`additional_containers` and `init_containers`, which render through the
+same container code.
+
+- K8S-16: A container's `tty` and `stdin` MUST render as the container
+  fields of the same name with the value the inventory sets. A container
+  without them, or with `null`, MUST render neither.
+
+  `null` lets a target drop a class's value. Output of an inventory
+  without the keys stays byte-identical. The API server stores `false` as
+  unset (`omitempty` on both fields in `k8s.io/api` `core/v1`), so
+  `false` and a missing key give the same object.
+
+  - Test: `kubernetes/tests/test_components.py::test_tty_and_stdin`, `::test_no_tty_or_stdin_renders_as_before`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys to the same output as 1.13.0, with both inventory backends
+  - Since: this change
+
 ## RBAC for one workload
 
 DEC-2: There is no generator mechanism for several roles per set of
@@ -323,7 +345,7 @@ because it already sits below `namespaces`.
 | Item | Value |
 |---|---|
 | Component Service | `kubernetes/generators.py` (`_build_service_bundle`) |
-| Container args | `kubernetes/base.py` (`Container.body`) |
+| Container args, tty and stdin | `kubernetes/base.py` (`Container.body`) |
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
