@@ -26,9 +26,9 @@ that way, and could not do the same for its Certificate.
   The generator's `name` label stays. A `name` key in `labels` replaces
   it, as in external-secrets and velero.
 
-  - Test: `certmanager/tests/test_metadata.py::test_entry_metadata`;
-    fixture target `complete`
-  - Since: this change
+  - Test: `certmanager/tests/test_metadata.py::test_entry_metadata`,
+    `::test_no_metadata_keys`; fixture target `complete`
+  - Since: #178
 
 - CM-2: A `ca_issuers` entry MUST add its `labels` and `annotations` to
   each of the three resources it renders.
@@ -38,8 +38,9 @@ that way, and could not do the same for its Certificate.
   belongs on all three. Different metadata per resource needs the three
   written as `clusterissuers` and `certs` entries.
 
-  - Test: `certmanager/tests/test_metadata.py::test_ca_issuer_metadata`
-  - Since: this change
+  - Test: `certmanager/tests/test_metadata.py::test_ca_issuer_metadata`;
+    fixture target `complete`
+  - Since: #178
 
 The unit tests need a target before the package loads, which `conftest.py`
 at the repository root registers (rabbitmq spec, DEC-1).
