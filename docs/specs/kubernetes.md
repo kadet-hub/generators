@@ -243,7 +243,7 @@ component name.
   Related: K8S-2
 
   - Test: `kubernetes/tests/test_components.py::test_statefulset_service_name`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys of K8S-17 to K8S-22 to the same output as 1.14.0, with both inventory backends
-  - Since: this change
+  - Since: #181
 
 The generator adds the label `name: <claim>` to every claim template. It
 came with the migration from kapicorp/generators (bb1b5c1), which has had
@@ -260,7 +260,7 @@ claim template without that label could not be reproduced.
   them.
 
   - Test: `kubernetes/tests/test_components.py::test_volume_claim_name_label`; fixture target `complete`; `manual:` as K8S-17
-  - Since: this change
+  - Since: #181
 
 DEC-5: The claim template label stays by default, and
 `volume_claim_name_label: false` turns it off. Dropping it would change
@@ -287,7 +287,7 @@ through the same container code.
   container without it, or with `null`, MUST render none.
 
   - Test: `kubernetes/tests/test_components.py::test_working_dir`; fixture target `complete`; `manual:` as K8S-17
-  - Since: this change
+  - Since: #181
 
 The umami recipe of kadet-hub/recipes considered `shareProcessNamespace`,
 which makes the pod's pause process PID 1, and had no key for it (DEC-120
@@ -302,7 +302,7 @@ there).
   pod-security-admission 1.37.2 has no check for it.
 
   - Test: `kubernetes/tests/test_components.py::test_share_process_namespace`; fixture target `complete`; `manual:` as K8S-17
-  - Since: this change
+  - Since: #181
 
 A `ports` key named the container port, and a Service port from it
 targeted that name. The API accepts a container port without a name and
@@ -322,7 +322,7 @@ checks a name only when one is set (`validateContainerPorts` in
   it.
 
   - Test: `kubernetes/tests/test_components.py::test_unnamed_port`, `::test_named_port_renders_as_before`; fixture target `complete`; `manual:` as K8S-17
-  - Since: this change
+  - Since: #181
 
 ## Service IP families
 
@@ -338,7 +338,7 @@ checks a name only when one is set (`validateContainerPorts` in
   fields on an ExternalName Service.
 
   - Test: `kubernetes/tests/test_components.py::test_service_ip_families`; fixture target `complete`; `manual:` as K8S-17
-  - Since: this change
+  - Since: #181
 
 ## RBAC for one workload
 
