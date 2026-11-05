@@ -1,0 +1,51 @@
+# Install with the Kapitan config management plugin, and an Application
+# that the plugin renders: target blackbox-exporter of the Kapitan project
+# at the root of the repository.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: install-cmp
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/argocd
+        output_path: manifests/
+
+  generators:
+    argocd:
+      install:
+        cmp:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+      projects:
+        apps:
+          source_repos:
+            - https://git.example.com/platform/apps.git
+          destinations:
+            - namespace: blackbox-exporter
+              server: https://kubernetes.default.svc
+      applications:
+        blackbox-exporter:
+          project: apps
+          destination: blackbox-exporter
+          source:
+            repoURL: https://git.example.com/platform/apps.git
+            targetRevision: main
+            path: .
+            plugin:
+              name: kapitan
+              env:
+                - name: TARGET
+                  value: blackbox-exporter
+          sync_policy:
+            automated:
+              prune: true
+              selfHeal: true
+            syncOptions:
+              - CreateNamespace=true

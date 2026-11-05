@@ -8,8 +8,9 @@ Kapitan kadet generator for [Argo CD](https://argo-cd.readthedocs.io/) resources
 - **ApplicationSet**: Applications templated from generators (clusters, git, list, matrix, ...)
 - **AppProject**: allowed source repositories, destinations and resource kinds for a group of Applications
 - **Applications from Kapitan topics**: one Application per target that publishes the `argocd` topic
+- **Argo CD itself** (opt-in): the release manifest, optionally with a Kapitan config management plugin in the repo server
 
-Cluster and repository credentials are Secrets with the `argocd.argoproj.io/secret-type` label; render them with the `kubernetes` generator. The Argo CD installation itself belongs in the `helm` input.
+Cluster and repository credentials are Secrets with the `argocd.argoproj.io/secret-type` label; render them with the `kubernetes` generator. Spec: [docs/specs/argocd.md](../docs/specs/argocd.md).
 
 ## Usage
 
@@ -41,6 +42,8 @@ All keys live under `parameters.generators.argocd`.
 | `topics.<topic>` | Application per publishing target | `<namespace>/<target>-application` |
 | `application_sets.<name>` | ApplicationSet | `<namespace>/<name>-appset` |
 | `projects.<name>` | AppProject | `<namespace>/<name>-appproject` |
+| `install` | Argo CD's release manifest, see [Installing Argo CD](#installing-argo-cd) | `install/<name>-<kind>` |
+| `install.cmp` | the Kapitan plugin, see [Kapitan config management plugin](#kapitan-config-management-plugin) | `install/kapitan-plugin-configmap` |
 
 Every entry accepts `name` (default: the entry key), `namespace`, `labels`, `annotations` and a `spec` dict that passes through to the resource `spec`. Precedence is generator defaults < `spec` < flat keys: a flat key wins over the same field in `spec` and logs `Flat key '<key>' overrides spec passthrough '<field>' for resource '<name>'`.
 
@@ -88,6 +91,55 @@ parameters:
           source:
             path: compiled/web/manifests
           destination: web
+```
+
+### Installing Argo CD
+
+`install: {}` renders Argo CD 3.5.6 from its release manifest [`manifests/install.yaml`](https://github.com/argoproj/argo-cd/blob/v3.5.6/manifests/install.yaml), one file per object under `install/`. The objects are upstream's with three changes: namespaced objects get the generator's `namespace` (`argocd` if unset), the ServiceAccount subjects of the ClusterRoleBindings move to that namespace, and every image is pinned by digest. A target drops an installation that a class sets with `install: null`.
+
+The generator renders no Namespace, as the manifest has none. The ApplicationSet CRD is too large for the annotation of a client-side apply, so apply server-side:
+
+```sh
+kubectl create namespace argocd
+kubectl apply --server-side -f compiled/<target>/manifests/install/
+```
+
+The manifest grants the application controller and the server every verb on every resource through ClusterRoles, so the generator declares the `rbac-admin` output capability. Settings such as `argocd-cm` data, replicas or a mirror registry for the images go in with the [mutate](../mutate/) generator on the compile entry's output; the generator has no keys for them. The pinned source, its checksums and how to vendor a newer release are in the spec.
+
+### Kapitan config management plugin
+
+`install.cmp` lets Argo CD compile a Kapitan project itself. It adds the container `kapitan` to the `argocd-repo-server` Deployment and renders the ConfigMap `kapitan-plugin` with the plugin's `plugin.yaml`. Container, volumes and plugin are those of the [argocd-cmp](https://github.com/kadet-hub/examples/tree/main/argocd-cmp) example in kadet-hub/examples.
+
+| Key | Default |
+|---|---|
+| `install.cmp.image` | `docker.io/kapicorp/kapitan:0.36.3@sha256:04b9ca04f5041851631fb1041fbafe37b1ca6c3ad99a81d6ccd40f5ebd20f857`; another image must be pinned by digest, or the compile fails |
+| `install.cmp.resources` | none; the container's `resources` as written |
+
+The sidecar runs as user 999 with a read-only root filesystem, no privilege escalation and every capability dropped. The repo server's pod mounts no service account token, and the compile fails if the manifest turns it on, so the plugin has no identity in the cluster. The manifest's NetworkPolicies limit ingress only, so the sidecar reaches the internet and every Service until an egress policy for the repo server's pod limits it, as `repo-server-egress.yaml` of the example does.
+
+The plugin runs code from every repository it renders: kadet generators are Python, and Jinja2 templates render outside a sandbox. Everyone who can push to a branch an Application tracks runs code in the sidecar, so protect those branches as you would a CI job.
+
+An Application selects the plugin and the Kapitan target in its `source`. `path` is the directory that holds `.kapitan`. The plugin compiles `-t <TARGET>` without `--fetch`, so the repository holds `lib/` and anything else the target fetches. It prints every YAML file below `compiled/<TARGET>` and fails when there is none, so an Application with automated prune never syncs an empty desired state.
+
+```yaml
+parameters:
+  generators:
+    argocd:
+      install:
+        cmp: {}
+      applications:
+        blackbox-exporter:
+          project: apps
+          destination: blackbox-exporter
+          source:
+            repoURL: https://git.example.com/platform/apps.git
+            targetRevision: main
+            path: .
+            plugin:
+              name: kapitan
+              env:
+                - name: TARGET
+                  value: blackbox-exporter
 ```
 
 ### Example

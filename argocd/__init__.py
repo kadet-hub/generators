@@ -25,11 +25,11 @@ RULES for inventory access:
      pass that check but behave differently.
 """
 
-__version__ = "1.0.4"
+__version__ = "1.1.0"
 
 from kapitan.inputs.kadet import BaseObj, inventory, topics
 
-from . import k8s
+from . import install, k8s
 
 
 _OMEGACONF_TYPES: tuple[type, ...]
@@ -391,6 +391,11 @@ def main(input_params: dict | None = None) -> BaseObj:
         appset = ArgoCDApplicationSet(name=appset_name, config=config)
         namespace = config.get("namespace", default_namespace)
         obj.root[f"{namespace}/{appset_name}-appset"] = appset
+
+    # Argo CD itself, from its release manifest (docs/specs/argocd.md).
+    if argocd_config.get("install") is not None:
+        for key, doc in install.render(argocd_config["install"], default_namespace).items():
+            obj.root[key] = doc
 
     return obj
 

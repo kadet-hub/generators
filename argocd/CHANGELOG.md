@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+New `install` key: renders Argo CD 3.5.6 from its release manifest `manifests/install.yaml`, one file per object under `install/`, with the namespace set and every image pinned by digest. `install.cmp` adds a Kapitan config management plugin to the repo server: a sidecar running Kapitan 0.36.3 by digest, without a service account token, and the ConfigMap `kapitan-plugin` with its `plugin.yaml`. The manifest grants Argo CD cluster-wide `*` rules, so the generator now declares the `rbac-admin` output capability. Output of inventories without `install` is unchanged. Spec: `docs/specs/argocd.md`.
+
 ## 1.0.4
 
 Built for Argo CD 3.5.6. The Application, ApplicationSet and AppProject CRDs are unchanged from 3.5.5, so the shipped schemas and rendered output are unchanged. The upstream files the README cites are identical at v3.5.6, and their links move to that tag.
