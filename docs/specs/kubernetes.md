@@ -214,6 +214,132 @@ same container code.
   - Test: `kubernetes/tests/test_components.py::test_tty_and_stdin`, `::test_no_tty_or_stdin_renders_as_before`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys to the same output as 1.13.0, with both inventory backends
   - Since: #177
 
+## StatefulSets taken over from a Helm release
+
+A converter that turns a Helm chart into a Kapitan inventory renders the
+chart's objects with this generator, and the result is applied over the
+running Helm release. The API rejects an update of a StatefulSet that
+changes `serviceName` or `volumeClaimTemplates`
+(`ValidateStatefulSetUpdate` in `pkg/apis/apps/validation` of Kubernetes
+1.37.2). Both have to match the release, and the generator could set
+neither to what a chart renders.
+
+A chart's StatefulSet often names a headless Service of its own as
+`serviceName`, such as `<release>-headless`, next to the Service that
+clients use. The generator took `serviceName` from `service.service_name`,
+which also names and renders the component's Service, or from the
+component name.
+
+- K8S-17: A StatefulSet component's `statefulset_service_name` MUST set
+  `spec.serviceName`, ahead of `service.service_name` and the component
+  name. Without it, or with `null`, `serviceName` MUST stay as before.
+
+  The key renders no Service. The governing Service comes from `service`,
+  `additional_services` or from outside the inventory. Other workload
+  types ignore the key. It carries the workload prefix, as
+  `deployment_progress_deadline_seconds` does, because a component-level
+  `service_name` would read like the `service_name` below `service`.
+
+  Related: K8S-2
+
+  - Test: `kubernetes/tests/test_components.py::test_statefulset_service_name`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys of K8S-17 to K8S-22 to the same output as 1.14.0, with both inventory backends
+  - Since: this change
+
+The generator adds the label `name: <claim>` to every claim template. It
+came with the migration from kapicorp/generators (bb1b5c1), which has had
+it since its initial commit of 2022-12-22, without a reason in the commit
+or its README. No code of the generator selects claims by it. A chart's
+claim template without that label could not be reproduced.
+
+- K8S-18: A StatefulSet component with `volume_claim_name_label: false`
+  MUST render its `volumeClaimTemplates` without the `name` label that
+  the generator adds. Without the key, or with another value, every claim
+  template MUST keep that label.
+
+  Labels in a claim's own `metadata.labels` stay, a `name` label among
+  them.
+
+  - Test: `kubernetes/tests/test_components.py::test_volume_claim_name_label`; fixture target `complete`; `manual:` as K8S-17
+  - Since: this change
+
+DEC-5: The claim template label stays by default, and
+`volume_claim_name_label: false` turns it off. Dropping it would change
+the claim templates of every StatefulSet with `volume_claims` that an
+earlier release rendered. The next apply of such a StatefulSet would fail
+until it is deleted with `--cascade=orphan` and created again. The claims
+the controller created from the templates carry the label too, and
+whether a selector outside the generator, such as a backup tool's, uses
+it is not known. A `null` label value per claim was considered. The
+generator's `merge` replaces a `null` with the default, so it would need
+handling of its own, and a takeover needs the label off on all claims of
+a StatefulSet anyway. `generators.manifest.default_config` can turn it
+off for a whole target.
+
+## Container and pod fields of charts
+
+The same converter found three fields that charts set and the generator
+had no key for. Compose's `working_dir` is a gap of kadet-hub/recipes for
+the same reason (RCP-37 there). `working_dir` applies to the main
+container, `additional_containers` and `init_containers`, which render
+through the same container code.
+
+- K8S-19: A container's `working_dir` MUST render as `workingDir`. A
+  container without it, or with `null`, MUST render none.
+
+  - Test: `kubernetes/tests/test_components.py::test_working_dir`; fixture target `complete`; `manual:` as K8S-17
+  - Since: this change
+
+The umami recipe of kadet-hub/recipes considered `shareProcessNamespace`,
+which makes the pod's pause process PID 1, and had no key for it (DEC-120
+there).
+
+- K8S-20: A component's `share_process_namespace` MUST render as the
+  pod's `shareProcessNamespace` with the value the inventory sets. A
+  component without it, or with `null`, MUST render none.
+
+  The containers of the pod then see and can signal each other's
+  processes. The Pod Security Standards do not restrict the field:
+  pod-security-admission 1.37.2 has no check for it.
+
+  - Test: `kubernetes/tests/test_components.py::test_share_process_namespace`; fixture target `complete`; `manual:` as K8S-17
+  - Since: this change
+
+A `ports` key named the container port, and a Service port from it
+targeted that name. The API accepts a container port without a name and
+checks a name only when one is set (`validateContainerPorts` in
+`pkg/apis/core/validation` of Kubernetes 1.37.2).
+
+- K8S-21: A `ports` entry with `unnamed: true` MUST render its container
+  port without `name`, and a Service port from it MUST target the
+  container port by its number. Without `unnamed`, the key MUST name the
+  container port and be the Service port's `targetPort`, as before.
+
+  The key still identifies the entry, orders the ports and names the
+  Service port, which a Service with more than one port needs. A probe
+  that names the port by its key then finds no port and fails at
+  runtime, so it takes the number. An empty key renders `name: ""`, which
+  the API stores as no name, but only one entry of the mapping can have
+  it.
+
+  - Test: `kubernetes/tests/test_components.py::test_unnamed_port`, `::test_named_port_renders_as_before`; fixture target `complete`; `manual:` as K8S-17
+  - Since: this change
+
+## Service IP families
+
+- K8S-22: A Service's `ip_family_policy` and `ip_families` MUST render as
+  `spec.ipFamilyPolicy` and `spec.ipFamilies`, on a component's `service`,
+  its `additional_services` and `generators.kubernetes.services`. A
+  Service without them, or with `null`, MUST render neither.
+
+  A chart that pins a Service to one family, or asks for dual-stack, sets
+  them, and the converter found no key for them. The values pass
+  unchanged. The API accepts `SingleStack`, `PreferDualStack` and
+  `RequireDualStack` and the families `IPv4` and `IPv6`, and rejects both
+  fields on an ExternalName Service.
+
+  - Test: `kubernetes/tests/test_components.py::test_service_ip_families`; fixture target `complete`; `manual:` as K8S-17
+  - Since: this change
+
 ## RBAC for one workload
 
 DEC-2: There is no generator mechanism for several roles per set of
@@ -345,7 +471,11 @@ because it already sits below `namespaces`.
 | Item | Value |
 |---|---|
 | Component Service | `kubernetes/generators.py` (`_build_service_bundle`) |
-| Container args, tty and stdin | `kubernetes/base.py` (`Container.body`) |
+| Service IP families, Service port of an unnamed container port | `kubernetes/networking.py` (`Service.body`, `Service._build_service_ports`) |
+| StatefulSet `serviceName` | `kubernetes/workloads.py` (`StatefulSet.body`) |
+| Claim template name label | `kubernetes/base.py` (`WorkloadCommon.add_volume_claims`) |
+| Pod `shareProcessNamespace` | `kubernetes/base.py` (`Workload.body`) |
+| Container args, tty, stdin, workingDir, unnamed ports | `kubernetes/base.py` (`Container.body`) |
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
 | Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
