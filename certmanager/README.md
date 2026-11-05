@@ -51,6 +51,7 @@ Every entry accepts these keys:
 | `name` | Overrides the map key in `metadata.name` and in the output key. |
 | `namespace` | Certificate, Issuer and `ca_issuers` only. ClusterIssuer and Bundle are cluster-scoped; a Bundle selects its target namespaces in `spec.target.namespaceSelector`. |
 | `type` | Entries without `type` or with `type: certmanager` render; any other value skips the entry, for resources managed elsewhere. |
+| `labels`, `annotations` | Added to the resource's `metadata`; a `ca_issuers` entry adds them to all three resources. Every resource also gets the label `name: <metadata.name>`, which `labels` can override. |
 
 ### Defaults and shorthands
 

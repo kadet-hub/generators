@@ -1,6 +1,7 @@
 # Complete: every kind, the CA bootstrap, the Let's Encrypt shorthands,
 # spec passthrough on top of defaults, generator and per-resource namespace,
-# name override and the type filter. Internal PKI with trust distribution.
+# name override, labels and annotations, and the type filter. Internal PKI
+# with trust distribution.
 classes: []
 
 parameters:
@@ -20,6 +21,11 @@ parameters:
       ca_issuers:
         internal-ca:
           common_name: Internal Root CA
+          # on all three resources of the CA
+          labels:
+            team: platform
+          annotations:
+            argocd.argoproj.io/sync-wave: "-2"
         partner-ca:
           namespace: pki
           # common_name wins over certificate.commonName
@@ -72,6 +78,10 @@ parameters:
           http01_ingress_class: nginx
       certs:
         wildcard-internal:
+          labels:
+            team: platform
+          annotations:
+            argocd.argoproj.io/sync-wave: "-1"
           spec:
             secretName: wildcard-internal-tls
             issuerRef:
