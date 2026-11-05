@@ -4,7 +4,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 
 | Generator | Renders |
 |---|---|
-| [argocd](argocd/) ([catalog](https://kadet-hub.org/generators/argocd/)) | Argo CD Applications, ApplicationSets and AppProjects, with an in-cluster destination shorthand and one Application per target publishing a Kapitan topic |
+| [argocd](argocd/) ([catalog](https://kadet-hub.org/generators/argocd/)) | Argo CD Applications, ApplicationSets and AppProjects, with an in-cluster destination shorthand and one Application per target publishing a Kapitan topic, and opt-in Argo CD itself from its release manifest with a Kapitan config management plugin |
 | [calico](calico/) ([catalog](https://kadet-hub.org/generators/calico/)) | Tigera operator Installation, APIServer, ImageSet, and opt-in Goldmane and Whisker, with provider-aware CNI defaults; Calico projectcalico.org/v3 network policies, network sets, IP pools and BGP resources, with selector and port shorthands |
 | [certmanager](certmanager/) ([catalog](https://kadet-hub.org/generators/certmanager/)) | cert-manager Certificates, Issuers and ClusterIssuers with Let's Encrypt and CA bootstrap shorthands, and trust-manager Bundles |
 | [cilium](cilium/) ([catalog](https://kadet-hub.org/generators/cilium/)) | Cilium network policies with port and DNS shorthands, LB-IPAM pools and L2 announcement policies |

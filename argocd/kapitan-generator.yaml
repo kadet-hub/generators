@@ -1,12 +1,12 @@
 name: argocd
-description: Renders Argo CD Applications, ApplicationSets and AppProjects from inventory parameters, including one Application per target that publishes a Kapitan topic.
+description: Renders Argo CD Applications, ApplicationSets and AppProjects from inventory parameters, including one Application per target that publishes a Kapitan topic, and optionally Argo CD itself from its release manifest with a Kapitan config management plugin.
 tags: [kubernetes, operators, ci]
 license: Apache-2.0
 owners: [3042152]
 kapitan: ">=0.36.3,<0.37"
 dependencies: []
 binaries: []
-output_capabilities: []
+output_capabilities: [rbac-admin]
 unparsed_outputs: []
 charts: []
 inventory_backends: [reclass-rs, omegaconf]

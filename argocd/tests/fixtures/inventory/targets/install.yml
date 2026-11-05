@@ -1,0 +1,16 @@
+# Install: Argo CD from its release manifest, without the plugin.
+classes: []
+
+parameters:
+  kapitan:
+    vars:
+      target: install
+    compile:
+      - input_type: kadet
+        input_paths:
+          - lib/argocd
+        output_path: manifests/
+
+  generators:
+    argocd:
+      install: {}
