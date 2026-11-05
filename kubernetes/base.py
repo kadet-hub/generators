@@ -334,7 +334,10 @@ class WorkloadCommon(BaseObj):
         templates = []
         for key, value in volume_claims.items():
             value = _convert_to_dict(value)
-            merge({"metadata": {"name": key, "labels": {"name": key}}}, value)
+            metadata = {"name": key, "labels": {"name": key}}
+            if self.kwargs.component.get("volume_claim_name_label") is False:  # K8S-18
+                del metadata["labels"]
+            merge({"metadata": metadata}, value)
             templates.append(value)
         if templates:
             self.root.spec.volumeClaimTemplates = templates
@@ -723,10 +726,10 @@ class Container(BaseObj):
             self.root.args = args
         if container.get("command"):
             self.root.command = container.get("command")
-        # Only when set, so inventories without them render as before (K8S-16).
-        for field in ("stdin", "tty"):
-            if container.get(field) is not None:
-                self.root[field] = container.get(field)
+        # Only when set, so inventories without them render as before (K8S-16, K8S-19).
+        for key, field in (("stdin", "stdin"), ("tty", "tty"), ("working_dir", "workingDir")):
+            if container.get(key) is not None:
+                self.root[field] = container.get(key)
         self.root.securityContext = container.get("security_context", {})
         self.add_volume_mounts_from_configs()
         self.add_volume_mounts(container.get("volume_mounts", {}))
@@ -735,15 +738,14 @@ class Container(BaseObj):
         for name, port in sorted(container.get("ports", {}).items()):
             protocol = port.get("protocol", "TCP")
             _validate_enum(protocol, VALID_PROTOCOL_TYPES, "protocol")
-            self.root.ports += [
-                {
-                    "containerPort": port.get(
-                        "container_port", port.get("service_port")
-                    ),
-                    "name": name,
-                    "protocol": protocol,
-                }
-            ]
+            rendered = {
+                "containerPort": port.get("container_port", port.get("service_port")),
+                "name": name,
+                "protocol": protocol,
+            }
+            if port.get("unnamed"):  # K8S-21
+                del rendered["name"]
+            self.root.ports += [rendered]
 
         # Init containers run to completion: the API rejects probes on them.
         healthcheck = {} if self.kwargs.get("init") else container.get("healthcheck", {})
@@ -844,6 +846,8 @@ class Workload(WorkloadCommon):
             workload.root.spec.template.spec.enableServiceLinks = component.get(
                 "enable_service_links"
             )
+        if component.get("share_process_namespace") is not None:  # K8S-20
+            pod_spec.shareProcessNamespace = component.get("share_process_namespace")
 
         container = []
         container = Container(name=name, container=component)
