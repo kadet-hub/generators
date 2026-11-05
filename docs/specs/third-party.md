@@ -84,7 +84,7 @@ no change beyond the version and the CHANGELOG entry.
   - Test: manual: pull the index's latest version with `oras pull
     ghcr.io/kadet-hub/<name>@<digest>`; `tar -tf <name>.tar LICENSE`
     succeeds
-  - Since: this change (grafana, velero); not met yet for the other 14
+  - Since: #179 (grafana, velero); not met yet for the other 14
 
 ## Open questions
 
