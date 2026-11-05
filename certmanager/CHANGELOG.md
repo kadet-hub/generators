@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+Every entry accepts `labels` and `annotations` and adds them to the metadata of the resources it renders; a `ca_issuers` entry adds them to all three. Up to 1.0.4 both keys were ignored without an error. Output of entries without them is unchanged.
+
 ## 1.0.4
 
 Built for trust-manager 0.26.0. Its Bundle CRD changes only in the `controller-gen.kubebuilder.io/version` annotation, so the shipped schema and rendered output are unchanged. The release removes the compromised eMudhra roots from the default CA package that `useDefaultCAs` selects. That package comes with the trust-manager installation, which the generator does not render.

@@ -11,7 +11,7 @@ using Kapitan's kadet input type. Supports Issuer, ClusterIssuer, Certificate,
 and trust-manager Bundle resources.
 """
 
-__version__ = "1.0.4"
+__version__ = "1.1.0"
 
 from kapitan.inputs.kadet import BaseObj, inventory
 
@@ -338,6 +338,7 @@ def main(input_params: dict | None = None) -> BaseObj:
             # A ClusterIssuer reads its Secret from the cluster resource namespace.
             ns = ca_spec.get("namespace", "cert-manager")
             selfsigned = f"{name}-selfsigned"
+            meta = {key: ca_spec.get(key) for key in ("labels", "annotations")}
             certificate = _merge(
                 {
                     "isCA": True,
@@ -363,14 +364,14 @@ def main(input_params: dict | None = None) -> BaseObj:
                 certificate["commonName"] = ca_spec.get("common_name")
             resources = {
                 f"{selfsigned}-cissuer": CertManagerClusterIssuer(
-                    name=selfsigned, config_spec={"spec": {"selfSigned": {}}}
+                    name=selfsigned, config_spec={**meta, "spec": {"selfSigned": {}}}
                 ),
                 f"{ns}/{name}-cert": CertManagerCertificate(
-                    name=name, config_spec={"namespace": ns, "spec": certificate}
+                    name=name, config_spec={**meta, "namespace": ns, "spec": certificate}
                 ),
                 f"{name}-cissuer": CertManagerClusterIssuer(
                     name=name,
-                    config_spec={"spec": {"ca": {"secretName": certificate["secretName"]}}},
+                    config_spec={**meta, "spec": {"ca": {"secretName": certificate["secretName"]}}},
                 ),
             }
             for key, resource in resources.items():

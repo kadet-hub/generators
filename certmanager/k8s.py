@@ -45,6 +45,9 @@ class Base(BaseObj):
                 " '-', '_' or '.', starting and ending with a letter or digit; use a shorter name"
             )
         self.add_label("name", name)
+        config_spec = self.kwargs.get("config_spec") or {}
+        self.add_labels(config_spec.get("labels") or {})
+        self.add_annotations(config_spec.get("annotations") or {})
 
     def add_labels(self, labels: dict[str, str]) -> None:
         """Add multiple labels to the resource metadata.

@@ -26,3 +26,4 @@ request, as its first commit.
 | [keycloak.md](keycloak.md) | keycloak generator (`KC-`) |
 | [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |
 | [flux.md](flux.md) | flux generator (`FLX-`) |
+| [certmanager.md](certmanager.md) | certmanager generator (`CM-`) |
