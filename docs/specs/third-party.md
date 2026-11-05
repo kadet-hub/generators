@@ -76,15 +76,16 @@ no change beyond the version and the CHANGELOG entry.
   repository's `LICENSE` at its root.
 
   In index serial 108 the latest version of 16 of the 38 generators was
-  published before kadet-hub/registry#418. grafana 1.0.3 and velero 1.0.3
-  replace two of them. k3d, kind, docker, ironcore, loki, calico, keda,
-  kmcp, kserve, thanos, strimzi, keycloak, cloudnative-pg and ocm still
-  need a patch release.
+  published before kadet-hub/registry#418, and its artefact has no
+  LICENSE. grafana 1.0.3 and velero 1.0.3 replace two of them. k3d 1.0.1,
+  kind 1.0.1, docker 1.0.2, ironcore 1.0.2, loki 1.0.2, calico 1.1.4,
+  keda 1.0.4, kmcp 1.0.3, kserve 1.0.3, thanos 1.0.3, strimzi 1.1.1,
+  keycloak 1.1.1, cloudnative-pg 1.1.2 and ocm 0.1.1 replace the other 14.
 
   - Test: manual: pull the index's latest version with `oras pull
     ghcr.io/kadet-hub/<name>@<digest>`; `tar -tf <name>.tar LICENSE`
     succeeds
-  - Since: #179 (grafana, velero); not met yet for the other 14
+  - Since: #179 (grafana, velero); #180 (the other 14)
 
 ## Open questions
 
