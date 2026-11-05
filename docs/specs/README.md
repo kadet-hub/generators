@@ -28,3 +28,4 @@ request, as its first commit.
 | [flux.md](flux.md) | flux generator (`FLX-`) |
 | [certmanager.md](certmanager.md) | certmanager generator (`CM-`) |
 | [argocd.md](argocd.md) | argocd generator (`ACD-`) |
+| [docker.md](docker.md) | docker generator (`DKR-`) |
