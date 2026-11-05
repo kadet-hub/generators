@@ -1,6 +1,6 @@
 """OCM component constructor from the images of a target's compiled manifests (docs/specs/ocm.md)."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from kapitan.inputs.kadet import BaseObj
 

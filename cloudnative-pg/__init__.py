@@ -12,7 +12,7 @@ from typing import Any
 
 from kapitan.inputs.kadet import BaseObj, CompileError, inventory
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.1.0 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.
+
 ## 1.1.0
 
 `name` on a Kafka, node pool, topic or user entry names its resource and its output key, which before always came from the entry's key. A recipe that may write only keys of its own name can then keep a cluster's name, such as the Kafka `events` with the node pool `dual` whose pods, claims, Services and Secrets carry both names. `cluster` and `strimzi.io/cluster` name the Kafka's resource. A topic or user whose `cluster` names Kafkas in two namespaces fails the compile unless it sets `namespace`. Output is unchanged for inventories without `name`.

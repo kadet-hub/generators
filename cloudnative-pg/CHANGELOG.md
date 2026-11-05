@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.1.1 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.
+
 ## 1.1.1
 
 `__version__` now reports the release version, which still read 1.0.1. Rendered output is unchanged.

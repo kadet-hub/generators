@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.0.1 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.
+
 ## 1.0.1
 
 Fails the compile when metadata.name is not a valid label value (over 63 characters), instead of rendering output the API server rejects.
