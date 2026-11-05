@@ -45,3 +45,7 @@ jobs:
           fi
           echo "generators: ${dirs:-none}"
           for d in $dirs; do ./check "$d"; done
+      - name: Compose golden of the docker generator (CHK-8)
+        run: |
+          docker compose version
+          docker compose -f docker/tests/golden/compose.yml config --quiet

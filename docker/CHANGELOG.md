@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+Docker Compose output from the components of the kubernetes generator.
+
+- `generators.docker.compose` turns on `compose.yml` next to the Dockerfiles. Each component of `parameters.components` becomes a service, after the kubernetes generator's defaults: image, entrypoint and command, environment with Secret and ConfigMap values by key and refs as tokens, exposed ports, named volumes from `volume_claims`, the readiness probe of type `command` as health check, `deploy.resources`, `user`, `read_only` and `restart: always`. `generators.docker.compose` is merged over the result.
+- A component key or value without a Compose counterpart fails the compile and names it.
+- Without `generators.docker.compose` the output is unchanged.
+
 ## 1.0.2
 
 Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefact of 1.0.1 has no LICENSE although it declares Apache-2.0. Rendered output is unchanged.
