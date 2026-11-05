@@ -126,6 +126,10 @@ class Service(k8s.Base):
                     f"not {service_spec.get('type')}"
                 )
             self.root.spec.clusterIP = "None"
+        # K8S-22: passed through; the API checks the values.
+        for key, field in (("ip_family_policy", "ipFamilyPolicy"), ("ip_families", "ipFamilies")):
+            if service_spec.get(key) is not None:
+                self.root.spec[field] = service_spec.get(key)
         self.root.spec.sessionAffinity = service_spec.get("session_affinity", "None")
         self.root.spec.ports = self._build_service_ports(
             self._collect_component_ports(component), service_spec
@@ -162,9 +166,10 @@ class Service(k8s.Base):
                 continue
             if "service_port" in ports:
                 # A component's container port carries the port name; a
-                # standalone Service has no container to name it.
+                # standalone Service has no container to name it, and an
+                # unnamed container port has no name (K8S-21).
                 target_port = port_name
-                if self.kwargs.workload is None:
+                if self.kwargs.workload is None or ports.get("unnamed"):
                     target_port = ports.get("container_port", ports.get("service_port"))
                 service_port = {
                     "name": port_name,

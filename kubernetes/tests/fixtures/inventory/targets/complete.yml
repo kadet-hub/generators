@@ -453,6 +453,7 @@ parameters:
 
     orders-api:
       image: registry.example.com/shop/orders-api:2.0.1
+      share_process_namespace: true
       ports:
         grpc:
           container_port: 9090
@@ -469,10 +470,16 @@ parameters:
           memory: 256Mi
       service:
         type: ClusterIP
+        ip_family_policy: PreferDualStack
+        ip_families: [IPv4, IPv6]
 
     db:
       type: statefulset
       image: postgres:17.6
+      # As a Helm release's StatefulSet: a governing Service of another name,
+      # rendered elsewhere, and claim templates without the generator's name label
+      statefulset_service_name: db-hl
+      volume_claim_name_label: false
       workload_security_context:
         runAsUser: 999
         runAsGroup: 999
@@ -534,6 +541,7 @@ parameters:
         amqps:
           container_port: 5671
           service_port: 5671
+          unnamed: true
       healthcheck:
         readiness:
           type: tcp
@@ -568,6 +576,7 @@ parameters:
       type: job
       image: registry.example.com/shop/web:1.4.2
       command: [/app/migrate]
+      working_dir: /app
       # Rendered only where set: the other containers have neither field
       tty: true
       stdin: true

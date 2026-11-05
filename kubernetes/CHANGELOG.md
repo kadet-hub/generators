@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.15.0
+
+Keys for what a Helm chart renders and the generator could not, found by converting charts into inventories that are applied over the running Helm release:
+
+- `statefulset_service_name` sets a StatefulSet's `serviceName` and renders no Service, for a governing Service rendered elsewhere, such as a chart's `<release>-headless`. It takes precedence over `service.service_name`.
+- `volume_claim_name_label: false` leaves out the `name` label that the generator adds to each StatefulSet claim template. The API rejects a change of the claim templates of an existing StatefulSet, so a StatefulSet applied over a Helm release has to keep them as the chart rendered them. The label stays by default, because removing it would fail the next apply of every StatefulSet with `volume_claims` rendered by an earlier release.
+- `working_dir` on a component, its `additional_containers` and `init_containers` renders as `workingDir`.
+- `share_process_namespace` renders as the pod's `shareProcessNamespace`.
+- A `ports` entry with `unnamed: true` renders its container port without `name`. A Service port from it keeps the key as its name and targets the container port by number.
+- `ip_family_policy` and `ip_families` on a component's `service`, `additional_services` and `generators.kubernetes.services` render as `ipFamilyPolicy` and `ipFamilies`.
+
+Output is unchanged for inventories without these keys.
+
 ## 1.14.0
 
 - `tty` and `stdin` on a component, and on its `additional_containers` and `init_containers`, render as the container fields of the same name. A recipe can then render what a chart sets there, such as `tty: true` on the main container of the Open WebUI chart 17.5.0. `null` renders neither, so a target can drop a class's value.

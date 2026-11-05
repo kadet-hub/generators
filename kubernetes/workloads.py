@@ -123,9 +123,10 @@ class StatefulSet(k8s.Base, WorkloadCommon):
         self.root.spec.updateStrategy = component.get(
             "update_strategy", default_update_strategy
         )
-        self.root.spec.serviceName = (component.get("service") or {}).get(
-            "service_name", name
-        )
+        # K8S-17: a governing Service other than the component's own.
+        self.root.spec.serviceName = component.get("statefulset_service_name") or (
+            component.get("service") or {}
+        ).get("service_name", name)
         self.set_replicas(component.get("replicas", 1))
 
 

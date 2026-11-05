@@ -85,9 +85,99 @@ def test_no_tty_or_stdin_renders_as_before():  # K8S-16
             assert "tty" not in container and "stdin" not in container, container
 
 
+def test_working_dir():  # K8S-19
+    for container in pod_containers(working_dir="/srv"):
+        assert container["workingDir"] == "/srv", container
+    for keys in ({}, {"working_dir": None}):
+        for container in pod_containers(**keys):
+            assert "workingDir" not in container, container
+
+
+def pod_spec(**keys):
+    return Workload(name="web", component=component(**keys)).root.spec.template.spec.to_dict()
+
+
+def test_share_process_namespace():  # K8S-20
+    assert pod_spec(share_process_namespace=True)["shareProcessNamespace"] is True
+    assert pod_spec(share_process_namespace=False)["shareProcessNamespace"] is False
+    for keys in ({}, {"share_process_namespace": None}):
+        assert "shareProcessNamespace" not in pod_spec(**keys)
+
+
+def test_unnamed_port():  # K8S-21
+    comp = component(ports={"http": {"container_port": 8080, "service_port": 80, "unnamed": True},
+                            "metrics": {"container_port": 9100}}, service={})
+    assert pod_spec(**comp)["containers"][0]["ports"] == [
+        {"containerPort": 8080, "protocol": "TCP"},
+        {"containerPort": 9100, "name": "metrics", "protocol": "TCP"},
+    ]
+    [service] = services(comp)
+    assert service["spec"]["ports"] == [{"name": "http", "port": 80, "targetPort": 8080, "protocol": "TCP", "appProtocol": "http"}]
+
+
+def test_named_port_renders_as_before():  # K8S-21
+    for keys in ({}, {"unnamed": False}, {"unnamed": None}):
+        comp = component(ports={"http": {"container_port": 8080, "service_port": 80, **keys}}, service={})
+        assert pod_spec(**comp)["containers"][0]["ports"] == [{"containerPort": 8080, "name": "http", "protocol": "TCP"}]
+        assert services(comp)[0]["spec"]["ports"][0]["targetPort"] == "http"
+
+
+def test_service_ip_families():  # K8S-22
+    families = {"ip_family_policy": "PreferDualStack", "ip_families": ["IPv6", "IPv4"]}
+    comp = component(service=families, additional_services={
+        "web-v4": {"ip_family_policy": "SingleStack", "ip_families": ["IPv4"]},
+        "web-plain": {"ip_family_policy": None, "ip_families": None},
+    })
+    main, v4, plain = [s["spec"] for s in services(comp)]
+    assert (main["ipFamilyPolicy"], main["ipFamilies"]) == ("PreferDualStack", ["IPv6", "IPv4"])
+    assert (v4["ipFamilyPolicy"], v4["ipFamilies"]) == ("SingleStack", ["IPv4"])
+    assert "ipFamilyPolicy" not in plain and "ipFamilies" not in plain
+    dns = {"selector": {"app": "dns"}, "ports": {"dns": {"service_port": 53, "protocol": "UDP"}}}
+    spec = resources({"services": {"dns": {**dns, **families}}})["shop/dns-svc"]["spec"]
+    assert (spec["ipFamilyPolicy"], spec["ipFamilies"]) == ("PreferDualStack", ["IPv6", "IPv4"])
+    spec = resources({"services": {"dns": dns}})["shop/dns-svc"]["spec"]
+    assert "ipFamilyPolicy" not in spec and "ipFamilies" not in spec
+
+
 def test_null_service_on_statefulset():
     workload = Workload(name="web", component=component(type="statefulset", service=None)).root
     assert workload.spec.serviceName == "web"
+
+
+def test_statefulset_service_name():  # K8S-17
+    def service_name(**keys):
+        return Workload(name="web", component=component(type="statefulset", **keys)).root.spec.serviceName
+
+    assert service_name(statefulset_service_name="web-headless", service={"service_name": "web-http"}) == "web-headless"
+    assert service_name(statefulset_service_name=None, service={"service_name": "web-http"}) == "web-http"
+    assert service_name(statefulset_service_name=None) == "web"
+    # The key renders no Service.
+    assert services(component(type="statefulset", statefulset_service_name="web-headless")) == []
+
+
+def claim_templates(**keys):
+    claims = {
+        "data": {"metadata": {"labels": {"tier": "db"}}, "spec": {"accessModes": ["ReadWriteOnce"]}},
+        "wal": {"metadata": {"labels": {"name": "wal-own"}}},
+        "logs": {"spec": {"accessModes": ["ReadWriteOnce"]}},
+    }
+    comp = component(type="statefulset", volume_claims=claims, **keys)
+    return {t["metadata"]["name"]: t["metadata"] for t in Workload(name="web", component=comp).root.spec.to_dict()["volumeClaimTemplates"]}
+
+
+def test_volume_claim_name_label():  # K8S-18
+    assert claim_templates() == {
+        "data": {"name": "data", "labels": {"tier": "db", "name": "data"}},
+        "wal": {"name": "wal", "labels": {"name": "wal-own"}},
+        "logs": {"name": "logs", "labels": {"name": "logs"}},
+    }
+    for value in (True, None):
+        assert claim_templates(volume_claim_name_label=value) == claim_templates()
+    assert claim_templates(volume_claim_name_label=False) == {
+        "data": {"name": "data", "labels": {"tier": "db"}},
+        "wal": {"name": "wal", "labels": {"name": "wal-own"}},
+        "logs": {"name": "logs"},
+    }
 
 
 def test_empty_service_serves_api_service():
