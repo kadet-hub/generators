@@ -27,3 +27,4 @@ request, as its first commit.
 | [tetragon.md](tetragon.md) | tetragon generator (`TET-`) |
 | [flux.md](flux.md) | flux generator (`FLX-`) |
 | [certmanager.md](certmanager.md) | certmanager generator (`CM-`) |
+| [argocd.md](argocd.md) | argocd generator (`ACD-`) |
