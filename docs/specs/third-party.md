@@ -1,7 +1,7 @@
 # Third-party licences and notices
 
 Status: Draft
-Code: `*/schemas/sources.yaml`, `*/schemas/<group>/NOTICE`, `*/schemas/<group>/LICENSE`
+Code: `*/schemas/sources.yaml`, `*/schemas/<group>/NOTICE`, `*/schemas/<group>/LICENSE`, `LICENSE`
 Verified against: main @ 1ea7e4e
 
 ## Problem and decision
@@ -61,6 +61,31 @@ the group's `sources.yaml` entry.
     group directory has one
   - Since: this change
 
+## Generator licence
+
+No generator directory holds a LICENSE. The registry gate accepts the one
+at the repository root (QA-1), and since kadet-hub/registry#418, merged on
+2026-10-30, the registry build adds it to the root of every artefact
+(PUB-15). The registry never rebuilds a published version (PUB-2), so the
+artefacts of versions published before carry no licence text. Each of them
+declares Apache-2.0, whose section 4(a) requires a copy of the licence with
+every redistribution. Only a new version ships the LICENSE. Its tree needs
+no change beyond the version and the CHANGELOG entry.
+
+- TP-3: The artefact of every generator's latest version MUST contain the
+  repository's `LICENSE` at its root.
+
+  In index serial 108 the latest version of 16 of the 38 generators was
+  published before kadet-hub/registry#418. grafana 1.0.3 and velero 1.0.3
+  replace two of them. k3d, kind, docker, ironcore, loki, calico, keda,
+  kmcp, kserve, thanos, strimzi, keycloak, cloudnative-pg and ocm still
+  need a patch release.
+
+  - Test: manual: pull the index's latest version with `oras pull
+    ghcr.io/kadet-hub/<name>@<digest>`; `tar -tf <name>.tar LICENSE`
+    succeeds
+  - Since: this change (grafana, velero); not met yet for the other 14
+
 ## Open questions
 
 None.
@@ -71,4 +96,5 @@ None.
 |---|---|
 | MPL-2.0 groups | `rabbitmq/schemas/rabbitmq.com`, `talos/schemas/core` (`*_v1alpha1.json`), `terraform-{aws,azurerm,google,opentelekomcloud}/schemas/terraform` |
 | MIT groups | `k3d/schemas/k3d.io` |
+| Generator licence | `LICENSE` at the repository root, added to the artefact by the registry's `release/build.py` (PUB-15) |
 | Upstream NOTICE carried | `prometheus-operator/schemas/monitoring.coreos.com`, `kyverno/schemas/kyverno.io`, `kyverno/schemas/policies.kyverno.io`, `multus/schemas/k8s.cni.cncf.io`, `crossplane/schemas/aws.m.upbound.io`, `rabbitmq/schemas/rabbitmq.com` |
