@@ -374,7 +374,7 @@ values of a constraint, are the same in the API reference of Kubernetes
   Related: K8S-17
 
   - Test: `kubernetes/tests/test_components.py::test_pod_management_policy`, `::test_no_pod_management_or_spread_renders_as_before`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys of K8S-23 and K8S-24 to the same output as 1.15.0, with both inventory backends
-  - Since: this change
+  - Since: #184
 
 - K8S-24: A component's `topology_spread_constraints` MUST render
   unchanged as the pod's `topologySpreadConstraints`, on every workload
@@ -393,7 +393,7 @@ values of a constraint, are the same in the API reference of Kubernetes
   of a component carry the label `name: <component>` for a selector.
 
   - Test: `kubernetes/tests/test_components.py::test_topology_spread_constraints`, `::test_no_pod_management_or_spread_renders_as_before`; fixture target `complete`; `manual:` as K8S-23
-  - Since: this change
+  - Since: #184
 
 DEC-6: `topology_spread_constraints` passes through without a default
 `labelSelector`. A selector on the component's `name` label where none is
