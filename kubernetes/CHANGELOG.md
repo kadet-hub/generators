@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.16.0
+
+- `pod_management_policy` on a StatefulSet component renders as `podManagementPolicy`, such as the `Parallel` that the charts `qdrant` 1.20.0 and `matrix-stack` 26.11.0 set. The API rejects a change of the field on an existing StatefulSet, so one that runs with the default `OrderedReady` switches only after it is deleted with `--cascade=orphan` and applied again.
+- `topology_spread_constraints` renders unchanged as the pod's `topologySpreadConstraints`, on every workload type. The generator adds no `labelSelector`, and a constraint without one spreads nothing.
+
+Output is unchanged for inventories without these keys.
+
 ## 1.15.0
 
 Keys for what a Helm chart renders and the generator could not, found by converting charts into inventories that are applied over the running Helm release:

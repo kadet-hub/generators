@@ -901,6 +901,9 @@ class Workload(WorkloadCommon):
 
         if component.get("tolerations"):
             workload.root.spec.template.spec.tolerations = component.get("tolerations")
+        _set_if_truthy(  # K8S-24, passed through unchanged (DEC-6)
+            pod_spec, "topologySpreadConstraints", component.get("topology_spread_constraints")
+        )
 
         # The affinity block passes through; the prefer_* shorthands append to it.
         affinity = _convert_to_dict(component.get("affinity")) or {}

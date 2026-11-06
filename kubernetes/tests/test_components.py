@@ -180,6 +180,38 @@ def test_volume_claim_name_label():  # K8S-18
     }
 
 
+WORKLOAD_TYPES = ("deployment", "statefulset", "daemonset", "job")
+
+
+def workload_spec(**keys):
+    return Workload(name="web", component=component(**keys)).root.spec.to_dict()
+
+
+def test_pod_management_policy():  # K8S-23
+    for value in ("Parallel", "OrderedReady"):
+        assert workload_spec(type="statefulset", pod_management_policy=value)["podManagementPolicy"] == value
+    # Only a StatefulSet has the field.
+    for kind in ("deployment", "daemonset", "job"):
+        assert "podManagementPolicy" not in workload_spec(type=kind, pod_management_policy="Parallel")
+
+
+def test_topology_spread_constraints():  # K8S-24
+    # As matrix-stack 26.11.0 renders it, empty matchLabelKeys included.
+    constraints = [{"labelSelector": {"matchLabels": {"name": "web"}}, "matchLabelKeys": [], "maxSkew": 1,
+                    "topologyKey": "kubernetes.io/hostname", "whenUnsatisfiable": "ScheduleAnyway"}]
+    for kind in WORKLOAD_TYPES:
+        assert pod_spec(type=kind, topology_spread_constraints=constraints)["topologySpreadConstraints"] == constraints
+
+
+def test_no_pod_management_or_spread_renders_as_before():  # K8S-23, K8S-24
+    for kind in WORKLOAD_TYPES:
+        for keys in ({}, {"pod_management_policy": None, "topology_spread_constraints": None},
+                     {"topology_spread_constraints": []}):
+            spec = workload_spec(type=kind, **keys)
+            assert "podManagementPolicy" not in spec, (kind, keys)
+            assert "topologySpreadConstraints" not in spec["template"]["spec"], (kind, keys)
+
+
 def test_empty_service_serves_api_service():
     comp = component(service={}, api_service={"group": "m.example.com", "version": "v1", "insecure_skip_tls_verify": True})
     workload = Workload(name="web", component=comp).root
