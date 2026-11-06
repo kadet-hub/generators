@@ -340,6 +340,70 @@ checks a name only when one is set (`validateContainerPorts` in
   - Test: `kubernetes/tests/test_components.py::test_service_ip_families`; fixture target `complete`; `manual:` as K8S-17
   - Since: #181
 
+## StatefulSet start order and pod spreading
+
+The StatefulSet of the chart `qdrant` 1.20.0 sets `podManagementPolicy:
+Parallel`. The chart's values warn that under the API default
+`OrderedReady` the nodes of a Qdrant cluster wait for each other's
+readiness forever, so the `qdrant` recipe of kadet-hub/recipes runs one
+node (DEC-231 there). element-hq's chart `matrix-stack` 26.11.0 sets
+`podManagementPolicy: Parallel` on its StatefulSet
+`<release>-synapse-main` and `topologySpreadConstraints` on its
+Deployments, StatefulSets and Jobs. The `matrix-synapse` recipe builds on
+the image instead of that chart for this reason (kadet-hub/recipes#124).
+The generator had a key for neither field. Both fields, and the fields and
+values of a constraint, are the same in the API reference of Kubernetes
+1.35, 1.36 and 1.37.
+
+- K8S-23: A StatefulSet component's `pod_management_policy` MUST render as
+  `spec.podManagementPolicy` with the value the inventory sets. A
+  StatefulSet without it, or with `null`, MUST render none.
+
+  Other workload types ignore the key. The value passes unchanged. The API
+  accepts `OrderedReady`, its default, and `Parallel` and rejects any other
+  value (`ValidateStatefulSetSpec` in `pkg/apis/apps/validation` of
+  Kubernetes 1.37.2). The key has no workload prefix, unlike
+  `statefulset_service_name`, because no other key reads like it.
+
+  The API rejects a change of the field on an existing StatefulSet
+  (`ValidateStatefulSetUpdate` of Kubernetes 1.35.0 and 1.37.2). A
+  StatefulSet that runs with the default switches to `Parallel` only after
+  it is deleted with `--cascade=orphan` and created again. Setting
+  `OrderedReady` on it is no change, because the API stores the default.
+
+  Related: K8S-17
+
+  - Test: `kubernetes/tests/test_components.py::test_pod_management_policy`, `::test_no_pod_management_or_spread_renders_as_before`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys of K8S-23 and K8S-24 to the same output as 1.15.0, with both inventory backends
+  - Since: this change
+
+- K8S-24: A component's `topology_spread_constraints` MUST render
+  unchanged as the pod's `topologySpreadConstraints`, on every workload
+  type. A component without it, with `null` or with an empty list MUST
+  render none.
+
+  matrix-stack sets the field on Jobs as well, so the key is not limited
+  to Deployments and StatefulSets. The API stores an empty list as no
+  field (`omitempty` in `k8s.io/api` `core/v1`). The field is part of the
+  pod template, so a change rolls the pods out.
+
+  The generator adds no `labelSelector` to an entry. A constraint without
+  one counts no pods and spreads nothing: the API reference states that a
+  null selector matches no objects, and the PodTopologySpread plugin of
+  Kubernetes 1.37.2 keeps it empty when `matchLabelKeys` is set. The pods
+  of a component carry the label `name: <component>` for a selector.
+
+  - Test: `kubernetes/tests/test_components.py::test_topology_spread_constraints`, `::test_no_pod_management_or_spread_renders_as_before`; fixture target `complete`; `manual:` as K8S-23
+  - Since: this change
+
+DEC-6: `topology_spread_constraints` passes through without a default
+`labelSelector`. A selector on the component's `name` label where none is
+set, as the `prefer_pods_in_different_*` keys add to their anti-affinity
+terms, was considered. A chart's constraint carries its own selector, such
+as `app.kubernetes.io/instance: <release>-synapse-main` in matrix-stack,
+and an inventory converted from the chart sets it. A default would turn a
+constraint that spreads nothing into one that spreads, without the
+inventory saying so.
+
 ## RBAC for one workload
 
 DEC-2: There is no generator mechanism for several roles per set of
@@ -472,9 +536,9 @@ because it already sits below `namespaces`.
 |---|---|
 | Component Service | `kubernetes/generators.py` (`_build_service_bundle`) |
 | Service IP families, Service port of an unnamed container port | `kubernetes/networking.py` (`Service.body`, `Service._build_service_ports`) |
-| StatefulSet `serviceName` | `kubernetes/workloads.py` (`StatefulSet.body`) |
+| StatefulSet `serviceName`, `podManagementPolicy` | `kubernetes/workloads.py` (`StatefulSet.body`) |
 | Claim template name label | `kubernetes/base.py` (`WorkloadCommon.add_volume_claims`) |
-| Pod `shareProcessNamespace` | `kubernetes/base.py` (`Workload.body`) |
+| Pod `shareProcessNamespace`, `topologySpreadConstraints` | `kubernetes/base.py` (`Workload.body`) |
 | Container args, tty, stdin, workingDir, unnamed ports | `kubernetes/base.py` (`Container.body`) |
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
