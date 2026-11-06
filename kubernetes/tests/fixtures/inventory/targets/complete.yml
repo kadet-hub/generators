@@ -362,6 +362,14 @@ parameters:
       image: registry.example.com/shop/web:1.4.2
       replicas: 2
       prefer_pods_in_different_zones: true
+      topology_spread_constraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              name: web
+          matchLabelKeys: [pod-template-hash]
       read_only_root_filesystem: true
       priority_class_name: shop-critical
       ports:
@@ -480,6 +488,14 @@ parameters:
       # rendered elsewhere, and claim templates without the generator's name label
       statefulset_service_name: db-hl
       volume_claim_name_label: false
+      pod_management_policy: Parallel
+      topology_spread_constraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              name: db
       workload_security_context:
         runAsUser: 999
         runAsGroup: 999
