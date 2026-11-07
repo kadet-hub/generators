@@ -1,8 +1,8 @@
 # tetragon generator
 
-Status: Draft
+Status: As-built
 Code: `tetragon/`
-Verified against: main @ ecb722d
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -85,14 +85,14 @@ policy examples could no longer be copied.
 
   - Test: `tetragon/tests/test_tetragon.py::test_spec_and_flat_keys`,
     `::test_flat_keys_are_the_spec_fields`
-  - Since: #138, this change
+  - Since: #138, #157
 
 - TET-7: Compiled output MUST validate against the closed JSON schemas of
   the TracingPolicy and TracingPolicyNamespaced CRDs of Tetragon 1.8.0.
 
   - Test: the kadet-hub gate (registry QA-7, QA-11) through `./check
     tetragon`, fixture targets `minimal` and `complete`
-  - Since: #138, this change
+  - Since: #138, #157
 
 - TET-8: A `hostSelector` with `matchLabels` or `matchExpressions`, set
   through `host_selector` or `spec`, MUST fail the compile, naming the
@@ -105,7 +105,7 @@ policy examples could no longer be copied.
   new in 1.8.0, does: it decides on which nodes the agents load the policy.
 
   - Test: `tetragon/tests/test_tetragon.py::test_host_selector_with_labels_fails`
-  - Since: this change
+  - Since: #157
 
 ## Implementation inventory
 

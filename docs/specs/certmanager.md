@@ -1,8 +1,8 @@
 # certmanager generator
 
-Status: Draft
+Status: As-built
 Code: `certmanager/`, `conftest.py`
-Verified against: main @ 15173ef
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 

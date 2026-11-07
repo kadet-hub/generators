@@ -1,8 +1,8 @@
 # talos generator
 
-Status: Draft
+Status: As-built
 Code: `talos/`
-Verified against: main @ 01d9c3c
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -47,7 +47,7 @@ images for one version.
   tag to give the other components.
 
   - Test: `talos/tests/test_multidoc.py::test_component_tags_must_agree`
-  - Since: this change, #134 (image without a tag)
+  - Since: #130, #134 (image without a tag)
 
 - TAL-2: On such a node, every component image the inventory does not set
   MUST be rendered with the upstream repository of that component and the
@@ -60,7 +60,7 @@ images for one version.
   digest only of its own default tag (TAL-4).
 
   - Test: `talos/tests/test_multidoc.py::test_missing_images_take_the_tag`
-  - Since: this change
+  - Since: #130
 
 - TAL-3: On a node where the inventory sets no component image, the
   rendered config MUST be unchanged against 1.1.0, apart from the default
@@ -70,7 +70,7 @@ images for one version.
 
   - Test: `talos/tests/test_multidoc.py::test_no_images_unchanged`;
     `./check talos` (fixture `minimal`)
-  - Since: this change
+  - Since: #130
 
 ## Default images
 
@@ -98,7 +98,7 @@ default and supports 1.37.2.
     repository and tag; `reference.ParseNormalizedNamed` of
     distribution/reference v0.6.0, which Talos' `VersionFromImageRef`
     uses, reads the tag of each default
-  - Since: this change
+  - Since: #134
 
 ## Implementation inventory
 

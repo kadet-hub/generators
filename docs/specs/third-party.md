@@ -1,8 +1,8 @@
 # Third-party licences and notices
 
-Status: Draft
+Status: As-built
 Code: `*/schemas/sources.yaml`, `*/schemas/<group>/NOTICE`, `*/schemas/<group>/LICENSE`, `LICENSE`
-Verified against: main @ 1ea7e4e
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -38,7 +38,7 @@ the group's `sources.yaml` entry.
 
   - Test: CHK-7 (presence and allow list); manual: compare each entry
     with the API at its ref
-  - Since: this change
+  - Since: #131
 
 ## Notices
 
@@ -59,7 +59,7 @@ the group's `sources.yaml` entry.
   - Test: manual: for each entry, `gh api
     repos/<owner>/<repo>/contents/?ref=<ref>` lists no NOTICE, or the
     group directory has one
-  - Since: this change
+  - Since: #131
 
 ## Generator licence
 

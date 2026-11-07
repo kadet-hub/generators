@@ -68,7 +68,7 @@ gate's SEC-5.
     `::test_no_install_renders_as_before`; fixture target `install`;
     `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and
     `complete` to the same output as 1.0.4, with both inventory backends
-  - Since: this change
+  - Since: #182
 
 - ACD-2: A rendered document MUST equal its upstream document except in
   three places: a namespaced object gets `metadata.namespace`, a
@@ -97,7 +97,7 @@ gate's SEC-5.
   - Test: `argocd/tests/test_install.py::test_install_is_upstream`,
     `::test_install_namespace`, `::test_unknown_kind_fails`,
     `::test_image_without_pin_fails`; fixture target `install`
-  - Since: this change
+  - Since: #182
 
 - ACD-3: The compile with `install` MUST fail when the SHA-256 of
   `argocd/manifests/install.yaml` differs from `INSTALL_SHA256`, or when
@@ -119,7 +119,7 @@ gate's SEC-5.
     `::test_version_mismatch_fails`; `manual:` the commands in the
     implementation inventory reproduce `argocd/manifests/install.yaml`
     from upstream and verify both checksums
-  - Since: this change
+  - Since: #182
 
 DEC-2: The release manifest stays as upstream wrote it, apart from the
 namespace and the image digests of ACD-2. The generator does not model
@@ -157,7 +157,7 @@ are those of EX-24, which kadet-hub/examples tests on kind with Argo CD
   - Test: `argocd/tests/test_install.py::test_cmp_golden` against
     `argocd/tests/golden/install-cmp.yaml`; fixture target `install-cmp`;
     `manual:` kind run of the implementation inventory
-  - Since: this change
+  - Since: #182
 
 - ACD-5: `install.cmp.image` MUST be an image reference pinned by digest,
   `<repository>[:<tag>]@sha256:<64 hex digits>`. Any other value MUST fail
@@ -169,13 +169,13 @@ are those of EX-24, which kadet-hub/examples tests on kind with Argo CD
 
   - Test: `argocd/tests/test_install.py::test_cmp_image_by_digest`,
     `::test_cmp_image_without_digest_fails`
-  - Since: this change
+  - Since: #182
 
 - ACD-6: `install.cmp.resources` MUST become the container's `resources`
   unchanged. Without it the container MUST have no `resources`, as
   upstream's repo server container has none.
   - Test: `argocd/tests/test_install.py::test_cmp_resources`
-  - Since: this change
+  - Since: #182
 
 - ACD-7: With `install.cmp` the compile MUST fail unless the pod template
   of `argocd-repo-server` sets `automountServiceAccountToken: false`.
@@ -190,7 +190,7 @@ are those of EX-24, which kadet-hub/examples tests on kind with Argo CD
   - Test: `argocd/tests/test_install.py::test_cmp_needs_pod_without_token`;
     `manual:` kind run of the implementation inventory, where the sidecar
     finds no `/var/run/secrets/kubernetes.io`
-  - Since: this change
+  - Since: #182
 
 - ACD-8: A value of `install` or `install.cmp` that is neither a mapping
   nor `null`, a key under `install` other than `cmp`, and a key under
@@ -200,7 +200,7 @@ are those of EX-24, which kadet-hub/examples tests on kind with Argo CD
   message, and `install: true` would read as turned on.
 
   - Test: `argocd/tests/test_install.py::test_unknown_keys_fail`
-  - Since: this change
+  - Since: #182
 
 DEC-3: The Application selects the target, through its plugin env
 `TARGET`, as in EX-24. The plugin compiles `$ARGOCD_ENV_TARGET`, prints

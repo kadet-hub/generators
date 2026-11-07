@@ -1,8 +1,8 @@
 # kubevirt generator
 
-Status: Draft
+Status: As-built
 Code: `kubevirt/`
-Verified against: feat/kubevirt-csi-snapshot-controller @ 3726e7f
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -55,7 +55,7 @@ hosted (registry DEC-16 in `docs/specs/publishing.md`).
   the default.
 
   - Test: `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
-  - Since: this change
+  - Since: #103
 
 ## CSI sidecar images
 
@@ -76,7 +76,7 @@ The generator now follows the kubernetes-csi releases.
   - Test: manual: `diff` of `deploy/kubernetes/rbac.yaml` between the old
     and new tag, `grep` of the passed flags in the release's `cmd/`
     sources; `./check kubevirt` (fixtures `csi-infra`, `csi-tenant`)
-  - Since: this change
+  - Since: #132
 
 ## KubeVirt CR spec
 
@@ -90,7 +90,7 @@ renders always get a `spec` mapping built from their flat keys.
   inventory, or with `spec: null`, it MUST render `spec: {}`.
 
   - Test: `./check kubevirt` (fixture `minimal`, QA-7 schema check)
-  - Since: this change
+  - Since: #104
 
 ## Implementation inventory
 

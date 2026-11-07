@@ -1,8 +1,8 @@
 # ocm generator
 
-Status: Draft
+Status: As-built
 Code: `ocm/`
-Verified against: main @ 5e4335d
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -67,7 +67,7 @@ rules, and reading images from anything other than YAML.
   plain`, as `ocm` returns the file's text.
 
   - Test: `ocm/tests/test_constructor.py::test_unknown_keys`
-  - Since: this change
+  - Since: #129
 
 - OCM-1a: A key of `images` with a value of the wrong type MUST fail the
   compile, naming the key: `scan` and `refs` are lists of strings, `access`
@@ -80,7 +80,7 @@ rules, and reading images from anything other than YAML.
   would otherwise change the output silently or end in a traceback.
 
   - Test: `ocm/tests/test_constructor.py::test_image_key_types`
-  - Since: this change
+  - Since: #129
 
 - OCM-2: `components` maps an id to a component. Every key of a component
   except `images` and `resources` MUST be copied to the constructor as
@@ -94,7 +94,7 @@ rules, and reading images from anything other than YAML.
 
   - Test: `ocm/tests/test_constructor.py::test_component_passthrough`,
     `::test_component_required`
-  - Since: this change
+  - Since: #129
 
 - OCM-3: `resources` maps a resource name to a resource. Each MUST be
   copied as written with `name` set to its key, in the order of the map,
@@ -105,7 +105,7 @@ rules, and reading images from anything other than YAML.
   artifact, a Git bundle, a directory of operations files.
 
   - Test: `ocm/tests/test_constructor.py::test_resources`
-  - Since: this change
+  - Since: #129
 
 - OCM-4: Two resources of one component with the same name MUST fail the
   compile, naming both.
@@ -114,7 +114,7 @@ rules, and reading images from anything other than YAML.
   compile names the image refs behind the clash, which the CLI does not.
 
   - Test: `ocm/tests/test_constructor.py::test_name_collision`
-  - Since: this change
+  - Since: #129
 
 ## Images
 
@@ -128,7 +128,7 @@ rules, and reading images from anything other than YAML.
   inside string values, such as a manifest in a ConfigMap, are not seen.
 
   - Test: `ocm/tests/test_constructor.py::test_scan`
-  - Since: this change
+  - Since: #129
 
 - OCM-5a: A pattern that matches no file, or a match outside the compile
   root, MUST fail the compile, naming the pattern. A file that does not
@@ -138,7 +138,7 @@ rules, and reading images from anything other than YAML.
   image list would ship a component that cannot run.
 
   - Test: `ocm/tests/test_constructor.py::test_scan_errors`
-  - Since: this change
+  - Since: #129
 
 - OCM-6: `images.refs` is a list of image references added to the scanned
   ones. Duplicates MUST collapse to one resource, and image resources MUST
@@ -148,7 +148,7 @@ rules, and reading images from anything other than YAML.
   image named in a machine config.
 
   - Test: `ocm/tests/test_constructor.py::test_refs_dedup_order`
-  - Since: this change
+  - Since: #129
 
 - OCM-6a: Duplicates MUST be detected on the parsed reference, with the
   registry in lower case: `redis:8` and `docker.io/library/redis:8` are one
@@ -162,7 +162,7 @@ rules, and reading images from anything other than YAML.
   `%ref%` and the label carry the first reference in sort order.
 
   - Test: `ocm/tests/test_constructor.py::test_dedup_parsed`
-  - Since: this change
+  - Since: #129
 
 - OCM-7: Each image MUST become a resource of type `ociImage` whose
   `access` is `{type: ociArtifact, imageReference: <images.access>}`, its
@@ -176,7 +176,7 @@ rules, and reading images from anything other than YAML.
 
   - Test: `ocm/tests/test_constructor.py::test_image_resource`,
     `::test_untagged_digest`
-  - Since: this change
+  - Since: #129
 
 - OCM-8: `images.access` is a template for `imageReference`, default
   `%ref%`. `ocm` MUST replace `%ref%` with the reference as written,
@@ -196,7 +196,7 @@ rules, and reading images from anything other than YAML.
 
   - Test: `ocm/tests/test_constructor.py::test_access_template`; `./check ocm`
     (fixture `complete`, both backends)
-  - Since: this change
+  - Since: #129
 
 - OCM-9: `images.label` MAY name a label. When set, each image resource
   MUST carry it with the reference as written as its value.
@@ -205,7 +205,7 @@ rules, and reading images from anything other than YAML.
   an image came from.
 
   - Test: `ocm/tests/test_constructor.py::test_label_digest`
-  - Since: this change
+  - Since: #129
 
 - OCM-10: With `images.require_digest: true`, an image without a digest
   MUST fail the compile, naming it. `images.names` maps a repository
@@ -220,7 +220,7 @@ rules, and reading images from anything other than YAML.
 
   - Test: `ocm/tests/test_constructor.py::test_label_digest`,
     `::test_names`
-  - Since: this change
+  - Since: #129
 
 ## Output
 
@@ -229,7 +229,7 @@ rules, and reading images from anything other than YAML.
   OCM constructor schema whenever the inventory values do.
 
   - Test: `ocm/tests/test_constructor.py::test_schema`; `./check ocm`
-  - Since: this change
+  - Since: #129
 
 ## Manifest and gate
 
@@ -242,7 +242,7 @@ rules, and reading images from anything other than YAML.
   tests instead.
 
   - Test: `./check ocm`
-  - Since: this change
+  - Since: #129
 
 ## Open questions
 
