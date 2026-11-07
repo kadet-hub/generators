@@ -27,12 +27,14 @@ Example inventory:
               cmd: ["python", "main.py"]
 """
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 
 import json
 from typing import Any
 
 from kapitan.inputs.kadet import BaseObj, inventory
+
+from . import compose
 
 
 inventory_data = inventory()
@@ -651,6 +653,18 @@ def main(input_params: dict) -> BaseObj:
             output_file_path = f"{component_name}/Dockerfile"
 
         output_object.root[output_file_path] = dockerfile_content
+
+    # DKR-1: a mapping turns the Compose file on, null or no key leaves it off.
+    compose_config = docker_config.get("compose")
+    if isinstance(compose_config, dict):
+        parameters = {
+            key: _convert_to_dict(inventory_data.parameters.get(key, {}))
+            for key in ("components", "applications", "generators")
+        }
+        compose_path = f"{base_output_path}/compose.yml" if base_output_path else "compose.yml"
+        output_object.root[compose_path] = compose.render(parameters)
+    elif compose_config is not None:
+        raise ValueError("generators.docker.compose must be a mapping or null")
 
     return output_object
 

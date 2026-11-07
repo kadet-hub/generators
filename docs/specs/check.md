@@ -88,6 +88,20 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   - Test: manual: review of `.github/workflows/check.yml`
   - Since: #39
 
+- CHK-8: The `check` workflow MUST run `docker compose config` on
+  `docker/tests/golden/compose.yml` and fail when Compose rejects it.
+
+  The golden is the Compose file the docker generator writes for its
+  fixture ([docker.md](docker.md)). The gate validates no Compose file,
+  because QA-7 covers documents with `apiVersion` and `kind` only. The
+  step uses the Docker Compose that the `ubuntu-24.04` runner image ships,
+  so its version follows the image and is not pinned. It takes about a
+  second and runs on every pull request and push.
+
+  - Test: manual: the step's log; a golden with an unknown service key
+    fails it
+  - Since: this change
+
 - CHK-6: Every pull request MUST request a review from `neat-bot`. That
   review MUST NOT be a condition for merging.
 
@@ -139,3 +153,4 @@ None.
 | Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |
 | Review request | `.github/workflows/request-review.yml`, `pull_request` (CHK-6) |
 | Licence allow list | registry `policy/licenses.txt`, first column (CHK-7) |
+| Compose validation | `.github/workflows/check.yml`, `docker compose config --quiet` on `docker/tests/golden/compose.yml` (CHK-8) |

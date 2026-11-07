@@ -1,5 +1,5 @@
 name: docker
-description: Renders Dockerfiles, single- or multi-stage, from short image descriptions in the inventory, with package installation for the base image's distribution and non-root user setup.
+description: Renders Dockerfiles, single- or multi-stage, from short image descriptions in the inventory, with package installation for the base image's distribution and non-root user setup, and a Docker Compose file from the kubernetes generator's components.
 tags: []
 license: Apache-2.0
 owners: [3042152]
