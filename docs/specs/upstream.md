@@ -282,14 +282,17 @@ and CHANGELOG entry before merging.
   review is the control there.
 
   - Test: manual: `gh api repos/kadet-hub/generators/rulesets` lists
-    `branches`, `upstream branches`, `renovate branches` and `tag creation`
-  - Since: #87; `renovate/` branches: #185 (ruleset not implemented)
+    `branches`, `upstream branches`, `renovate branches` and `tag creation`,
+    and `gh api repos/kadet-hub/generators/rulesets/<id of branches> --jq
+    .conditions.ref_name.exclude` lists `refs/heads/main`,
+    `refs/heads/upstream/**/*` and `refs/heads/renovate/**/*`
+  - Since: #87; `renovate/` branches: not met yet
 
 ## Open deviations
 
 | Requirement | Deviation |
 |---|---|
-| UPD-7 | The repository has no `renovate branches` ruleset, and the `branches` ruleset exempts only `main` and `upstream/`, so Renovate cannot push to `renovate/`. The rulesets come from the organization's Terraform config. Checked with `gh api repos/kadet-hub/generators/rulesets` on 2026-11-07. |
+| UPD-7 | The `renovate/` clause, added in #185, fails its Test on 2026-11-07. The repository has no `renovate branches` ruleset, and the exclude list of `branches` lacks `refs/heads/renovate/**/*`, so Renovate cannot push to `renovate/`. The rulesets come from the organization's Terraform config. |
 
 ## Open questions
 
