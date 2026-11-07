@@ -262,12 +262,14 @@ and CHANGELOG entry before merging.
 
 - UPD-7: Rulesets MUST restrict creating, updating and deleting branches
   other than `main` to the admin role, branches under `upstream/` to the
-  `kadet-hub-upstream` App and the admin role, and creating tags to the
-  admin role.
+  `kadet-hub-upstream` App and the admin role, branches under `renovate/`
+  to Renovate and the admin role, and creating tags to the admin role.
 
   Renovate holds `contents` and `workflows` write on every repository of
-  the organization but has no configuration here, so no ruleset admits it
-  and it can push no branch. The App holds `contents` write without
+  the organization. The `renovate branches` ruleset admits it to
+  `renovate/` only, as REV-3 does in kadet-hub/registry. A workflow it
+  pushes there gets no App key, because the `upstream` environment admits
+  only `main` (UPD-6). The App holds `contents` write without
   `workflows`; without the tag rule its key could create a release tag
   `<generator>-v<semver>` on any commit the repository holds, such as an
   unmerged branch, and the registry's Renovate would propose that tag as
@@ -280,8 +282,8 @@ and CHANGELOG entry before merging.
   review is the control there.
 
   - Test: manual: `gh api repos/kadet-hub/generators/rulesets` lists
-    `branches`, `upstream branches` and `tag creation`
-  - Since: #87
+    `branches`, `upstream branches`, `renovate branches` and `tag creation`
+  - Since: #87; `renovate/` branches: not implemented
 
 ## Open questions
 
@@ -297,5 +299,5 @@ None.
 | Branch | `upstream/<generator>` |
 | Issue title | `[upstream] <generator>: <software> <version>` |
 | Secrets | `APP_CLIENT_ID`, `APP_PRIVATE_KEY` (GitHub App) in the environment `upstream`, deployment branch `main` only |
-| Rulesets, environment | `branches`, `upstream branches`, `tag creation` and the environment `upstream`, declared in the organisation's Terraform configuration |
+| Rulesets, environment | `branches`, `upstream branches`, `renovate branches`, `tag creation` and the environment `upstream`, declared in the organisation's Terraform configuration |
 | Workflow policy | `tools/workflow-policy`, run by the `check` workflow |
