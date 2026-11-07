@@ -1,0 +1,69 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "github>kadet-hub/renovate-config"
+  ],
+  "automerge": false,
+  "platformAutomerge": false,
+  "minimumReleaseAge": "3 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
+  "internalChecksFilter": "strict",
+  "customManagers": [
+    {
+      "description": "IMG-3: default images, one string literal <repository>:<tag>@sha256:<digest> each (IMG-1)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^[^/]+/.+\\.py$/"
+      ],
+      "matchStrings": [
+        "[\"'](?<depName>[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)+):(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[0-9a-f]{64})[\"']"
+      ],
+      "datasourceTemplate": "docker",
+      "depTypeTemplate": "default-image"
+    },
+    {
+      "description": "IMG-2: tool release assets with a renovate comment carry their SHA-256 along",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>github-release-attachments) depName=(?<depName>\\S+)\\n\\s*[A-Z_]+: (?<currentValue>\\S+)\\n\\s*[A-Z_]+_SHA256: (?<currentDigest>[0-9a-f]{64})"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "IMG-3: a default image moves only to a patch release or a new digest of its tag; minors are the generator's decision",
+      "matchDepTypes": [
+        "default-image"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "IMG-3: one pull request per generator, which the reviewer completes with the generator version and CHANGELOG entry",
+      "matchDepTypes": [
+        "default-image"
+      ],
+      "groupName": "{{replace '^([^/]+)/.*$' '$1' packageFile}} default images",
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Registries other than Docker Hub report no release timestamp",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "/^[^/]*[.:][^/]*//",
+        "!/^(docker\\.io|index\\.docker\\.io)//"
+      ],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    }
+  ]
+}
