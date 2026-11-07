@@ -283,7 +283,7 @@ and CHANGELOG entry before merging.
 
   - Test: manual: `gh api repos/kadet-hub/generators/rulesets` lists
     `branches`, `upstream branches`, `renovate branches` and `tag creation`
-  - Since: #87; `renovate/` branches: not implemented
+  - Since: #87; `renovate/` branches: #185 (ruleset not implemented)
 
 ## Open questions
 

@@ -90,7 +90,7 @@ can fix.
     v3.6.1, dex v2.46.1 and kindest/node v1.37.0, which the package rule
     disables when Renovate builds the branches; `--platform=local` stops
     before that step.
-  - Since: this change
+  - Since: #185
 
 ## Open questions
 
