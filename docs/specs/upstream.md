@@ -1,8 +1,8 @@
 # Upstream schema updates
 
-Status: Draft
+Status: As-built
 Code: `tools/upstream.py`, `tools/workflow-policy`, `.github/workflows/upstream.yml`
-Verified against: main @ 313f1ca
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -284,6 +284,12 @@ and CHANGELOG entry before merging.
   - Test: manual: `gh api repos/kadet-hub/generators/rulesets` lists
     `branches`, `upstream branches`, `renovate branches` and `tag creation`
   - Since: #87; `renovate/` branches: #185 (ruleset not implemented)
+
+## Open deviations
+
+| Requirement | Deviation |
+|---|---|
+| UPD-7 | The repository has no `renovate branches` ruleset, and the `branches` ruleset exempts only `main` and `upstream/`, so Renovate cannot push to `renovate/`. The rulesets come from the organization's Terraform config. Checked with `gh api repos/kadet-hub/generators/rulesets` on 2026-11-07. |
 
 ## Open questions
 

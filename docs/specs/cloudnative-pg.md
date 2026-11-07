@@ -1,8 +1,8 @@
 # cloudnative-pg generator
 
-Status: Draft
+Status: As-built
 Code: `cloudnative-pg/`
-Verified against: main @ f9fa4dd
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 

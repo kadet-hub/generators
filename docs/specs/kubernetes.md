@@ -1,8 +1,8 @@
 # kubernetes generator
 
-Status: Draft
+Status: As-built
 Code: `kubernetes/`
-Verified against: main @ 53ac637
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -448,7 +448,7 @@ out of step whenever a component was added or removed.
   Chainsaw configuration sets them for a run.
 
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_test_per_namespace`, `::test_chainsaw_test_uses_output_type`, `::test_no_chainsaw_test_for_cronjobs_only`; fixture target `complete`; `manual:` `chainsaw test --no-cluster` on the compiled fixture loads both Tests and their templates
-  - Since: this change
+  - Since: #139
 
 - K8S-13: `generators.kubernetes.chainsaw.workloads.<name>` with `kind`
   and an optional `namespace` MUST render the same StepTemplate and Test
@@ -474,7 +474,7 @@ out of step whenever a component was added or removed.
   component, a Job when its `Complete` condition is `True`.
 
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_workloads_rendered_elsewhere`, `::test_chainsaw_workload_kind_must_be_known`, `::test_chainsaw_workload_and_component_of_one_name_fail`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind: the four kinds and a Deployment with 0 replicas pass, a Deployment and a StatefulSet with an image that does not exist fail
-  - Since: this change
+  - Since: #141
 
 - K8S-14: `generators.kubernetes.chainsaw.resources.<key>` with
   `api_version`, `kind` and a `status` mapping MUST render a StepTemplate
@@ -490,7 +490,7 @@ out of step whenever a component was added or removed.
   fails the compile, because both write one file.
 
   - Test: `kubernetes/tests/test_components.py::test_chainsaw_resource_status_assert`, `::test_chainsaw_resource_needs_kind_and_status`, `::test_no_chainsaw_keys_render_as_before`; fixture target `complete`; `manual:` Chainsaw 0.2.15 on kind against a custom resource: fails without status and with a wrong nested field, passes once the status matches
-  - Since: this change
+  - Since: #143
 
 ## Namespaces in their namespace directory
 

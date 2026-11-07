@@ -1,8 +1,8 @@
 # rabbitmq generator
 
-Status: Draft
+Status: As-built
 Code: `rabbitmq/`, `conftest.py`
-Verified against: main @ 5d11df4
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 

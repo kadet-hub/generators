@@ -1,8 +1,8 @@
 # Gate check
 
-Status: Draft
+Status: As-built
 Code: `check`, `.github/workflows/check.yml`, `.github/workflows/request-review.yml`
-Verified against: main @ ca05de9
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -100,7 +100,7 @@ signatures with `freshclam`, or warns and scans with the shipped database.
 
   - Test: manual: the step's log; a golden with an unknown service key
     fails it
-  - Since: this change
+  - Since: #183
 
 - CHK-6: Every pull request MUST request a review from `neat-bot`. That
   review MUST NOT be a condition for merging.
@@ -137,7 +137,7 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   - Test: manual: in a throwaway copy of a generator, `./check` fails with
     `license` removed from an entry and with `license: WTFPL`, and passes
     with `license: GPL-3.0-only`
-  - Since: this change
+  - Since: #133
 
 ## Open questions
 

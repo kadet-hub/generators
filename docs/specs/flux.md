@@ -1,8 +1,8 @@
 # flux generator
 
-Status: Draft
+Status: As-built
 Code: `flux/`, `conftest.py`
-Verified against: main @ 3dbbb6b
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 

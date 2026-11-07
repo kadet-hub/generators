@@ -44,7 +44,7 @@ gets is dropped without a message. The rejected options are in
   - Test: `docker/tests/test_compose.py::test_without_switch`; `manual:`
     Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` on
     reclass-rs and omegaconf to the same files as 1.0.2
-  - Since: this change
+  - Since: #183
 
 ## Components
 
@@ -63,7 +63,7 @@ gets is dropped without a message. The rejected options are in
   through its application defaults.
 
   - Test: `docker/tests/test_compose.py::test_defaults`, `::test_disabled`
-  - Since: this change
+  - Since: #183
 
 - DKR-3: A component key MUST render as the table below states. Any other
   key, and a value the table does not allow, MUST fail the compile with
@@ -100,7 +100,7 @@ gets is dropped without a message. The rejected options are in
     `docker/tests/golden/compose.yml` (fixture target `compose`),
     `::test_command_and_args`, `::test_user_and_read_only`,
     `::test_refusals`
-  - Since: this change
+  - Since: #183
 
 - DKR-4: A `$` in a value the generator takes from a component MUST be
   written as `$$`. A value of `env`, `command` or `args` that contains
@@ -116,7 +116,7 @@ gets is dropped without a message. The rejected options are in
   (DKR-9) are written as given, with Compose interpolation.
 
   - Test: `docker/tests/test_compose.py::test_dollar`
-  - Since: this change
+  - Since: #183
 
 ## Environment and refs
 
@@ -144,7 +144,7 @@ gets is dropped without a message. The rejected options are in
 
   - Test: `docker/tests/test_compose.py::test_golden`, `::test_refusals`;
     `manual:` the compiled fixture target `compose` holds hashed ref tags
-  - Since: this change
+  - Since: #183
 
 ## Health check
 
@@ -168,7 +168,7 @@ gets is dropped without a message. The rejected options are in
 
   - Test: `docker/tests/test_compose.py::test_golden`, `::test_refusals`,
     `::test_probe_without_type_renders_nothing`
-  - Since: this change
+  - Since: #183
 
 ## Resources
 
@@ -186,7 +186,7 @@ gets is dropped without a message. The rejected options are in
   out.
 
   - Test: `docker/tests/test_compose.py::test_resources`, `::test_refusals`
-  - Since: this change
+  - Since: #183
 
 ## Volumes
 
@@ -206,7 +206,7 @@ gets is dropped without a message. The rejected options are in
 
   - Test: `docker/tests/test_compose.py::test_golden`, `::test_volumes`,
     `::test_refusals`
-  - Since: this change
+  - Since: #183
 
 ## Docker host settings
 
@@ -221,7 +221,7 @@ gets is dropped without a message. The rejected options are in
   `docker compose config` does.
 
   - Test: `docker/tests/test_compose.py::test_golden`, `::test_overrides`
-  - Since: this change
+  - Since: #183
 
 ## Verification
 

@@ -1,8 +1,8 @@
 # keycloak generator
 
-Status: Draft
+Status: As-built
 Code: `keycloak/`, `conftest.py`
-Verified against: main @ 0011e4c
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 

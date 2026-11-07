@@ -1,8 +1,8 @@
 # Default images
 
-Status: Draft
+Status: As-built
 Code: `tools/default_images.py`, `.github/workflows/images.yml`, `renovate.json`
-Verified against: main @ 1ea7e4e
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
@@ -38,7 +38,7 @@ can fix.
 
   - Test: `tools/test_default_images.py`; the scan's job summary lists
     every default image
-  - Since: this change
+  - Since: #135
 
 ## Weekly scan
 
@@ -57,7 +57,7 @@ can fix.
 
   - Test: manual: dispatch the workflow; the summary lists every image
     `tools/default_images.py` prints, with counts
-  - Since: this change
+  - Since: #135
 
 ## Updates
 

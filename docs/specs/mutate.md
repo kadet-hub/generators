@@ -1,8 +1,8 @@
 # mutate generator
 
-Status: Draft
+Status: As-built
 Code: `mutate/`
-Verified against: main @ 7cd44eb
+Verified against: main @ fbe8c39
 
 ## Problem and decision
 
