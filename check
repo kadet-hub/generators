@@ -2,7 +2,8 @@
 # Run the kadet-hub gate's static scan and sandbox compile on a generator.
 #
 # Usage: ./check <generator dir>
-# Needs: Linux x86-64, docker, git, curl, uv, yq, python3. REGISTRY_REF
+# Needs: Linux x86-64, docker, git, curl, uv, yq, python3; with GH_TOKEN set,
+# gh, and the downloads from GitHub use the token (CHK-9). REGISTRY_REF
 # selects the kadet-hub/registry commit whose gate scripts, scanner pins and
 # sandbox image are used (default: main, what the gate runs). Without gVisor
 # the syscall trace is not judged; exceptions (SEC-14) apply only in the gate.
@@ -34,13 +35,17 @@ if [[ -f $sources ]]; then
 fi
 
 echo "## sandbox image"
-docker build -q -t kadet-hub/sandbox "$reg/sandbox" >/dev/null
+docker build -q --secret id=GH_TOKEN,env=GH_TOKEN -t kadet-hub/sandbox "$reg/sandbox" >/dev/null
 
 echo "## static scan (SEC-1 to SEC-6, QA-3)"
 # The scanners as the gate's setup-gate action pins them, installed under $work.
 action=$reg/.github/actions/setup-gate/action.yml
 gitleaks=$(sed -n 's/^ *GITLEAKS_VERSION: *//p' "$action")
-curl -fsSLo "$work/gitleaks.tar.gz" "https://github.com/gitleaks/gitleaks/releases/download/${gitleaks}/gitleaks_${gitleaks#v}_linux_x64.tar.gz"
+if [[ -n ${GH_TOKEN:-} ]]; then
+  gh release download "$gitleaks" -R gitleaks/gitleaks -p "gitleaks_${gitleaks#v}_linux_x64.tar.gz" -O "$work/gitleaks.tar.gz"
+else
+  curl -fsSLo "$work/gitleaks.tar.gz" "https://github.com/gitleaks/gitleaks/releases/download/${gitleaks}/gitleaks_${gitleaks#v}_linux_x64.tar.gz"
+fi
 echo "$(sed -n 's/^ *GITLEAKS_SHA256: *//p' "$action")  $work/gitleaks.tar.gz" | sha256sum -c --quiet -
 mkdir -- "$work/bin"
 tar -xzf "$work/gitleaks.tar.gz" -C "$work/bin" gitleaks

@@ -49,6 +49,26 @@ has an exception today; a finding the maintainers excepted still fails
   - Test: manual (as CHK-1)
   - Since: #50, #92
 
+- CHK-9: With `GH_TOKEN` in its environment, `./check` MUST download from
+  GitHub with that token. The `check` workflow MUST give it the job's
+  read-only `GITHUB_TOKEN`.
+
+  gitleaks then comes through the REST API with `gh release download`,
+  because github.com ignores a token on a release download URL, and the
+  sandbox image build gets the token as the secret `GH_TOKEN` for its own
+  downloads from GitHub (registry GI-6). Without `GH_TOKEN`, as in a local
+  run and in the `upstream` job (UPD-8), both stay anonymous and `gh` is
+  not needed. GitHub rate-limits anonymous requests more tightly, and on
+  2026-11-08, during its timeouts for unauthenticated users, the same
+  anonymous downloads failed registry and recipes CI with HTTP 504. The
+  clone of the registry stays anonymous: git sends credentials only when
+  the server asks for them, which GitHub does not for a public
+  repository.
+
+  - Test: the `check` workflow on a pull request that changes `check`
+    (every generator is checked, CHK-4)
+  - Since: #188
+
 ClamAV runs as in the gate, because `static-scan` runs it unconditionally and
 skipping it would mean changing or copying that script. The first run pulls
 the digest-pinned `clamav/clamav` image (about 390 MB); each run updates the
@@ -147,7 +167,7 @@ None.
 
 | Item | Value |
 |---|---|
-| Script | `check`, needs docker, git, curl, uv, yq and python3 |
+| Script | `check`, needs docker, git, curl, uv, yq and python3, and gh with `GH_TOKEN` (CHK-9) |
 | Registry | `https://github.com/kadet-hub/registry.git` at `REGISTRY_REF`, default `main` |
 | Scanner pins | registry `.github/actions/setup-gate/action.yml` (gitleaks), `scan/requirements.txt` (semgrep, GuardDog, ruff), `scan/static-scan` (ClamAV image digest) |
 | Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |

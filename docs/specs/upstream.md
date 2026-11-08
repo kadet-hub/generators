@@ -210,8 +210,15 @@ and CHANGELOG entry before merging.
   `APP_PRIVATE_KEY` of the environment `upstream` (UPD-6); the token
   action's `app-id` input is deprecated in favour of `client-id`.
 
-  - Test: manual: dispatch the workflow and confirm the pull request runs `check`
-  - Since: #39
+  `tools/upstream.py` reads the API through `gh` with that token, and the
+  files on raw.githubusercontent.com with it as a Bearer header, which is
+  sent only to that host. Anonymous reads get GitHub's tighter limit for
+  unauthenticated requests. The upstream repositories already accept the
+  token for the API reads of the weekly runs.
+
+  - Test: manual: dispatch the workflow and confirm the pull request runs `check`;
+    `tools/test_upstream.py` (`Get`) for the raw reads
+  - Since: #39; raw reads with the token: #188
 
 - UPD-6: The `upstream` job MUST name the environment `upstream`, whose
   deployment branch policy admits only the branch `main`, and the App's

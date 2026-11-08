@@ -35,6 +35,7 @@ jobs:
           fi
       - name: Gate checks for changed generators
         env:
+          GH_TOKEN: ${{ github.token }} # CHK-9: downloads from GitHub
           BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.before }} # CHK-4
         run: |
           changed=$(git diff --name-only "$BASE" HEAD)

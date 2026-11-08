@@ -29,7 +29,8 @@ GITHUB = re.compile(r"https://github\.com/([^/]+/[^/]+)/(tree|blob)/([^/]+)/(.+)
 TERRAFORM = re.compile(r"https://registry\.terraform\.io/providers/([^/]+/[^/]+)/([^/]+)")
 ANNOTATIONS = ("$id", "$schema", "title", "description")
 COMPONENTS = "#/components/schemas/"
-TF_VERIFY = "https://raw.githubusercontent.com/kadet-hub/registry/main/.github/workflows/tf-schema-verify.yml"
+RAW = "https://raw.githubusercontent.com/"
+TF_VERIFY = RAW + "kadet-hub/registry/main/.github/workflows/tf-schema-verify.yml"
 TF_KINDS = ("resource_schemas", "data_source_schemas")
 
 
@@ -41,10 +42,13 @@ Loader.add_constructor("tag:yaml.org,2002:value", Loader.construct_yaml_str)
 
 
 def get(url):
-    """Every network read: the GitHub API through gh, anything else over HTTPS."""
+    """Every network read: the GitHub API through gh, raw files with GH_TOKEN (UPD-5), anything else over HTTPS."""
     if url.startswith(API):
         return subprocess.run(["gh", "api", url.removeprefix(API)], cwd=ROOT, check=True, capture_output=True, text=True).stdout
-    with urllib.request.urlopen(url, timeout=120) as response:
+    request = urllib.request.Request(url)
+    if url.startswith(RAW) and os.environ.get("GH_TOKEN"):
+        request.add_unredirected_header("Authorization", f"Bearer {os.environ['GH_TOKEN']}")
+    with urllib.request.urlopen(request, timeout=120) as response:
         return response.read()
 
 
