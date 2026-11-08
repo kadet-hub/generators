@@ -74,6 +74,28 @@ WIDGET = {
 }
 
 
+class Get(unittest.TestCase):
+    """UPD-5: raw.githubusercontent.com gets GH_TOKEN as a Bearer header; no other host gets it."""
+
+    def requests(self, url, token):
+        sent = []
+        with mock.patch.dict("os.environ", {"GH_TOKEN": token} if token else {}), \
+                mock.patch.object(upstream.urllib.request, "urlopen", lambda r, timeout: sent.append(r) or io.BytesIO(b"x")):
+            if not token:
+                upstream.os.environ.pop("GH_TOKEN", None)
+            self.assertEqual(upstream.get(url), b"x")
+        return sent
+
+    def test_raw_with_the_token(self):
+        (r,) = self.requests(f"{RAW}example/widgets/v1.0.0/crds/widgets.yaml", "t")
+        self.assertEqual((r.unredirected_hdrs, r.headers), ({"Authorization": "Bearer t"}, {}))
+
+    def test_other_hosts_and_no_token_without_it(self):
+        for url, token in (("https://registry.terraform.io/v1/providers/hashicorp/aws", "t"), (f"{RAW}example/widgets/v1.0.0/x.yaml", None)):
+            (r,) = self.requests(url, token)
+            self.assertEqual((r.full_url, r.unredirected_hdrs, r.headers), (url, {}, {}))
+
+
 class Repo(unittest.TestCase):
     """A temporary repository root with one generator, gen, whose example.io group is at widgets v1.0.0."""
 
