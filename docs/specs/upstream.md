@@ -218,7 +218,7 @@ and CHANGELOG entry before merging.
 
   - Test: manual: dispatch the workflow and confirm the pull request runs `check`;
     `tools/test_upstream.py` (`Get`) for the raw reads
-  - Since: #39; raw reads with the token: this change
+  - Since: #39; raw reads with the token: #188
 
 - UPD-6: The `upstream` job MUST name the environment `upstream`, whose
   deployment branch policy admits only the branch `main`, and the App's

@@ -67,7 +67,7 @@ has an exception today; a finding the maintainers excepted still fails
 
   - Test: the `check` workflow on a pull request that changes `check`
     (every generator is checked, CHK-4)
-  - Since: this change
+  - Since: #188
 
 ClamAV runs as in the gate, because `static-scan` runs it unconditionally and
 skipping it would mean changing or copying that script. The first run pulls
