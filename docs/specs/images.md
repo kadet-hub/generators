@@ -53,7 +53,9 @@ can fix.
   a pinned SHA-256, and runs without a workflow cache (CHK-5). The version
   is the release tag, because Renovate's `github-release-attachments`
   datasource looks the release up by it and hashes the new tarball
-  (IMG-3).
+  (IMG-3). The tarball is downloaded anonymously: the aquasecurity
+  organization has an IP allow list, which refuses a workflow's token
+  from a runner with HTTP 403 (kadet-hub/registry run 42483338507).
 
   - Test: manual: dispatch the workflow; the summary lists every image
     `tools/default_images.py` prints, with counts
