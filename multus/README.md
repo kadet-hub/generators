@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/multus/) page.
 
-Kapitan kadet generator for [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) NetworkAttachmentDefinitions (`k8s.cni.cncf.io/v1`). Built for Multus CNI 4.3.1.
+Kapitan kadet generator for [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) NetworkAttachmentDefinitions (`k8s.cni.cncf.io/v1`). Built for Multus CNI 4.3.2.
 
 Each entry under `networks` renders one NetworkAttachmentDefinition. The CNI configuration is written as YAML in the inventory and serialised to the JSON string that `spec.config` expects, with sorted keys so the output is stable.
 

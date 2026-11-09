@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 k8s.cni.cncf.io:
   software: Multus CNI
-  version: 4.3.1
-  source: https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.1/deployments/multus-daemonset-thick.yml
+  version: 4.3.2
+  source: https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.2/deployments/multus-daemonset-thick.yml
   license: Apache-2.0
