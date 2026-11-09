@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/strimzi/) page.
 
-Built for Strimzi 1.3.0 (`kafka.strimzi.io/v1`, the only served and storage version of every kind, not deprecated). Strimzi 1.x runs Kafka in KRaft mode with KafkaNodePools only. The bundled `kafka.strimzi.io` JSON Schemas come from the upstream CRDs of this release (Apache-2.0).
+Built for Strimzi 1.3.1 (`kafka.strimzi.io/v1`, the only served and storage version of every kind, not deprecated). Strimzi 1.x runs Kafka in KRaft mode with KafkaNodePools only. The bundled `kafka.strimzi.io` JSON Schemas come from the upstream CRDs of this release (Apache-2.0).
 
 Kapitan kadet generator for [Strimzi](https://strimzi.io/):
 
