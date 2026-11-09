@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/ironcore/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/ironcore/) page.
 
-Kapitan kadet generator for [IronCore](https://github.com/ironcore-dev/ironcore) IaaS resources. Built for IronCore 0.8.0 (`v1alpha1`, the only version of these groups at that release):
+Kapitan kadet generator for [IronCore](https://github.com/ironcore-dev/ironcore) IaaS resources. Built for IronCore 0.9.0 (`v1alpha1`, the only version of these groups at that release):
 
 | Kind | API group |
 |---|---|
