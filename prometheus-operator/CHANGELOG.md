@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.7
+
+Built for Prometheus Operator 0.95.1. Its CRDs add fields and remove none, and their kinds, versions and short names are unchanged, so the flat keys, shorthands and output keys still apply. New fields such as `extraScrapeMetrics` on Prometheus, PrometheusAgent, ServiceMonitor, PodMonitor, Probe and ScrapeConfig, or `alertmanagerConfigFileSystemMode` on Alertmanager, go into `spec`. In the CRDs, `clientAuthType` of `web.tlsConfig` and of Alertmanager `clusterTLS.server` only accepts the five Go `tls.ClientAuthType` names. A Webex receiver in an AlertmanagerConfig needs `httpConfig.authorization` or `httpConfig.bearerTokenSecret`. With `alertmanagerConfigFileSystemMode` and `alertmanagerConfigMatcherStrategy` unset, the operator now rejects an AlertmanagerConfig that references a file in the Alertmanager container, such as a Telegram `botTokenFile`, unless `alertmanagerConfiguration` names it. The upstream files the README cites say the same at v0.95.1, and their links move to that tag. The kube-prometheus-stack links move to chart 93.1.1, the newest that ships 0.95.1. The selector values and template lines the README cites are the same as in 92.3.0. Rendered output is unchanged.
+
 ## 1.1.6
 
 Ships the Kubernetes 1.37.2 ServiceAccount, ClusterRole and ClusterRoleBinding schemas instead of 1.37.1. kubernetes-json-schema has the same files for both releases. The three files no longer end in a newline, so they match upstream byte for byte. Rendered output is unchanged.
