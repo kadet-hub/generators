@@ -20,12 +20,12 @@ from . import k8s
 inv = inventory()
 logger = logging.getLogger(__name__)
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 API_VERSION = "kafka.strimzi.io/v1"
 CLUSTER_LABEL = "strimzi.io/cluster"
 
-# packaging/examples/security/tls-auth/kafka.yaml at 1.3.0
+# packaging/examples/security/tls-auth/kafka.yaml at 1.3.1
 DEFAULT_LISTENER = {
     "name": "tls",
     "port": 9093,
@@ -117,7 +117,7 @@ def _storage(value: Any) -> Any:
     """A size string -> one persistent JBOD volume that also holds the KRaft metadata."""
     if not isinstance(value, str):
         return value
-    # packaging/examples/kafka/kafka-persistent.yaml at 1.3.0
+    # packaging/examples/kafka/kafka-persistent.yaml at 1.3.1
     volume = {"id": 0, "type": "persistent-claim", "size": value, "kraftMetadata": "shared"}
     return {"type": "jbod", "volumes": [volume]}
 
@@ -210,7 +210,7 @@ class StrimziResource(k8s.Base):
         labels = config.get("labels") or {}
         reserved = [k for k in labels if k.startswith("strimzi.io/") and k != CLUSTER_LABEL]
         if reserved:
-            # operator-common/.../model/Labels.java at 1.3.0 rejects them
+            # operator-common/.../model/Labels.java at 1.3.1 rejects them
             raise ValueError(f"{self.kwargs.kind} '{self.kwargs.name}': labels {reserved} are reserved by Strimzi")
         self.add_labels(labels)
         self.add_annotations(config.get("annotations") or {})
