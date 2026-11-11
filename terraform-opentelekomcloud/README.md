@@ -7,7 +7,7 @@ Kapitan kadet generator that renders Terraform JSON for [Open Telekom Cloud](htt
 - **network**: a VPC, its subnets with CIDRs derived in Python, and optionally a NAT gateway with an EIP and one SNAT rule per egress subnet
 - **bucket**: a private OBS bucket with versioning, KMS server-side encryption (own key, given key or OBS default key) and a lifecycle rule
 
-The output pins `opentelekomcloud/opentelekomcloud` **1.37.11** and needs Terraform >= 1.5.0.
+The output pins `opentelekomcloud/opentelekomcloud` **1.37.12** and needs Terraform >= 1.5.0.
 
 ## Usage
 
@@ -117,7 +117,7 @@ The EIP is a `5_bgp` address with a dedicated (`PER`) bandwidth. SNAT rules sele
 
 The bucket is always `private` and encrypted with SSE-KMS. Once versioning has been enabled, a bucket can only suspend it, never return to unversioned. The KMS key alias is `<bucket>-obs` with `.` replaced by `-`, because KMS aliases allow only letters, digits and `:/_-`. With `create_key: false` and no `key_id`, OBS uses its default master key.
 
-Created keys live in the base project, because OBS accepts only base-project KMS keys for encryption (see the `server_side_encryption` note in the [opentelekomcloud_obs_bucket](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/obs_bucket) docs). When `tenant_name` is a sub-project such as `eu-de_myproject` and a bucket creates a key, `providers.tf.json` gets a second provider block with alias `base` and `tenant_name` set to the part before the first `_` (`eu-de`), and every KMS key uses `provider = opentelekomcloud.base`. The credentials must have KMS rights in that base project. A `tenant_name` without `_` is already the base project and gets no alias.
+Created keys live in the base project, because OBS accepts only base-project KMS keys for encryption (see the `server_side_encryption` note in the [opentelekomcloud_obs_bucket](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/obs_bucket) docs). When `tenant_name` is a sub-project such as `eu-de_myproject` and a bucket creates a key, `providers.tf.json` gets a second provider block with alias `base` and `tenant_name` set to the part before the first `_` (`eu-de`), and every KMS key uses `provider = opentelekomcloud.base`. The credentials must have KMS rights in that base project. A `tenant_name` without `_` is already the base project and gets no alias.
 
 The lifecycle rule `default` covers the whole bucket. Its 90 and 7 days are this generator's choice, not vendor defaults.
 
@@ -139,15 +139,15 @@ Terraform outputs, with `<name>` the sanitized key:
 | `<name>_bucket_name` | bucket name |
 | `<name>_kms_key_id` | KMS key ID, unless OBS uses its default key |
 
-Resource reference (provider 1.37.11):
+Resource reference (provider 1.37.12):
 
-- [opentelekomcloud_vpc_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/vpc_v1)
-- [opentelekomcloud_vpc_subnet_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/vpc_subnet_v1)
-- [opentelekomcloud_nat_gateway_v2](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/nat_gateway_v2)
-- [opentelekomcloud_vpc_eip_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/vpc_eip_v1)
-- [opentelekomcloud_nat_snat_rule_v2](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/nat_snat_rule_v2)
-- [opentelekomcloud_kms_key_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/kms_key_v1)
-- [opentelekomcloud_obs_bucket](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11/docs/resources/obs_bucket)
+- [opentelekomcloud_vpc_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/vpc_v1)
+- [opentelekomcloud_vpc_subnet_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/vpc_subnet_v1)
+- [opentelekomcloud_nat_gateway_v2](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/nat_gateway_v2)
+- [opentelekomcloud_vpc_eip_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/vpc_eip_v1)
+- [opentelekomcloud_nat_snat_rule_v2](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/nat_snat_rule_v2)
+- [opentelekomcloud_kms_key_v1](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/kms_key_v1)
+- [opentelekomcloud_obs_bucket](https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12/docs/resources/obs_bucket)
 
 The network defaults (OTC DNS pair, gateway on the first host, NAT spec `"0"`, 100 Mbit/s `PER` bandwidth on a `5_bgp` EIP, SNAT by network ID) mirror the community modules [iits-consulting/terraform-opentelekomcloud-vpc](https://github.com/iits-consulting/terraform-opentelekomcloud-vpc) and [iits-consulting/terraform-opentelekomcloud-snat](https://github.com/iits-consulting/terraform-opentelekomcloud-snat) (MPL-2.0).
 

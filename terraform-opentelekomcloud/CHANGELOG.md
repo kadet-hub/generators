@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+Pins opentelekomcloud/opentelekomcloud 1.37.12 instead of 1.37.11 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for opentelekomcloud/opentelekomcloud 1.37.12". The extracts of both versions are the same, and the 1.37.12 release notes name none of the seven resource types the generator emits. Rendered output differs only in the provider version.
+
 ## 0.1.3
 
 Pins opentelekomcloud/opentelekomcloud 1.37.11 instead of 1.37.10 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for opentelekomcloud/opentelekomcloud 1.37.11". The extracts of both versions are the same, and the 1.37.11 release notes name none of the seven resource types the generator emits. `schemas/terraform/NOTICE` no longer names the extract's version. Rendered output differs only in the provider version.

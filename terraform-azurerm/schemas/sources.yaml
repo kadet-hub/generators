@@ -2,6 +2,6 @@
 # reduced with kadet-hub/registry sandbox/tf_schema.py extract to the types the fixtures emit.
 terraform/hashicorp/azurerm:
   software: hashicorp/azurerm
-  version: 5.12.0
-  source: https://registry.terraform.io/providers/hashicorp/azurerm/5.12.0
+  version: 5.13.0
+  source: https://registry.terraform.io/providers/hashicorp/azurerm/5.13.0
   license: MPL-2.0

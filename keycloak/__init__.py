@@ -20,7 +20,7 @@ RULES for inventory access:
      them to resource classes or mutating them.
 """
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 import logging
 import re

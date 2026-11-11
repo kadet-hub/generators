@@ -1324,6 +1324,11 @@
         "optional": true,
         "type": "bool"
        },
+       "smb_oauth_enabled": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": "bool"
+       },
        "table_encryption_key_type": {
         "description_kind": "plain",
         "optional": true,
