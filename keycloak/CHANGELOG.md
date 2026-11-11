@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+Built for Keycloak Operator 26.8.2. The CRDs and their JSON Schemas are unchanged from 26.8.1, as is the operator code the generator's defaults rely on. The upstream files the README cites are unchanged at 26.8.2, and their links move to that tag. Rendered output is unchanged.
+
 ## 1.1.1
 
 Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.1.0 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.
