@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+Pins hashicorp/google 8.10.0 instead of 8.9.0 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/google 8.10.0". The extracts of both versions are the same, and the 8.10.0 release notes name none of the seven resource types the generator emits. Rendered output differs only in the provider version.
+
 ## 0.1.4
 
 Pins hashicorp/google 8.9.0 instead of 8.7.0 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/google 8.9.0". Of the release notes of 8.8.0, 8.8.1 and 8.9.0, two entries touch the emitted types: `google_compute_firewall` gains the computed `firewall_id` and `google_compute_router` the computed `router_id`, which the generator does not set. Between the two extracts the `google_compute_subnetwork` descriptions of `purpose` and `role` also change, and the generator sets neither. `schemas/terraform/NOTICE` no longer names the extract's version. Rendered output differs only in the provider version.
