@@ -80,28 +80,28 @@ No defaults are added. The CRDs and the operator already default replicas, reten
 
 A ServiceMonitor or PodMonitor without `namespace_selector` discovers targets only in its own namespace ([NamespaceSelector][ns-selector]); scraping all namespaces needs `namespace_selector: {any: true}`. `selector` and ServiceMonitor `endpoints` are required by the CRD and have no default, so a monitor without them fails schema validation at compile time.
 
-[selector]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/prometheus_types.go#L138-L150
-[storage]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/Documentation/platform/storage.md
-[storage-spec]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/prometheus_types.go#L1534-L1553
-[prober]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/probe_types.go#L260-L269
-[probe-targets]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/probe_types.go#L197-L225
-[endpoint]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/types.go#L549-L555
-[pod-endpoint]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/podmonitor_types.go#L224-L236
-[getting-started]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/Documentation/developer/getting-started.md#using-servicemonitors
-[ns-selector]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/types.go#L791-L810
-[rule-group]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/pkg/apis/monitoring/v1/prometheusrule_types.go#L67-L84
+[selector]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/prometheus_types.go#L138-L150
+[storage]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/Documentation/platform/storage.md
+[storage-spec]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/prometheus_types.go#L1543-L1562
+[prober]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/probe_types.go#L269-L278
+[probe-targets]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/probe_types.go#L206-L234
+[endpoint]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/types.go#L577-L583
+[pod-endpoint]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/podmonitor_types.go#L233-L245
+[getting-started]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/Documentation/developer/getting-started.md#using-servicemonitors
+[ns-selector]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/types.go#L822-L841
+[rule-group]: https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/pkg/apis/monitoring/v1/prometheusrule_types.go#L67-L84
 
 ### kube-prometheus-stack
 
-The Prometheus and ThanosRuler of the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-92.3.0/charts/kube-prometheus-stack) chart select ServiceMonitors, PodMonitors, Probes, ScrapeConfigs and PrometheusRules by the label `release: <helm release name>` as long as the chart's `*SelectorNilUsesHelmValues` values keep their default `true` ([values][kps-values], [Prometheus template][kps-prometheus], [ThanosRuler template][kps-ruler]; chart 92.3.0, Prometheus Operator 0.94.1). `release_label: <helm release name>` adds that label to every ServiceMonitor, PodMonitor, Probe, ScrapeConfig and PrometheusRule this generator renders. It has no default. A `release` key in a resource's own `labels` wins over it. The chart's AlertmanagerConfig selector does not use the label, so AlertmanagerConfig does not get it.
+The Prometheus and ThanosRuler of the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-93.1.1/charts/kube-prometheus-stack) chart select ServiceMonitors, PodMonitors, Probes, ScrapeConfigs and PrometheusRules by the label `release: <helm release name>` as long as the chart's `*SelectorNilUsesHelmValues` values keep their default `true` ([values][kps-values], [Prometheus template][kps-prometheus], [ThanosRuler template][kps-ruler]; chart 93.1.1, Prometheus Operator 0.95.1). `release_label: <helm release name>` adds that label to every ServiceMonitor, PodMonitor, Probe, ScrapeConfig and PrometheusRule this generator renders. It has no default. A `release` key in a resource's own `labels` wins over it. The chart's AlertmanagerConfig selector does not use the label, so AlertmanagerConfig does not get it.
 
-[kps-values]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-92.3.0/charts/kube-prometheus-stack/values.yaml#L4654-L4753
-[kps-prometheus]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-92.3.0/charts/kube-prometheus-stack/templates/prometheus/prometheus.yaml#L203-L307
-[kps-ruler]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-92.3.0/charts/kube-prometheus-stack/templates/thanos-ruler/ruler.yaml#L64-L73
+[kps-values]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-93.1.1/charts/kube-prometheus-stack/values.yaml#L4754-L4853
+[kps-prometheus]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-93.1.1/charts/kube-prometheus-stack/templates/prometheus/prometheus.yaml#L210-L314
+[kps-ruler]: https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-93.1.1/charts/kube-prometheus-stack/templates/thanos-ruler/ruler.yaml#L64-L73
 
 ### RBAC
 
-`rbac: true` on a Prometheus or PrometheusAgent entry adds the RBAC the [upstream RBAC guide](https://github.com/prometheus-operator/prometheus-operator/blob/v0.94.2/Documentation/platform/rbac.md) lists as a prerequisite. Absent or `false` adds nothing.
+`rbac: true` on a Prometheus or PrometheusAgent entry adds the RBAC the [upstream RBAC guide](https://github.com/prometheus-operator/prometheus-operator/blob/v0.95.1/Documentation/platform/rbac.md) lists as a prerequisite. Absent or `false` adds nothing.
 
 | Resource | Output key | Name |
 |---|---|---|
