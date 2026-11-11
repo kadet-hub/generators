@@ -2,6 +2,6 @@
 # reduced with kadet-hub/registry sandbox/tf_schema.py extract to the types the fixtures emit.
 terraform/opentelekomcloud/opentelekomcloud:
   software: opentelekomcloud/opentelekomcloud
-  version: 1.37.11
-  source: https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.11
+  version: 1.37.12
+  source: https://registry.terraform.io/providers/opentelekomcloud/opentelekomcloud/1.37.12
   license: MPL-2.0
