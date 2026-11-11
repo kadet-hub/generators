@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+Pins hashicorp/aws 6.72.0 instead of 6.71.0 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/aws 6.72.0". The extracts of both versions are the same, and the 6.72.0 release notes change none of the 15 resource types the generator emits. Rendered output differs only in the provider version.
+
 ## 0.1.4
 
 Pins hashicorp/aws 6.71.0 instead of 6.69.1 in `providers.tf.json` and ships its provider schema extract under `schemas/terraform/`, so the catalog shows "Built for hashicorp/aws 6.71.0". The release notes of 6.70.0 and 6.71.0 change none of the 15 resource types the generator emits. Between the two extracts only the provider's `endpoints` block gains `bedrockdataautomation` and `securityir`. `schemas/terraform/NOTICE` no longer names the extract's version. Rendered output differs only in the provider version.
