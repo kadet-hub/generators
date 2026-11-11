@@ -34,7 +34,7 @@ try:
 except ImportError:
     _OMEGACONF_TYPES = ()
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 
 # =============================================================================
@@ -198,7 +198,7 @@ class CephCluster(RookCephBase):
                 "encryptedDevice"
             ] = str(encrypted_device)
 
-        # Default from deploy/examples/cluster.yaml at v1.21.1: without
+        # Default from deploy/examples/cluster.yaml at v1.21.2: without
         # dataDirHostPath the daemons keep mon data in an emptyDir.
         spec.setdefault("dataDirHostPath", "/var/lib/rook")
         # The operator sets no image; an external cluster without one only
@@ -207,7 +207,7 @@ class CephCluster(RookCephBase):
         if not external and not (spec.get("cephVersion") or {}).get("image"):
             raise CompileError(
                 f"rook-ceph: cluster '{self.kwargs.name}' needs ceph_version.image "
-                "(for Rook v1.21.1 for example quay.io/ceph/ceph:v20.2.4)"
+                "(for Rook v1.21.2 for example quay.io/ceph/ceph:v20.2.4)"
             )
 
 

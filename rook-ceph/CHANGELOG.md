@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for Rook 1.21.2. Its `deploy/examples/crds.yaml` is the same file as at 1.21.1, so the shipped schemas and CRDs and the rendered output are unchanged. The upstream files the README cites are unchanged at v1.21.2 apart from `spec.go`, where the cited code is the same but now at lines 198 to 204. Their links move to that tag. The example Ceph image is still `quay.io/ceph/ceph:v20.2.4`.
+
 ## 1.0.3
 
 Built for Rook 1.21.1. The schemas and CRDs gain CephCluster `monitoring.scrapeTimeoutSeconds`, CephObjectStore `gateway.service.trafficDistribution` and CephObjectStoreUser `secretTemplate`. The `spec` passthrough and the flat keys `monitoring` and `gateway` set them. CephBlockPool, CephFilesystem, CephNFS and CephObjectStore gain a bounded `status.message`, which the generator does not set. Rendered output of existing inventories is unchanged. The upstream files the README cites are unchanged at v1.21.1, and their links move to that tag. The example Ceph image is still `quay.io/ceph/ceph:v20.2.4`.
