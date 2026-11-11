@@ -10,7 +10,7 @@ import re
 from kapitan.inputs.kadet import BaseObj, inventory
 
 NAME = "terraform-opentelekomcloud"
-PROVIDER = {"source": "opentelekomcloud/opentelekomcloud", "version": "1.37.11"}
+PROVIDER = {"source": "opentelekomcloud/opentelekomcloud", "version": "1.37.12"}
 AUTH_URL = "https://iam.eu-de.otc.t-systems.com/v3"
 DNS = ["100.125.4.25", "100.125.129.199"]
 NAT_SPECS = ("0", "1", "2", "3", "4")
