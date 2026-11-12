@@ -18,7 +18,7 @@ API groups:
 See: https://github.com/ironcore-dev/ironcore
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 import ipaddress
 import logging

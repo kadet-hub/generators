@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+Built for IronCore 0.9.0. The breaking changes of the release are in the IRI runtime API, etcd and the Kubernetes Go libraries. The generated OpenAPI v3 documents of the compute, networking and storage groups are the same as at v0.8.0, so the shipped schemas and rendered output are unchanged. The validation and defaulting files the README cites are unchanged at v0.9.0, and their links move to that tag.
+
 ## 1.0.2
 
 Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.0.1 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.

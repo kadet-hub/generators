@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/ironcore/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/ironcore/) page.
 
-Kapitan kadet generator for [IronCore](https://github.com/ironcore-dev/ironcore) IaaS resources. Built for IronCore 0.8.0 (`v1alpha1`, the only version of these groups at that release):
+Kapitan kadet generator for [IronCore](https://github.com/ironcore-dev/ironcore) IaaS resources. Built for IronCore 0.9.0 (`v1alpha1`, the only version of these groups at that release):
 
 | Kind | API group |
 |---|---|
@@ -79,8 +79,8 @@ Defaults and derived values:
 
 | Field | Value | Why |
 |---|---|---|
-| VirtualIP, NATGateway `type` | `Public` | Required and the only supported type ([VirtualIP](https://github.com/ironcore-dev/ironcore/blob/v0.8.0/internal/apis/networking/validation/virtualip.go), [NATGateway](https://github.com/ironcore-dev/ironcore/blob/v0.8.0/internal/apis/networking/validation/natgateway.go) validation). |
-| NetworkInterface, LoadBalancer `ipFamilies` | one family per entry of `ips`: the family of a `value`, else the prefix template's `ipFamily`; the compile fails if neither is set | The API server derives it the same way ([defaulting](https://github.com/ironcore-dev/ironcore/blob/v0.8.0/internal/apis/networking/v1alpha1/defaults.go)), but the OpenAPI schema marks it required, so the gate's schema check needs it in the output. |
+| VirtualIP, NATGateway `type` | `Public` | Required and the only supported type ([VirtualIP](https://github.com/ironcore-dev/ironcore/blob/v0.9.0/internal/apis/networking/validation/virtualip.go), [NATGateway](https://github.com/ironcore-dev/ironcore/blob/v0.9.0/internal/apis/networking/validation/natgateway.go) validation). |
+| NetworkInterface, LoadBalancer `ipFamilies` | one family per entry of `ips`: the family of a `value`, else the prefix template's `ipFamily`; the compile fails if neither is set | The API server derives it the same way ([defaulting](https://github.com/ironcore-dev/ironcore/blob/v0.9.0/internal/apis/networking/v1alpha1/defaults.go)), but the OpenAPI schema marks it required, so the gate's schema check needs it in the output. |
 
 Required inputs without a default: LoadBalancer `type` (`Public` exposes the selected interfaces to the internet, so choose `Public` or `Internal`), VirtualIP and NATGateway `ip_family`, LoadBalancer `ip_families` when it has no `ips`, and NetworkInterface `ips` (an ephemeral IP needs a parent Prefix only the operator knows). Without them the schema check fails. A VirtualIP is bound to an interface through the NetworkInterface's `virtual_ip: {virtualIPRef: <name>}`; `targetRef` needs the interface UID, which is unknown at compile time. NetworkPolicy `policyTypes`, NATGateway `portsPerNetworkInterface`, Machine `power` and volume `device` are left to the API server, which derives `policyTypes` from `ingress`/`egress`, defaults the others and assigns `od*` device names. A default-deny policy without rules needs `policy_types` set explicitly.
 
@@ -150,4 +150,4 @@ parameters:
 
 ## Schemas
 
-IronCore serves these kinds through an aggregated API server, not CRDs. The schemas under `schemas/` come from the generated OpenAPI v3 documents in `gen/v3/` at IronCore v0.8.0 (Apache-2.0); see `schemas/sources.yaml`.
+IronCore serves these kinds through an aggregated API server, not CRDs. The schemas under `schemas/` come from the generated OpenAPI v3 documents in `gen/v3/` at IronCore v0.9.0 (Apache-2.0); see `schemas/sources.yaml`.
