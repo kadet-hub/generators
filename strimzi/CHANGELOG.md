@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+Built for Strimzi 1.3.1. Its Kafka, KafkaNodePool, KafkaTopic and KafkaUser CRDs are unchanged, so the shipped schemas and rendered output are unchanged. Strimzi 1.3.1 adds Kafka 4.3.2 and makes it the default, which the Cluster Operator uses for a Kafka entry without `version`. The upstream files and documentation pages the README and the code comments cite differ at 1.3.1 only in Strimzi, Kafka and Bridge versions, and their links move to that tag.
+
 ## 1.1.1
 
 Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.1.0 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.
