@@ -13,19 +13,19 @@ from yaml import safe_load, safe_load_all
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# ACD-3: manifests/install.yaml is INSTALL_SOURCE (SHA-256 846c644bc81ce5557dd9048757a9c7353378f25c5eb811c77d32a9e907823599)
+# ACD-3: manifests/install.yaml is INSTALL_SOURCE (SHA-256 7be23ca7d9ca3d3074dee8332f1ca92a933b990cee7c9cf22cf3843ee8c2913e)
 # from the line after its third "---" to the end; the three CRDs before it come from schemas/argoproj.io/crds.
-INSTALL_VERSION = "3.5.6"
-INSTALL_SOURCE = "https://raw.githubusercontent.com/argoproj/argo-cd/c2b1e3017e2cec86b122172e861dcd026453ae44/manifests/install.yaml"
-INSTALL_SHA256 = "da75c759694b305f80d4e860fc5ea03fa8eefb1db12fc387d719bae52d9fa054"
+INSTALL_VERSION = "3.6.1"
+INSTALL_SOURCE = "https://raw.githubusercontent.com/argoproj/argo-cd/94037c4d4e1af4bd0651d37a179fbd9e347e668c/manifests/install.yaml"
+INSTALL_SHA256 = "6adb773d6cbe011bd3e1e7815ba401b9fd168aabf66b197a9b7820956f8e3d62"
 
 # ACD-2, IMG-1: every image of the manifest, pinned by tag and digest.
 INSTALL_IMAGES = {
     image.partition("@")[0]: image
     for image in (
-        "quay.io/argoproj/argocd:v3.5.6@sha256:8e5cc5bb008df8a09dba439462e58c94c55b7735888d3ebde0c25fc05e4e5335",
-        "ghcr.io/dexidp/dex:v2.45.1@sha256:8499afd690c437f52301efd2b05b2455da5bd2dfc20332cd697dc9937f808462",
-        "public.ecr.aws/docker/library/redis:8.2.3-alpine@sha256:08ad0b1d280850169a790dba1393ff7a90aef951fc19632cf4d3ce4f78e679ba",
+        "quay.io/argoproj/argocd:v3.6.1@sha256:296e3d74f449b2ce45265613fcb68c18ed7366488360c8ea32f5f2a93d2e5c54",
+        "ghcr.io/dexidp/dex:v2.46.0@sha256:933fcd3f523338c847b88ef84a7145fb2fcb7b9917f08418612afeaaa2001777",
+        "public.ecr.aws/docker/library/redis:8.10.1-alpine@sha256:ef216d85ec44f4fdf7c0e6df2d1757a4734ed32fbb278cabd3181b5a27353b79",
     )
 }
 
