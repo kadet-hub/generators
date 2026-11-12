@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+Built for Multus CNI 4.3.2. Its NetworkAttachmentDefinition CRD is unchanged, so the shipped schema and rendered output are unchanged. Multus 4.3.2 still builds with network-attachment-definition-client v1.7.6. Of the Multus files the README cites, only `docs/how-to-use.md` changes at v4.3.2, by a `--force-config-watch` section outside the cited one, and their links move to that tag.
+
 ## 1.0.3
 
 Ships the upstream NOTICE of the schemas and CRDs it vendors in their group directory (Apache-2.0 section 4(d)). Rendered output is unchanged.

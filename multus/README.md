@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/multus/) page.
 
-Kapitan kadet generator for [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) NetworkAttachmentDefinitions (`k8s.cni.cncf.io/v1`). Built for Multus CNI 4.3.1.
+Kapitan kadet generator for [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) NetworkAttachmentDefinitions (`k8s.cni.cncf.io/v1`). Built for Multus CNI 4.3.2.
 
 Each entry under `networks` renders one NetworkAttachmentDefinition. The CNI configuration is written as YAML in the inventory and serialised to the JSON string that `spec.config` expects, with sorted keys so the output is stable.
 
@@ -49,14 +49,14 @@ Every entry under `networks` accepts:
 
 Precedence is generator defaults < `spec` < flat keys: `cni_config` or `config_json` wins over `spec.config` and logs a warning, and `resource_name` wins over the same key in `annotations`.
 
-An entry without `cni_config`, `config_json` or `spec.config` renders an empty `spec`. Multus then loads the CNI config file from its config directory whose `name` matches the NetworkAttachmentDefinition ([GetCNIConfig](https://github.com/k8snetworkplumbingwg/network-attachment-definition-client/blob/v1.7.6/pkg/utils/cniconfig.go#L36-L56), the NAD client version Multus 4.3.1 builds with).
+An entry without `cni_config`, `config_json` or `spec.config` renders an empty `spec`. Multus then loads the CNI config file from its config directory whose `name` matches the NetworkAttachmentDefinition ([GetCNIConfig](https://github.com/k8snetworkplumbingwg/network-attachment-definition-client/blob/v1.7.6/pkg/utils/cniconfig.go#L36-L56), the NAD client version Multus 4.3.2 builds with).
 
 ### Defaults and Shorthands
 
 | Input | Result | Source |
 |---|---|---|
 | `cni_config` without `name` | `name: <entry name>` | Multus injects the same name at runtime ([GetCNIConfigFromSpec](https://github.com/k8snetworkplumbingwg/network-attachment-definition-client/blob/v1.7.6/pkg/utils/cniconfig.go#L108-L128)); the rendered config is complete without it. |
-| `resource_name: <resource>` | `metadata.annotations["k8s.v1.cni.cncf.io/resourceName"]` | Multus matches this annotation against the device plugin or DRA resource name and passes the allocated device ID to the CNI plugin ([how-to-use](https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.1/docs/how-to-use.md#create-network-attachment-definition-with-resource-name), [k8sclient.go](https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.1/pkg/k8sclient/k8sclient.go#L309-L350)). The value must equal the resource name exactly. |
+| `resource_name: <resource>` | `metadata.annotations["k8s.v1.cni.cncf.io/resourceName"]` | Multus matches this annotation against the device plugin or DRA resource name and passes the allocated device ID to the CNI plugin ([how-to-use](https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.2/docs/how-to-use.md#create-network-attachment-definition-with-resource-name), [k8sclient.go](https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.3.2/pkg/k8sclient/k8sclient.go#L309-L350)). The value must equal the resource name exactly. |
 
 `cniVersion` has no default: which versions a config may declare depends on the CNI plugin binaries installed on the nodes. Set it in `cni_config`, as the upstream examples do.
 
