@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/keda/): pin a released version by digest from its catalog page.
 
-Kapitan kadet generator for [KEDA](https://keda.sh/) resources (`keda.sh/v1alpha1`, KEDA v2.21):
+Kapitan kadet generator for [KEDA](https://keda.sh/) resources (`keda.sh/v1alpha1`). Built for KEDA 2.21.0.
 
 - **ScaledObject**: event-driven scaling of a Deployment, StatefulSet or any `/scale` resource
 - **ScaledJob**: event-driven creation of Kubernetes Jobs
