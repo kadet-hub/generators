@@ -103,6 +103,24 @@ signatures with `freshclam`, or warns and scans with the shipped database.
     pull request changes
   - Since: #28, #159
 
+- CHK-10: The `check` workflow MUST run the unit tests of each generator
+  it checks (CHK-4) that has `tests/test_*.py`, before `./check`, and fail
+  when a test fails.
+
+  Each suite runs with the command of its spec's implementation inventory,
+  with pytest, kapitan and omegaconf pinned. ocm and mutate import their
+  modules by top-level name, so their suites run from the generator's
+  directory, and ocm's also needs jsonschema. opentelemetry-operator runs
+  with `--import-mode=importlib`, because its directory name is no Python
+  identifier. `PYTHONDONTWRITEBYTECODE=1` and `-p no:cacheprovider` keep
+  bytecode and the pytest cache out of the tree, which the scan of the
+  following `./check` would fail (SEC-5).
+
+  - Test: manual: the job log names each suite it runs
+    (`unit tests: <generator>`); a broken assert fails the step; a pull
+    request that changes only generators without tests runs none
+  - Since: #209
+
 - CHK-5: The `check` workflow MUST NOT use workflow caches, as the
   registry's GI-10 requires for its own workflows.
   - Test: manual: review of `.github/workflows/check.yml`
@@ -174,3 +192,4 @@ None.
 | Review request | `.github/workflows/request-review.yml`, `pull_request` (CHK-6) |
 | Licence allow list | registry `policy/licenses.txt`, first column (CHK-7) |
 | Compose validation | `.github/workflows/check.yml`, `docker compose config --quiet` on `docker/tests/golden/compose.yml` (CHK-8) |
+| Unit tests | `.github/workflows/check.yml`, step for CHK-10: pytest 9.2.0, kapitan 0.36.3, omegaconf 2.4.0.dev4, and jsonschema 4.26.0 for ocm |
