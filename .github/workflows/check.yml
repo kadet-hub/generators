@@ -33,9 +33,9 @@ jobs:
           if git diff --name-only "$BASE" HEAD | grep -qE '^(tools/|\.github/)'; then
             uv run --with pyyaml==6.0.3 python3 -m unittest discover -s tools
           fi
-      - name: Gate checks for changed generators
+      - name: Changed generators (CHK-4)
+        id: changed
         env:
-          GH_TOKEN: ${{ github.token }} # CHK-9: downloads from GitHub
           BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.before }} # CHK-4
         run: |
           changed=$(git diff --name-only "$BASE" HEAD)
@@ -45,7 +45,30 @@ jobs:
             dirs=$(cut -d/ -f1 <<<"$changed" | sort -u | while read -r d; do if [ -f "$d/kapitan-generator.yaml" ]; then echo "$d"; fi; done)
           fi
           echo "generators: ${dirs:-none}"
-          for d in $dirs; do ./check "$d"; done
+          echo "dirs=$(paste -sd " " <<<"$dirs")" >> "$GITHUB_OUTPUT"
+      - name: Unit tests of changed generators (CHK-10)
+        env:
+          DIRS: ${{ steps.changed.outputs.dirs }}
+          PYTHONDONTWRITEBYTECODE: "1" # SEC-5: ./check fails on bytecode in the tree
+        run: |
+          pytest=(uv run -p 3.12 --with pytest==9.2.0 --with kapitan==0.36.3 --with omegaconf==2.4.0.dev4)
+          for d in $DIRS; do
+            compgen -G "$d/tests/test_*.py" >/dev/null || continue
+            echo "unit tests: $d"
+            case $d in
+              # they import constructor.py and mutations.py by top-level name
+              ocm) (cd ocm && "${pytest[@]}" --with jsonschema==4.26.0 python3 -m pytest -q -p no:cacheprovider tests) ;;
+              mutate) (cd mutate && "${pytest[@]}" python3 -m pytest -q -p no:cacheprovider tests) ;;
+              # the directory name is no Python identifier
+              opentelemetry-operator) "${pytest[@]}" python3 -m pytest -q -p no:cacheprovider --import-mode=importlib "$d/tests" ;;
+              *) "${pytest[@]}" python3 -m pytest -q -p no:cacheprovider "$d/tests" ;;
+            esac
+          done
+      - name: Gate checks for changed generators
+        env:
+          GH_TOKEN: ${{ github.token }} # CHK-9: downloads from GitHub
+          DIRS: ${{ steps.changed.outputs.dirs }}
+        run: for d in $DIRS; do ./check "$d"; done
       - name: Compose golden of the docker generator (CHK-8)
         run: |
           docker compose version
