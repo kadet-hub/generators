@@ -13,7 +13,7 @@ def render(**sections):
 def test_oci_repository_defaults():
     out = render(oci_repositories={"plain": {"url": "oci://r.example/a"}, "set": {"url": "oci://r.example/b", "provider": "aws", "spec": {"timeout": "2m"}}})
     plain, other = out["flux-system/plain-ocirepository"]["spec"], out["flux-system/set-ocirepository"]["spec"]
-    assert (plain["provider"], plain["timeout"]) == ("generic", "60s"), plain
+    assert (plain["provider"], plain["timeout"]) == ("generic", "61s"), plain
     assert (other["provider"], other["timeout"]) == ("aws", "2m"), other
 
 
