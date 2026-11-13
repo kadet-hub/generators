@@ -56,8 +56,9 @@ x86-64 with docker, git, curl, uv, yq and python3, and pulls a ClamAV
 image of about 390 MB on the first run. The syscall trace needs gVisor and
 runs only in the gate ([docs/specs/check.md](docs/specs/check.md)).
 
-CI does not run the unit tests, so run them for the generator you change,
-from the repository root:
+The `check` workflow runs the unit tests of every generator a pull request
+changes, before `./check` (CHK-10 in [docs/specs/check.md](docs/specs/check.md)).
+To run them yourself for the generator you change, from the repository root:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' \
