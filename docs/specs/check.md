@@ -119,7 +119,7 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   - Test: manual: the job log names each suite it runs
     (`unit tests: <generator>`); a broken assert fails the step; a pull
     request that changes only generators without tests runs none
-  - Since: this change
+  - Since: #209
 
 - CHK-5: The `check` workflow MUST NOT use workflow caches, as the
   registry's GI-10 requires for its own workflows.
