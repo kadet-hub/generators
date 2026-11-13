@@ -9,6 +9,10 @@ permissions:
   contents: read
   actions: read # UPD-6: the deployment branch policies of the environments
 
+concurrency: # CHK-11
+  group: check-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-24.04
@@ -39,7 +43,7 @@ jobs:
           BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.before }} # CHK-4
         run: |
           changed=$(git diff --name-only "$BASE" HEAD)
-          if grep -qE '^(check$|\.github/)' <<<"$changed"; then
+          if grep -qE '^(check|conftest\.py|\.github/workflows/check\.yml)$' <<<"$changed"; then
             dirs=$(for m in */kapitan-generator.yaml; do dirname "$m"; done)
           else
             dirs=$(cut -d/ -f1 <<<"$changed" | sort -u | while read -r d; do if [ -f "$d/kapitan-generator.yaml" ]; then echo "$d"; fi; done)

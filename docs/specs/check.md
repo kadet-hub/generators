@@ -85,8 +85,15 @@ signatures with `freshclam`, or warns and scans with the shipped database.
 ## Workflow
 
 - CHK-4: The `check` workflow MUST run `./check` for each generator a pull
-  request or a push to `main` changes, and for every generator when `check`
-  or `.github/` changes.
+  request or a push to `main` changes, and for every generator when `check`,
+  `conftest.py` or `.github/workflows/check.yml` changes.
+
+  No other file under `.github/` reaches `./check` or a unit test. The
+  other workflows build images, update schemas and request reviews. Until
+  this change any file there checked all 38 generators. #185 and #135
+  changed `images.yml` and no other workflow, and their runs took 24 and
+  31 minutes. `conftest.py` sets the target that the unit tests run from
+  the repository root import with (CHK-10).
 
   What a pull request changes is the diff between the merge commit that
   `actions/checkout` checks out and its first parent, the `main` commit
@@ -94,14 +101,29 @@ signatures with `freshclam`, or warns and scans with the shipped database.
   `main` commit the pull request was last synchronised with. On a pull
   request behind `main` it is older, and the diff against it also holds
   everything `main` changed since, up to every generator when that
-  touches `check` or `.github/` (#142). A push to `main` diffs against
+  touches `check` or `check.yml` (#142). A push to `main` diffs against
   `github.event.before`. The tests of `tools/upstream.py` use the same
   base.
 
   - Test: manual: the job log names the generators it checks
     (`generators: ...`); on a pull request behind `main` only those the
-    pull request changes
-  - Since: #28, #159
+    pull request changes; on a pull request that changes only
+    `request-review.yml`, none
+  - Since: #28, #159; `check.yml` and `conftest.py` in place of `.github/`:
+    this change
+
+- CHK-11: A newer commit of a pull request MUST cancel the `check` run of
+  its older commit. A run on a push to `main` MUST NOT be cancelled.
+
+  The workflow's `concurrency` group is `check-<pull request number>` with
+  `cancel-in-progress: true`, and a push takes its run ID as the group.
+  Before, a superseded run that checked every generator went on for up to
+  32 minutes. The run on `main` checks the merged tree, which a release
+  tag is cut from.
+
+  - Test: manual: on the pull request that introduced this, the second
+    commit cancelled the run of the first
+  - Since: this change
 
 - CHK-10: The `check` workflow MUST run the unit tests of each generator
   it checks (CHK-4) that has `tests/test_*.py`, before `./check`, and fail
@@ -188,7 +210,7 @@ None.
 | Script | `check`, needs docker, git, curl, uv, yq and python3, and gh with `GH_TOKEN` (CHK-9) |
 | Registry | `https://github.com/kadet-hub/registry.git` at `REGISTRY_REF`, default `main` |
 | Scanner pins | registry `.github/actions/setup-gate/action.yml` (gitleaks), `scan/requirements.txt` (semgrep, GuardDog, ruff), `scan/static-scan` (ClamAV image digest) |
-| Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false` |
+| Workflow | `.github/workflows/check.yml`, uv via `astral-sh/setup-uv` with `enable-cache: false`; `concurrency` (CHK-11) |
 | Review request | `.github/workflows/request-review.yml`, `pull_request` (CHK-6) |
 | Licence allow list | registry `policy/licenses.txt`, first column (CHK-7) |
 | Compose validation | `.github/workflows/check.yml`, `docker compose config --quiet` on `docker/tests/golden/compose.yml` (CHK-8) |
