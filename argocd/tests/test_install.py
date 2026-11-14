@@ -13,11 +13,11 @@ from .. import install, inv, main
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN = Path(__file__).resolve().parent / "golden" / "install-cmp.yaml"
 CLUSTER_SCOPED = {"ClusterRole", "ClusterRoleBinding", "CustomResourceDefinition"}
-# The images of Argo CD 3.5.6's install.yaml with the digests their registries serve for these tags.
+# The images of Argo CD 3.6.1's install.yaml with the digests their registries serve for these tags.
 PINNED = {
-    "quay.io/argoproj/argocd:v3.5.6": "sha256:8e5cc5bb008df8a09dba439462e58c94c55b7735888d3ebde0c25fc05e4e5335",
-    "ghcr.io/dexidp/dex:v2.45.1": "sha256:8499afd690c437f52301efd2b05b2455da5bd2dfc20332cd697dc9937f808462",
-    "public.ecr.aws/docker/library/redis:8.2.3-alpine": "sha256:08ad0b1d280850169a790dba1393ff7a90aef951fc19632cf4d3ce4f78e679ba",
+    "quay.io/argoproj/argocd:v3.6.1": "sha256:296e3d74f449b2ce45265613fcb68c18ed7366488360c8ea32f5f2a93d2e5c54",
+    "ghcr.io/dexidp/dex:v2.46.0": "sha256:933fcd3f523338c847b88ef84a7145fb2fcb7b9917f08418612afeaaa2001777",
+    "public.ecr.aws/docker/library/redis:8.10.1-alpine": "sha256:ef216d85ec44f4fdf7c0e6df2d1757a4734ed32fbb278cabd3181b5a27353b79",
 }
 KAPITAN = "docker.io/kapicorp/kapitan:0.36.3@sha256:04b9ca04f5041851631fb1041fbafe37b1ca6c3ad99a81d6ccd40f5ebd20f857"
 
@@ -95,7 +95,7 @@ def test_no_install_renders_as_before():
 def test_install_is_upstream():
     out = render(install={})
     expected = upstream()
-    assert len(expected) == 59
+    assert len(expected) == 60
     assert set(out) == set(expected)
     for key, doc in out.items():
         assert undo(doc, "argocd") == expected[key], key
@@ -138,7 +138,7 @@ def test_edited_manifest_fails():
 def test_version_mismatch_fails():
     pin, install.INSTALL_VERSION = install.INSTALL_VERSION, "3.5.7"
     try:
-        fails("the CRDs in schemas/ are Argo CD 3.5.6, manifests/install.yaml is 3.5.7", install={})
+        fails("the CRDs in schemas/ are Argo CD 3.6.1, manifests/install.yaml is 3.5.7", install={})
     finally:
         install.INSTALL_VERSION = pin
 
