@@ -1,6 +1,7 @@
 # Complete: every kind, the source, ref, secret_ref and depends_on shorthands,
 # a cross-namespace source, a chart from an OCIRepository and from a
-# HelmRepository, prune opted in, and a flat key overriding spec.
+# HelmRepository, prune opted in, a flat key overriding spec, and the flat
+# keys layer_selector, retry_interval, wait, patches and components.
 classes: []
 
 parameters:
@@ -31,6 +32,9 @@ parameters:
           url: oci://ghcr.io/stefanprodan/charts/podinfo
           ref:
             semver: ">=6.0.0"
+          layer_selector:
+            mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+            operation: copy
         platform-manifests:
           url: oci://registry.example.com/platform/manifests
           ref: 1.4.0
@@ -47,6 +51,8 @@ parameters:
           source: fleet
           path: ./clusters/production/infrastructure
           prune: true
+          retry_interval: 1m
+          wait: false
           labels:
             app.kubernetes.io/part-of: platform
         apps:
@@ -56,6 +62,22 @@ parameters:
           depends_on:
             - infrastructure
           service_account_name: flux-apps
+          components:
+            - ../components/monitoring
+          patches:
+            - patch: |
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: not-used
+                spec:
+                  template:
+                    metadata:
+                      annotations:
+                        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+              target:
+                kind: Deployment
+                labelSelector: app.kubernetes.io/part-of=apps
           post_build:
             substitute:
               cluster_name: production
