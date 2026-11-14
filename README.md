@@ -51,7 +51,8 @@ the registry itself is [kadet-hub/registry](https://github.com/kadet-hub/registr
 
 `./check <generator>` runs the gate's static scan and sandbox compile locally (Linux x86-64
 with docker, uv and yq; [spec](docs/specs/check.md)); the `check` workflow runs it for every
-generator a pull request changes.
+generator a pull request changes. How to change a generator and get the change released is in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Upstream updates
 
