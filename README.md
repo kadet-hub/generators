@@ -15,7 +15,7 @@ Kapitan kadet generators published on [kadet-hub](https://kadet-hub.org).
 | [flux](flux/) ([catalog](https://kadet-hub.org/generators/flux/)) | Flux GitRepositories, OCIRepositories, HelmRepositories, Kustomizations and HelmReleases, with Flux's recommended intervals and a source shorthand that wires consumers to their sources |
 | [grafana](grafana/) ([catalog](https://kadet-hub.org/generators/grafana/)) | Grafana Operator instances, dashboards, folders, datasources, alert rules, contact points, notification policies and more, with instance selector defaults |
 | [ironcore](ironcore/) ([catalog](https://kadet-hub.org/generators/ironcore/)) | IronCore Machines, Volumes, Networks, NetworkInterfaces, VirtualIPs, LoadBalancers, NAT gateways and NetworkPolicies, with ipFamilies derived from IPs and no public exposure by default |
-| [k3d](k3d/) ([catalog](https://kadet-hub.org/generators/k3d/)) | k3d cluster configs (k3d.io/v1alpha5 Simple) with port, volume, env and registry shorthands |
+| [k3d](k3d/) ([catalog](https://kadet-hub.org/generators/k3d/)) | k3d cluster configs (k3d.io/v1alpha5 Simple) with port, volume and env shorthands, and registries passed through |
 | [keda](keda/) ([catalog](https://kadet-hub.org/generators/keda/)) | KEDA ScaledObjects, ScaledJobs and TriggerAuthentications |
 | [keycloak](keycloak/) ([catalog](https://kadet-hub.org/generators/keycloak/)) | Keycloak Operator Keycloak instances, realm imports and OIDC and SAML clients, with database credential and CR reference defaults |
 | [kind](kind/) ([catalog](https://kadet-hub.org/generators/kind/)) | kind cluster configs (kind.x-k8s.io/v1alpha4), with kindest/node images pinned by digest from `kubernetes_version` |
