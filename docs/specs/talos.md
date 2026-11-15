@@ -123,7 +123,7 @@ neither the node config nor its userdata Secret would contain them.
 
   - Test: `talos/tests/test_multidoc.py::test_documents_appended`;
     `./check talos` (fixture `complete`)
-  - Since: this change
+  - Since: #216
 
 - TAL-6: The compile MUST fail, naming the node and the entry, when an
   entry of `documents` lacks `apiVersion` or `kind`.
@@ -132,7 +132,7 @@ neither the node config nor its userdata Secret would contain them.
   schema check (QA-7) skips documents without them.
 
   - Test: `talos/tests/test_multidoc.py::test_documents_need_apiversion_and_kind`
-  - Since: this change
+  - Since: #216
 
 - TAL-7: The compile MUST fail, naming the node and the entry, when an
   entry has the `kind` and `name` of a document the generator writes for
@@ -146,7 +146,7 @@ neither the node config nor its userdata Secret would contain them.
   filter.
 
   - Test: `talos/tests/test_multidoc.py::test_documents_must_not_repeat_generated`
-  - Since: this change
+  - Since: #216
 
 ## Implementation inventory
 
