@@ -1,6 +1,7 @@
 # Complete: three nodes sharing a base, shorthands (one overriding the nested
-# hostname), keyed-list dict forms, worker hardening, a
-# KubeVirt userdata Secret for the VM worker, a config patch and a talosconfig.
+# hostname), keyed-list dict forms, worker hardening, raw documents (one node
+# replacing the base list), a KubeVirt userdata Secret for the VM worker, a
+# config patch and a talosconfig.
 classes: []
 
 parameters:
@@ -85,6 +86,13 @@ parameters:
                 kind: Namespace
                 metadata:
                   name: cilium
+        documents:
+          - apiVersion: v1alpha1
+            kind: FilesystemTrimConfig
+            interval: 168h0m0s
+          - apiVersion: v1alpha1
+            kind: SecurityProfileConfig
+            workloadIsolation: true
       nodes:
         cp-1:
           type: controlplane
@@ -120,6 +128,15 @@ parameters:
                         - 10.20.0.21/24
             nodeLabels:
               node.kubernetes.io/pool: general
+          # Replaces the base list.
+          documents:
+            - apiVersion: v1alpha1
+              kind: FilesystemTrimConfig
+              interval: 168h0m0s
+            - apiVersion: v1alpha1
+              kind: UserVolumeConfig
+              name: local-path-provisioner
+              volumeType: directory
         worker-2:
           type: worker
           hostname: worker-2

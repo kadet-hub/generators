@@ -34,13 +34,16 @@ All keys live under `parameters.generators.talos`.
 | `base` | | Config deep-merged under every node. |
 | `nodes.<name>` | `<name>` | Talos machine config: the `v1alpha1` document plus multi-document kinds. |
 | `nodes.<name>.userdataSecret` (`name`, `namespace`) | `<namespace>/<name>-secret` | `v1` Secret, `stringData.userdata` holds the node's machine config. |
+| `base.documents`, `nodes.<name>.documents` | `<name>` | List of Talos multi-documents (`apiVersion`, `kind`, optional `name`), appended unchanged after the node's generated documents, in list order. |
 | `patches.<name>` | `<name>` | Config patch, passed through with the dict forms below normalized. |
 | `secrets` | `secrets` | Passed through, for a `talosctl gen secrets` bundle. |
 | `talosconfig` | `talosconfig` | Passed through. |
 
-A node accepts `type` (`controlplane`, `worker` or `init`, default `worker`), `debug`, `machine`, `cluster` and the shorthands below. The legacy `parameters.talos_nodes` location still works with a deprecation warning; a node of the same name under `generators.talos.nodes` wins. An extra output whose key equals a node name replaces that node and logs a warning.
+A node accepts `type` (`controlplane`, `worker` or `init`, default `worker`), `debug`, `machine`, `cluster`, `documents` and the shorthands below. The legacy `parameters.talos_nodes` location still works with a deprecation warning; a node of the same name under `generators.talos.nodes` wins. An extra output whose key equals a node name replaces that node and logs a warning.
 
 Precedence: generator defaults < `base` < the node's `machine`/`cluster` < shorthands. `base` and the node merge recursively; lists replace. A shorthand that overrides a nested value logs `Flat key 'hostname' overrides spec passthrough 'machine.network.hostname' for resource '<node>'`.
+
+`documents` carries kinds the generator does not translate, such as `FilesystemTrimConfig`, `SecurityProfileConfig` or `UserVolumeConfig`. A node's list replaces the `base` list. Kapitan refs inside an entry pass through, and the userdata Secret carries the entries. Workers get them too, without the control plane filter described below. The compile fails when an entry lacks `apiVersion` or `kind`, or when it has the `kind` and `name` of a document the generator writes for that node. Such a document is set through the inventory key it is translated from.
 
 | Shorthand | Result |
 |---|---|
@@ -158,6 +161,17 @@ parameters:
             enabled: true
             registries:
               service: {}
+        documents:
+          - apiVersion: v1alpha1
+            kind: FilesystemTrimConfig
+            interval: 168h0m0s
+          - apiVersion: v1alpha1
+            kind: SecurityProfileConfig
+            workloadIsolation: true
+          - apiVersion: v1alpha1
+            kind: UserVolumeConfig
+            name: local-path-provisioner
+            volumeType: directory
       nodes:
         cp-1:
           type: controlplane
@@ -213,7 +227,7 @@ compiled/<target>/talos/
 └── patch-time.yaml
 ```
 
-Each node file is a multi-document YAML stream: the `v1alpha1` document first, then the kinds in a fixed order. Apply it with `talosctl apply-config --nodes 10.0.0.11 --file compiled/<target>/talos/cp-1.yaml`. Reference the Secret from the VirtualMachine's `cloudInitNoCloud.secretRef`.
+Each node file is a multi-document YAML stream: the `v1alpha1` document first, then the kinds in a fixed order, then the node's `documents`. Apply it with `talosctl apply-config --nodes 10.0.0.11 --file compiled/<target>/talos/cp-1.yaml`. Reference the Secret from the VirtualMachine's `cloudInitNoCloud.secretRef`.
 
 ## Schemas
 

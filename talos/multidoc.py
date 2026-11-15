@@ -759,3 +759,21 @@ def split(node: str, config: dict) -> list:
     if not control_plane:
         docs = [d for d in docs if d["kind"] not in CONTROL_PLANE_KINDS]
     return [config, *docs]
+
+
+def append_documents(node: str, rendered: list, documents: Any) -> list:
+    """*rendered* (from split) followed by the inventory's raw documents, unchanged (TAL-5 to TAL-7)."""
+    if not isinstance(documents, list):
+        raise ValueError(f"talos: node {node}: documents must be a list")
+    generated = {(d["kind"], d.get("name")) for d in rendered[1:]}
+    for i, doc in enumerate(documents):
+        missing = [k for k in ("apiVersion", "kind") if not isinstance(doc, dict) or not doc.get(k)]
+        if missing:
+            raise ValueError(f"talos: node {node}: documents[{i}] lacks {' and '.join(missing)}")
+        if (doc["kind"], doc.get("name")) in generated:
+            name = f" {doc['name']}" if doc.get("name") else ""
+            raise ValueError(
+                f"talos: node {node}: documents[{i}] {doc['kind']}{name} is a document the generator "
+                "already writes; set it through the inventory key it is translated from"
+            )
+    return [*rendered, *documents]

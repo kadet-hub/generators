@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+- `documents` in `base` and `nodes.<name>` takes Talos multi-documents the generator does not translate, such as `FilesystemTrimConfig`, `SecurityProfileConfig` and `UserVolumeConfig`. They are appended unchanged after the node's generated documents, in list order, on workers as well, and the userdata Secret carries them. A node's list replaces the `base` list. The compile fails when an entry lacks `apiVersion` or `kind`, or repeats the `kind` and `name` of a document the generator writes for that node. Output is unchanged for inventories without `documents`.
+
 ## 1.3.1
 
 Ships the Kubernetes 1.37.2 Secret schema instead of 1.37.1. kubernetes-json-schema has the same file for both releases, so validation and rendered output are unchanged.

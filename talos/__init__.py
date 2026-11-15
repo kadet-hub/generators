@@ -78,7 +78,7 @@ except ImportError:
     # For testing outside Kapitan context
     inv = None  # type: ignore[assignment]
 
-__version__ = "1.3.1"
+__version__ = "1.4.0"
 __all__ = ["TalosNodeConfig", "generate_talos_config", "main", "inv"]
 
 logger = logging.getLogger(__name__)
@@ -475,7 +475,9 @@ def main(input_params: dict | None = None) -> BaseObj:
     for node_name, node_config in talos_nodes.items():
         merged = _deep_merge(base_config, convert_to_plain_dict(node_config) or {})
         secret_config = merged.pop("userdataSecret", None)
+        documents = merged.pop("documents", None) or []
         rendered = multidoc.split(node_name, generate_talos_config(node_name, merged))
+        rendered = multidoc.append_documents(node_name, rendered, documents)
         obj.root[node_name] = rendered
         if secret_config:
             userdata_secrets.append(
