@@ -100,10 +100,58 @@ default and supports 1.37.2.
     uses, reads the tag of each default
   - Since: #134
 
+## Raw documents
+
+Talos 1.14 has kinds without any v1alpha1 field, such as
+`FilesystemTrimConfig`, `SecurityProfileConfig` and `UserVolumeConfig`.
+The generator only translates v1alpha1 keys, so a cluster config that uses
+these kinds could not be rendered from the inventory. The key `documents`
+in `base` and in `nodes.<name>` takes a list of such documents and passes
+them through. `patches` were considered. They are separate outputs, so
+neither the node config nor its userdata Secret would contain them.
+
+- TAL-5: The entries of a node's `documents` list MUST be appended
+  unchanged and in list order after the documents the generator writes
+  for that node, on every node type.
+
+  The node's list replaces the one in `base`, as every list in the
+  generator does. Kapitan refs inside an entry pass through as written.
+  The key never reaches the v1alpha1 document. The userdata Secret carries
+  the entries, because it wraps the rendered config. The worker filter of
+  control plane kinds does not apply to them, so a control plane kind on a
+  worker reaches Talos, which rejects it.
+
+  - Test: `talos/tests/test_multidoc.py::test_documents_appended`;
+    `./check talos` (fixture `complete`)
+  - Since: this change
+
+- TAL-6: The compile MUST fail, naming the node and the entry, when an
+  entry of `documents` lacks `apiVersion` or `kind`.
+
+  Talos picks the document type by these two fields, and the gate's
+  schema check (QA-7) skips documents without them.
+
+  - Test: `talos/tests/test_multidoc.py::test_documents_need_apiversion_and_kind`
+  - Since: this change
+
+- TAL-7: The compile MUST fail, naming the node and the entry, when an
+  entry has the `kind` and `name` of a document the generator writes for
+  that node.
+
+  Such a document is set through the inventory key the generator
+  translates into it (README, Translation to Talos 1.14 documents), and a
+  raw entry must not duplicate or override it unnoticed. Kinds without a
+  name, such as `HostnameConfig`, collide on the kind alone. On a worker
+  the entries are compared with the documents left after the worker
+  filter.
+
+  - Test: `talos/tests/test_multidoc.py::test_documents_must_not_repeat_generated`
+  - Since: this change
+
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
-| Code | `talos/multidoc.py` (`_component_images`, called from `split`; `IMAGES`), `talos/__init__.py` (`DEFAULT_INSTALLER_IMAGE`) |
+| Code | `talos/multidoc.py` (`_component_images`, called from `split`; `IMAGES`; `append_documents`), `talos/__init__.py` (`DEFAULT_INSTALLER_IMAGE`; `main` takes `documents` out of the merged node config and calls `append_documents`) |
 | Unit tests | `talos/tests/test_multidoc.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider talos/tests` |
 | Upstream repositories | `ghcr.io/siderolabs/kubelet`, `registry.k8s.io/kube-apiserver`, `registry.k8s.io/kube-controller-manager`, `registry.k8s.io/kube-scheduler`, `registry.k8s.io/kube-proxy` |
