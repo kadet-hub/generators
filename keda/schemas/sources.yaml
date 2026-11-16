@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 keda.sh:
   software: KEDA
-  version: 2.21.0
-  source: https://github.com/kedacore/keda/tree/v2.21.0/config/crd/bases
+  version: 2.21.1
+  source: https://github.com/kedacore/keda/tree/v2.21.1/config/crd/bases
   license: Apache-2.0
