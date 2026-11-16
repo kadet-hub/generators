@@ -1670,6 +1670,7 @@
            "description": "Value of the key used for MD5 authentication.",
            "description_kind": "plain",
            "required": true,
+           "sensitive": true,
            "type": "string"
           },
           "name": {
@@ -1679,6 +1680,8 @@
            "type": "string"
           }
          },
+         "deprecated": true,
+         "deprecation_message": "`md5_authentication_keys` is deprecated and will be removed in a future major release. It has no effect; use the `md5_authentication_key` block of `google_compute_router_peer` to configure MD5 authentication for a BGP peer instead.",
          "description": "Keys used for MD5 authentication.",
          "description_kind": "plain"
         },
