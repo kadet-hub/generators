@@ -2,7 +2,7 @@
 
 Published on [kadet-hub](https://kadet-hub.org/generators/cloudnative-pg/): pin a released version by digest from its [catalog](https://kadet-hub.org/generators/cloudnative-pg/) page.
 
-Kapitan kadet generator for [CloudNativePG](https://cloudnative-pg.io/) PostgreSQL clusters. Built for CloudNativePG 1.30.1 and the Barman Cloud Plugin 0.15.1. It renders Cluster, Database, Pooler, ScheduledBackup and Backup (`postgresql.cnpg.io/v1`) and the plugin's ObjectStore (`barmancloud.cnpg.io/v1`). PodMonitors come from the prometheus-operator generator, see [Monitoring](#monitoring). Backups go through the [Barman Cloud Plugin](https://cloudnative-pg.io/plugin-barman-cloud/), which replaces the in-tree `barmanObjectStore` deprecated since CloudNativePG 1.26. The operator, the plugin and the Secrets with object store credentials are installed separately.
+Kapitan kadet generator for [CloudNativePG](https://cloudnative-pg.io/) PostgreSQL clusters. Built for CloudNativePG 1.30.1 and the Barman Cloud Plugin 0.16.0. It renders Cluster, Database, Pooler, ScheduledBackup and Backup (`postgresql.cnpg.io/v1`) and the plugin's ObjectStore (`barmancloud.cnpg.io/v1`). PodMonitors come from the prometheus-operator generator, see [Monitoring](#monitoring). Backups go through the [Barman Cloud Plugin](https://cloudnative-pg.io/plugin-barman-cloud/), which replaces the in-tree `barmanObjectStore` deprecated since CloudNativePG 1.26. The operator, the plugin and the Secrets with object store credentials are installed separately.
 
 ## Usage
 

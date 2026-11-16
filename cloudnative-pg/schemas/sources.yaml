@@ -9,6 +9,6 @@ postgresql.cnpg.io:
   license: Apache-2.0
 barmancloud.cnpg.io:
   software: Barman Cloud Plugin
-  version: 0.15.1
-  source: https://github.com/cloudnative-pg/plugin-barman-cloud/tree/v0.15.1/config/crd/bases
+  version: 0.16.0
+  source: https://github.com/cloudnative-pg/plugin-barman-cloud/tree/v0.16.0/config/crd/bases
   license: Apache-2.0
