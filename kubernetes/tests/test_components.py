@@ -4,8 +4,17 @@ from box import Box
 
 from .. import utils
 from ..base import Container, Workload
-from ..generators import _build_service_bundle, generate_chainsaw_asserts, generate_gateway, generate_resource_manifests
+from ..generators import (
+    _build_rbac_bundle,
+    _build_scaling_bundle,
+    _build_service_bundle,
+    _build_workload_extras,
+    generate_chainsaw_asserts,
+    generate_gateway,
+    generate_resource_manifests,
+)
 from ..webhooks import APIService, MutatingWebhookConfiguration, ValidatingWebhookConfiguration, _webhooks
+from ..workloads import CronJob
 
 # The generator reads the target's inventory; these tests have none. The
 # gate's import policy has no pytest, so there are no fixtures.
@@ -212,6 +221,57 @@ def test_no_pod_management_or_spread_renders_as_before():  # K8S-23, K8S-24
             assert "topologySpreadConstraints" not in spec["template"]["spec"], (kind, keys)
 
 
+def test_workload_name():  # K8S-28
+    for kind in WORKLOAD_TYPES:
+        comp = component(type=kind, workload_name="node-agent", additional_containers={"sidecar": {"image": "x/side:1.0"}})
+        workload = Workload(name="web", component=comp).root.to_dict()
+        assert workload["metadata"]["name"] == "node-agent", kind
+        assert workload["metadata"]["labels"]["name"] == "node-agent", kind
+        assert workload["spec"]["template"]["metadata"]["labels"]["name"] == "node-agent", kind
+        if kind != "job":
+            assert workload["spec"]["selector"]["matchLabels"] == {"name": "node-agent"}, kind
+        assert [c["name"] for c in workload["spec"]["template"]["spec"]["containers"]] == ["node-agent", "sidecar"], kind
+    comp = component(type="job", schedule="0 3 * * *", workload_name="node-agent")
+    cron = CronJob(name="web", component=comp, job=Workload(name="web", component=comp)).root.to_dict()
+    assert cron["metadata"]["name"] == "node-agent"
+
+
+def test_workload_name_derived_objects():  # K8S-28
+    comp = component(workload_name="node-agent", service={}, service_account={"create": True},
+                     pdb_min_available=1, hpa={"min_replicas": 1, "max_replicas": 3}, vpa="Auto",
+                     prefer_pods_in_different_nodes=True)
+    workload = Workload(name="web", component=comp).root
+    pod = workload.spec.template.spec.to_dict()
+    [service] = [s.to_dict() for s in _build_service_bundle("web", comp, workload)]
+    assert service["metadata"]["name"] == "web"
+    assert service["spec"]["selector"] == {"name": "node-agent"}
+    [account] = [o.to_dict() for o in _build_rbac_bundle("web", comp)]
+    assert account["metadata"]["name"] == pod["serviceAccountName"] == "web"
+    [term] = pod["affinity"]["podAntiAffinity"]["preferredDuringSchedulingIgnoredDuringExecution"]
+    assert term["podAffinityTerm"]["labelSelector"]["matchExpressions"][0]["values"] == ["node-agent"]
+    scaling = {o["kind"]: o for o in (b.to_dict() for b in _build_scaling_bundle("web", comp, workload))}
+    assert scaling["PodDisruptionBudget"]["spec"]["selector"]["matchLabels"] == {"name": "node-agent"}
+    assert scaling["HorizontalPodAutoscaler"]["spec"]["scaleTargetRef"]["name"] == "node-agent"
+    assert scaling["VerticalPodAutoscaler"]["spec"]["targetRef"]["name"] == "node-agent"
+    # Each keeps its own name and name label.
+    for kind, obj in scaling.items():
+        assert obj["metadata"]["name"] == "web" and obj["metadata"]["labels"]["name"] == "web", kind
+    statefulset = Workload(name="web", component=component(type="statefulset", workload_name="node-agent")).root
+    assert statefulset.spec.serviceName == "web"
+    out = chainsaw({"web": component(workload_name="node-agent")})
+    assert out["demo/web-assert"]["metadata"]["name"] == "web"
+    assert out["demo/web-assert"]["spec"]["try"][0]["assert"]["resource"]["metadata"]["name"] == "node-agent"
+
+
+def test_no_workload_name_renders_as_before():  # K8S-28
+    for kind in WORKLOAD_TYPES:
+        before = Workload(name="web", component=component(type=kind, prefer_pods_in_different_nodes=True)).root.to_dict()
+        assert before["metadata"]["name"] == before["spec"]["template"]["spec"]["containers"][0]["name"] == "web"
+        for value in (None, "web"):
+            comp = component(type=kind, prefer_pods_in_different_nodes=True, workload_name=value)
+            assert Workload(name="web", component=comp).root.to_dict() == before, (kind, value)
+
+
 def test_empty_service_serves_api_service():
     comp = component(service={}, api_service={"group": "m.example.com", "version": "v1", "insecure_skip_tls_verify": True})
     workload = Workload(name="web", component=comp).root
@@ -337,6 +397,75 @@ def test_webhook_configuration_default_names():
     comp = component(webhooks=[OPERATOR_WEBHOOK], validating_webhooks=[OPERATOR_WEBHOOK], webhook_ca_injected=True)
     assert MutatingWebhookConfiguration(name="web", component=comp).root.to_dict()["metadata"]["name"] == "demo-web"
     assert ValidatingWebhookConfiguration(name="web", component=comp).root.to_dict()["metadata"]["name"] == "demo-web"
+
+
+ESO_WEBHOOKS = {
+    "secretstore-validate": [
+        {"name": "validate.secretstore.external-secrets.io", "clientConfig": {"service": {"path": "/validate-secretstore"}}},
+        {"name": "validate.clustersecretstore.external-secrets.io", "clientConfig": {"service": {"path": "/validate-clustersecretstore"}}},
+    ],
+    "externalsecret-validate": [
+        {"name": "validate.externalsecret.external-secrets.io", "clientConfig": {"service": {"path": "/validate-externalsecret"}}},
+    ],
+}
+ESO_LABEL = {"external-secrets.io/component": "webhook"}
+
+
+def webhook_configurations(**keys):
+    comp = component(webhook_ca_injected=True, **keys)
+    workload = Workload(name="web", component=comp).root
+    return [o.to_dict() for o in _build_workload_extras("web", comp, workload)]
+
+
+def test_webhook_labels():  # K8S-25
+    both = {"webhooks": [OPERATOR_WEBHOOK], "validating_webhooks": [OPERATOR_WEBHOOK]}
+    configs = webhook_configurations(webhook_labels=ESO_LABEL, **both)
+    assert [c["kind"] for c in configs] == ["MutatingWebhookConfiguration", "ValidatingWebhookConfiguration"]
+    for config in configs:
+        assert config["metadata"]["labels"] == {"name": "demo-web", **ESO_LABEL}, config
+    for config in webhook_configurations(**both):
+        assert config["metadata"]["labels"] == {"name": "demo-web"}, config
+
+
+def test_validating_webhooks_mapping():  # K8S-26
+    configs = webhook_configurations(validating_webhooks={**ESO_WEBHOOKS, "dropped": None, "empty": []}, webhook_labels=ESO_LABEL)
+    assert [(c["kind"], c["metadata"]["name"], [w["name"] for w in c["webhooks"]]) for c in configs] == [
+        ("ValidatingWebhookConfiguration", "secretstore-validate",
+         ["validate.secretstore.external-secrets.io", "validate.clustersecretstore.external-secrets.io"]),
+        ("ValidatingWebhookConfiguration", "externalsecret-validate", ["validate.externalsecret.external-secrets.io"]),
+    ]
+    for config in configs:
+        assert config["metadata"]["labels"] == {"name": config["metadata"]["name"], **ESO_LABEL}, config
+        # The defaults of the list form apply to each configuration.
+        for webhook in config["webhooks"]:
+            assert webhook["clientConfig"]["service"]["name"] == "web", webhook
+            assert webhook["clientConfig"]["service"]["namespace"] == "demo", webhook
+            assert webhook["sideEffects"] == "None", webhook
+    # K8S-9 holds per configuration.
+    try:
+        _build_workload_extras("web", component(validating_webhooks=ESO_WEBHOOKS), None)
+    except ValueError as e:
+        assert "webhook_ca_injected" in str(e), str(e)
+    else:
+        raise AssertionError("no ValueError")
+    # The list form renders one configuration, as before.
+    [config] = webhook_configurations(validating_webhooks=ESO_WEBHOOKS["secretstore-validate"])
+    assert config["metadata"]["name"] == "demo-web" and len(config["webhooks"]) == 2
+
+
+def test_validating_webhooks_mapping_fails():  # K8S-27
+    for keys, message in (
+        ({"validating_webhooks": ESO_WEBHOOKS, "validating_webhook_configuration_name": "x"},
+         "validating_webhook_configuration_name"),
+        ({"validating_webhooks": {"secretstore-validate": ESO_WEBHOOKS["secretstore-validate"][0]}},
+         "validating_webhooks.secretstore-validate"),
+    ):
+        try:
+            webhook_configurations(**keys)
+        except ValueError as e:
+            assert str(e).startswith("web: ") and message in str(e), str(e)
+        else:
+            raise AssertionError(f"no ValueError for {keys}")
 
 
 def mounts(volume_mounts):

@@ -754,7 +754,25 @@ def _build_workload_extras(name, component, workload_spec):
     bundle = []
     if component.get("webhooks"):
         bundle += [MutatingWebhookConfiguration(name=name, component=component).root]
-    if component.get("validating_webhooks"):
+    validating = component.get("validating_webhooks")
+    if isinstance(validating, dict):
+        # K8S-26: each key renders as the list form, named by the key.
+        if component.get("validating_webhook_configuration_name"):
+            raise ValueError(
+                f"{name}: validating_webhooks as a mapping names its configurations by key; "
+                "drop validating_webhook_configuration_name"
+            )
+        for key, webhooks in validating.items():
+            if webhooks is not None and not isinstance(webhooks, list):
+                raise ValueError(f"{name}: validating_webhooks.{key} must be a list of webhooks")
+            if webhooks:
+                configuration = {
+                    **component,
+                    "validating_webhooks": webhooks,
+                    "validating_webhook_configuration_name": key,
+                }
+                bundle += [ValidatingWebhookConfiguration(name=name, component=configuration).root]
+    elif validating:
         bundle += [ValidatingWebhookConfiguration(name=name, component=component).root]
     if component.get("api_service"):
         bundle += [APIService(name=name, component=component, workload=workload_spec).root]

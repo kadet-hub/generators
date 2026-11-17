@@ -73,6 +73,7 @@ class VerticalPodAutoscaler(k8s.Base):
         if namespace:
             self.add_namespace(namespace)
         self.add_labels(workload.metadata.labels)
+        self.add_label("name", self.root.metadata.name)  # its own, not the workload's (K8S-28)
         self.root.spec.targetRef.apiVersion = workload.apiVersion
         self.root.spec.targetRef.kind = workload.kind
         self.root.spec.targetRef.name = workload.metadata.name
@@ -108,6 +109,7 @@ class HorizontalPodAutoscaler(k8s.Base):
         if namespace:
             self.add_namespace(namespace)
         self.add_labels(workload.metadata.labels)
+        self.add_label("name", self.root.metadata.name)  # its own, not the workload's (K8S-28)
         self.root.spec.scaleTargetRef.apiVersion = workload.apiVersion
         self.root.spec.scaleTargetRef.kind = workload.kind
         self.root.spec.scaleTargetRef.name = workload.metadata.name

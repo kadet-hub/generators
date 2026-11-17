@@ -84,6 +84,7 @@ class MutatingWebhookConfiguration(k8s.Base):
             self.kwargs.name, self.kwargs.component, "webhooks"
         )
         self.add_annotations(annotations)
+        self.add_labels(self.kwargs.component.get("webhook_labels") or {})  # K8S-25
 
 
 class ValidatingWebhookConfiguration(k8s.Base):
@@ -104,6 +105,7 @@ class ValidatingWebhookConfiguration(k8s.Base):
             self.kwargs.name, self.kwargs.component, "validating_webhooks"
         )
         self.add_annotations(annotations)
+        self.add_labels(self.kwargs.component.get("webhook_labels") or {})  # K8S-25
 
 
 class APIService(k8s.Base):

@@ -775,15 +775,17 @@ class Workload(WorkloadCommon):
 
         component = self.kwargs.component
         name = self.kwargs.name
+        # K8S-28: names the workload, its name label (so its selectors) and main container.
+        workload_name = component.get("workload_name") or name
         component_type = component.get("type")
         if component_type == "deployment":
-            workload = Deployment(name=name, component=self.kwargs.component)
+            workload = Deployment(name=name, component=component, rendered_name=workload_name)
         elif component_type == "statefulset":
-            workload = StatefulSet(name=name, component=self.kwargs.component)
+            workload = StatefulSet(name=name, component=component, rendered_name=workload_name)
         elif component_type == "daemonset":
-            workload = DaemonSet(name=name, component=self.kwargs.component)
+            workload = DaemonSet(name=name, component=component, rendered_name=workload_name)
         elif component_type == "job":
-            workload = Job(name=name, component=self.kwargs.component)
+            workload = Job(name=name, component=component, rendered_name=workload_name)
         else:
             raise ValueError(
                 f"Unknown workload type '{component_type}' for component '{name}'. "
@@ -850,7 +852,7 @@ class Workload(WorkloadCommon):
             pod_spec.shareProcessNamespace = component.get("share_process_namespace")
 
         container = []
-        container = Container(name=name, container=component)
+        container = Container(name=workload_name, container=component)
         additional_containers = []
         additional_containers = [
             Container(name=name, container=component)
@@ -939,7 +941,7 @@ class Workload(WorkloadCommon):
                         "podAffinityTerm": {
                             "labelSelector": {
                                 "matchExpressions": [
-                                    {"key": "name", "operator": "In", "values": [name]}
+                                    {"key": "name", "operator": "In", "values": [workload_name]}
                                 ]
                             },
                             "topologyKey": topology,
