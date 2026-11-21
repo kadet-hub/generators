@@ -98,4 +98,4 @@ None.
 | MPL-2.0 groups | `rabbitmq/schemas/rabbitmq.com`, `talos/schemas/core` (`*_v1alpha1.json`), `terraform-{aws,azurerm,google,opentelekomcloud}/schemas/terraform` |
 | MIT groups | `k3d/schemas/k3d.io` |
 | Generator licence | `LICENSE` at the repository root, added to the artefact by the registry's `release/build.py` (PUB-15) |
-| Upstream NOTICE carried | `prometheus-operator/schemas/monitoring.coreos.com`, `kyverno/schemas/kyverno.io`, `kyverno/schemas/policies.kyverno.io`, `multus/schemas/k8s.cni.cncf.io`, `crossplane/schemas/aws.m.upbound.io`, `rabbitmq/schemas/rabbitmq.com` |
+| Upstream NOTICE carried | `prometheus-operator/schemas/monitoring.coreos.com`, `kyverno/schemas/policies.kyverno.io`, `multus/schemas/k8s.cni.cncf.io`, `crossplane/schemas/aws.m.upbound.io`, `rabbitmq/schemas/rabbitmq.com` |

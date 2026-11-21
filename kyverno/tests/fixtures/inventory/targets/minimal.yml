@@ -1,4 +1,4 @@
-# Minimal: one ClusterPolicy with the match_kinds shorthand, Kyverno's default Audit action
+# Minimal: one ValidatingPolicy with the match_kinds shorthand, Kyverno's default Deny action
 classes: []
 
 parameters:
@@ -13,15 +13,10 @@ parameters:
 
   generators:
     kyverno:
-      cluster_policies:
+      validating_policies:
         require-labels:
-          rules:
-            - name: require-app-label
-              match_kinds:
-                - Pod
-              validate:
-                message: "The label 'app' is required"
-                pattern:
-                  metadata:
-                    labels:
-                      app: "?*"
+          match_kinds:
+            - Pod
+          validations:
+            - expression: "has(object.metadata.labels) && has(object.metadata.labels.app)"
+              message: "The label 'app' is required"
