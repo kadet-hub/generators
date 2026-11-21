@@ -1,4 +1,4 @@
-# Complete: Installation with BGP and IPIP, APIServer, ImageSet, Goldmane and Whisker for Calico v3.33.0
+# Complete: Installation with BGP and IPIP, APIServer, ImageSet, Goldmane and Whisker for Calico v3.33.1
 classes: []
 
 parameters:
@@ -42,15 +42,15 @@ parameters:
           nodeMetricsPort: 9091
       api_server: {}
       imageset:
-        name: calico-v3.33.0
+        name: calico-v3.33.1
         images:
           - image: calico/calico
-            digest: sha256:4ebc20730127bc9e8bf1db5f5a2d8b58cf37fe0e891b3c7b5471992221d213e5
+            digest: sha256:fc7c26a079896ada2bea3b0bd7732430e0b095a9af726ed2150fe0894d748d4b
           - image: calico/node
-            digest: sha256:565d8db3200e443955557f8f28ff44ab8a4a456754bc74a19c4f2f3444af9b1c
+            digest: sha256:1820b229f4aa6192bd2fc73930fcebd724387e6b8ff944c45061e81529bbd337
           - image: calico/third-party-cni-plugins
-            digest: sha256:0f32f48279484c0d6f0e0d0e767b2d0e1a6c6ca34cb3421a61b989d992f3df41
+            digest: sha256:3e1f07559df83c36cc3ff6db7d288e8893893ea9517434d5d9cf1e326737b6f3
           - image: calico/whisker
-            digest: sha256:4802f246acbc4ac08d1ce6b5c229a518dc4d85e33b50b4d1366b05a49459497c
+            digest: sha256:941ce3169c2d381ee4b9f65b7cdcd27fab9d5c8e9a123284fd09a450695ff721
       goldmane: {}
       whisker: {}

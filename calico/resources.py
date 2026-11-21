@@ -1,7 +1,7 @@
 """Calico day-2 resources in projectcalico.org/v3.
 
 Renders NetworkPolicy, GlobalNetworkPolicy, NetworkSet, GlobalNetworkSet,
-IPPool, BGPPeer and BGPConfiguration for Calico v3.33.0 from the sections of
+IPPool, BGPPeer and BGPConfiguration for Calico v3.33.1 from the sections of
 parameters.generators.calico; see README.md for the inventory contract.
 """
 

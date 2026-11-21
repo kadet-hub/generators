@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5
+
+Built for Calico 3.33.1 and Tigera operator 1.44.1. The GlobalNetworkPolicy and NetworkPolicy schemas and CRDs limit `serviceAccounts.names` entries to DNS subdomain names of at most 253 characters and `serviceAccounts.selector` to 1024 characters, and the BGPPeer `peerIP` rule checks a bracketed IPv6 address with port more strictly. The Installation schema changes only in descriptions. The README example and the `complete` fixture name the ImageSet `calico-v3.33.1` with that release's image digests. The upstream files the README cites are unchanged at the new tags apart from the installation controller, whose provider defaults for `cni.type` stay the same, and their links move to those tags. Rendered output is unchanged.
+
 ## 1.1.4
 
 Republished so the artefact carries the repository's LICENSE, which the kadet-hub registry adds to every artefact it builds since kadet-hub/registry#418. The artefacts of 1.1.3 and earlier have no LICENSE although they declare Apache-2.0. Rendered output is unchanged.

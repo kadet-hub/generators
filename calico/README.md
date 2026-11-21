@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/calico/) page.
 
-Kapitan kadet generator for the [Tigera operator](https://github.com/tigera/operator) resources that install and configure Calico. Built for Calico 3.33.0 (Tigera operator 1.44.0).
+Kapitan kadet generator for the [Tigera operator](https://github.com/tigera/operator) resources that install and configure Calico. Built for Calico 3.33.1 (Tigera operator 1.44.1).
 
 - **Installation** (`operator.tigera.io/v1`): Calico networking, CNI, IP pools and control plane settings
 - **APIServer** (`operator.tigera.io/v1`): the Calico API server
@@ -14,7 +14,7 @@ Kapitan kadet generator for the [Tigera operator](https://github.com/tigera/oper
 - **IPPool** (`projectcalico.org/v3`): an additional IP pool
 - **BGPPeer**, **BGPConfiguration** (`projectcalico.org/v3`): BGP peerings and the cluster or per-node BGP settings
 
-The five operator kinds are cluster-scoped and exist only as `v1`, the served storage version at operator 1.44.0. The operator itself and its CRDs come from the upstream `tigera-operator.yaml` manifest or the `tigera-operator` Helm chart. At Calico 3.33.0 the seven `projectcalico.org` kinds are served and stored as `v3` by the native CRDs in `v3_projectcalico_org.yaml`; none is deprecated. Clusters that still use the `crd.projectcalico.org/v1` CRDs accept the same documents through the Calico API server (`api_server`).
+The five operator kinds are cluster-scoped and exist only as `v1`, the served storage version at operator 1.44.1. The operator itself and its CRDs come from the upstream `tigera-operator.yaml` manifest or the `tigera-operator` Helm chart. At Calico 3.33.1 the seven `projectcalico.org` kinds are served and stored as `v3` by the native CRDs in `v3_projectcalico_org.yaml`; none is deprecated. Clusters that still use the `crd.projectcalico.org/v1` CRDs accept the same documents through the Calico API server (`api_server`).
 
 ## Usage
 
@@ -57,7 +57,7 @@ All keys live under `parameters.generators.calico`.
 
 The Installation is rendered in every target, also in one that only sets policies; compile policies for an application in the target that holds the cluster's Installation, or set the same `installation` there.
 
-Every operator resource accepts `name`, `labels`, `annotations` and `spec`, and gets the label `name: <name>`. `name` defaults to `default`. The CRDs only accept `default`, `tigera-secure` or `overlay` for an Installation `default` or `tigera-secure` for an APIServer and `default` for Goldmane and Whisker. An ImageSet must be named `calico-<release>`, for this release `calico-v3.33.0` (`enterprise-<release>` for the enterprise variants); the operator ignores names without that prefix and refuses to install while a `calico-*` ImageSet with the wrong release exists ([imageset.go](https://github.com/tigera/operator/blob/v1.44.0/pkg/controller/utils/imageset/imageset.go)). An ImageSet without `name` is rendered as `default` and logs a warning.
+Every operator resource accepts `name`, `labels`, `annotations` and `spec`, and gets the label `name: <name>`. `name` defaults to `default`. The CRDs only accept `default`, `tigera-secure` or `overlay` for an Installation `default` or `tigera-secure` for an APIServer and `default` for Goldmane and Whisker. An ImageSet must be named `calico-<release>`, for this release `calico-v3.33.1` (`enterprise-<release>` for the enterprise variants); the operator ignores names without that prefix and refuses to install while a `calico-*` ImageSet with the wrong release exists ([imageset.go](https://github.com/tigera/operator/blob/v1.44.1/pkg/controller/utils/imageset/imageset.go)). An ImageSet without `name` is rendered as `default` and logs a warning.
 
 Precedence is generator defaults < `spec` < flat keys: a flat key that overrides the same field in `spec` wins and logs a warning. The override is per top-level field, so a flat `cni` or `calico_network` replaces the whole `spec.cni` or `spec.calicoNetwork`.
 
@@ -117,11 +117,11 @@ For these kinds the generator adds no rule, policy or networking setting on its 
 
 ### Operator defaults
 
-Once `cni` is set the CRD requires `cni.type`. Without one the generator takes `spec.cni.type`, or else sets the operator's own default for the provider: `AzureVNET` for `AKS`, `AmazonVPC` for `EKS`, `GKE` for `GKE`, `Calico` otherwise ([fillDefaults](https://github.com/tigera/operator/blob/v1.44.0/pkg/controller/installation/core_controller.go)). The operator additionally picks `AmazonVPC` when an `aws-node` DaemonSet exists; that cannot be seen at compile time, so set `type` on such clusters.
+Once `cni` is set the CRD requires `cni.type`. Without one the generator takes `spec.cni.type`, or else sets the operator's own default for the provider: `AzureVNET` for `AKS`, `AmazonVPC` for `EKS`, `GKE` for `GKE`, `Calico` otherwise ([fillDefaults](https://github.com/tigera/operator/blob/v1.44.1/pkg/controller/installation/core_controller.go)). The operator additionally picks `AmazonVPC` when an `aws-node` DaemonSet exists; that cannot be seen at compile time, so set `type` on such clusters.
 
 Nothing else is defaulted. `variant` is left to the operator, which fills in the variant it runs as. BGP, encapsulation, NAT and the IP pools themselves change the cluster network and are rendered only when set; the operator defaults an IP pool to IPIP encapsulation, `natOutgoing: Enabled`, `nodeSelector: all()` and block size 26 ([Installation API](https://docs.tigera.io/calico/3.33/reference/installation/api)).
 
-Goldmane and Whisker are opt-in, although the upstream `custom-resources.yaml` creates both: Goldmane aggregates the flow logs of every node and Whisker serves them in a UI. The operator marks Whisker degraded while no Goldmane exists ([whisker controller](https://github.com/tigera/operator/blob/v1.44.0/pkg/controller/whisker/controller.go)), so `whisker` without `goldmane` logs a warning. Whisker's `notifications` defaults to `Disabled` here because the upstream default `Enabled` makes the UI fetch banner text from an external API ([Whisker CRD](https://github.com/tigera/operator/blob/v1.44.0/pkg/imports/crds/operator/operator.tigera.io_whiskers.yaml)); `notifications` or `spec.notifications` set to `Enabled` turns it on.
+Goldmane and Whisker are opt-in, although the upstream `custom-resources.yaml` creates both: Goldmane aggregates the flow logs of every node and Whisker serves them in a UI. The operator marks Whisker degraded while no Goldmane exists ([whisker controller](https://github.com/tigera/operator/blob/v1.44.1/pkg/controller/whisker/controller.go)), so `whisker` without `goldmane` logs a warning. Whisker's `notifications` defaults to `Disabled` here because the upstream default `Enabled` makes the UI fetch banner text from an external API ([Whisker CRD](https://github.com/tigera/operator/blob/v1.44.1/pkg/imports/crds/operator/operator.tigera.io_whiskers.yaml)); `notifications` or `spec.notifications` set to `Enabled` turns it on.
 
 An ImageSet must list a digest for every image the operator deploys for the configured Installation; image names are the `calico/` names of the release, such as `calico/calico`, `calico/node` and `calico/third-party-cni-plugins` ([ImageSet](https://docs.tigera.io/calico/3.33/operations/image-options/imageset)).
 
@@ -146,17 +146,17 @@ parameters:
           nodeMetricsPort: 9091
       api_server: {}
       imageset:
-        name: calico-v3.33.0
+        name: calico-v3.33.1
         images:
           - image: calico/calico
-            digest: sha256:4ebc20730127bc9e8bf1db5f5a2d8b58cf37fe0e891b3c7b5471992221d213e5
+            digest: sha256:fc7c26a079896ada2bea3b0bd7732430e0b095a9af726ed2150fe0894d748d4b
           - image: calico/node
-            digest: sha256:565d8db3200e443955557f8f28ff44ab8a4a456754bc74a19c4f2f3444af9b1c
+            digest: sha256:1820b229f4aa6192bd2fc73930fcebd724387e6b8ff944c45061e81529bbd337
           - image: calico/third-party-cni-plugins
-            digest: sha256:0f32f48279484c0d6f0e0d0e767b2d0e1a6c6ca34cb3421a61b989d992f3df41
+            digest: sha256:3e1f07559df83c36cc3ff6db7d288e8893893ea9517434d5d9cf1e326737b6f3
 ```
 
-This renders `default-installation`, `default-apiserver` and `calico-v3.33.0-imageset`.
+This renders `default-installation`, `default-apiserver` and `calico-v3.33.1-imageset`.
 
 Policies, network sets and BGP:
 
@@ -208,4 +208,4 @@ This renders `shop/api-np`, `deny-app-policy-gnp`, `shop/partner-api-netset` and
 
 ## Schemas
 
-`schemas/operator.tigera.io/` holds the closed JSON Schemas of the five kinds from the Tigera operator 1.44.0 CRDs (Apache-2.0). `schemas/projectcalico.org/` holds the closed JSON Schemas of the seven kinds from the Calico 3.33.0 `v3_projectcalico_org.yaml` CRDs (Apache-2.0). The CRDs' CEL rules, for example that an IPPool CIDR is strictly masked or that `node` and `nodeSelector` exclude each other, are checked by the API server, not by QA-7.
+`schemas/operator.tigera.io/` holds the closed JSON Schemas of the five kinds from the Tigera operator 1.44.1 CRDs (Apache-2.0). `schemas/projectcalico.org/` holds the closed JSON Schemas of the seven kinds from the Calico 3.33.1 `v3_projectcalico_org.yaml` CRDs (Apache-2.0). The CRDs' CEL rules, for example that an IPPool CIDR is strictly masked or that `node` and `nodeSelector` exclude each other, are checked by the API server, not by QA-7.
