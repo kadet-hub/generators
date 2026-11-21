@@ -219,7 +219,7 @@ neat-bot again afterwards.
   - Test: manual: `git grep -n -e <old version> -- <generator>
     ':!<generator>/schemas' ':!<generator>/CHANGELOG.md'` prints only
     lines about that version
-  - Since: this change
+  - Since: #233
 
 - UPD-10: A README link pinned to the previous tag MUST move to the new tag
   only after its cited file and line range shows the same content at the
@@ -234,7 +234,7 @@ neat-bot again afterwards.
 
   - Test: manual: for every pinned link, the line range at the old and the
     new tag is identical, or the claim was re-checked
-  - Since: this change
+  - Since: #233
 
 - UPD-11: Fixture and README values that belong to one upstream release,
   such as image digests and release-named resources, MUST be taken from
@@ -248,7 +248,7 @@ neat-bot again afterwards.
 
   - Test: manual: the registry returns the fixture's digests for the new
     tag
-  - Since: this change
+  - Since: #233
 
 - UPD-12: The maintainer MUST read the upstream release notes for kinds or
   versions that are removed, rejected at admission or no longer acted on,
@@ -261,7 +261,7 @@ neat-bot again afterwards.
   longer executes them (kyverno#18164).
 
   - Test: manual: the pull request names the release notes it read
-  - Since: this change
+  - Since: #233
 
 - UPD-13: If the new release removes, rejects or stops acting on a kind
   the generator renders, the generator MUST get a major version that
@@ -275,7 +275,7 @@ neat-bot again afterwards.
   `sources.yaml` entry.
 
   - Test: the generator's unit test for the rejected section
-  - Since: this change
+  - Since: #233
 
 - UPD-14: Before the merge, the maintainer MUST set the generator's
   version and add its CHANGELOG entry (QA-1 of the registry's gate spec).
@@ -287,7 +287,7 @@ neat-bot again afterwards.
 
   - Test: the registry gate (QA-1) fails a tag without the entry; manual:
     `__version__` in `<generator>/__init__.py` equals the new heading
-  - Since: this change
+  - Since: #233
 
 ## Credentials
 
