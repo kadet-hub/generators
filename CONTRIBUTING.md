@@ -87,6 +87,10 @@ be adapted by hand. Those issues are open for anyone to pick up. The
 README's [Upstream updates](README.md#upstream-updates) shows how to run
 the tool without writing anything.
 
+A maintainer reviews such a pull request as
+[docs/specs/upstream.md](docs/specs/upstream.md#reviewing-an-upstream-pull-request)
+describes, including the major release when upstream stops accepting a kind.
+
 ## Pull requests
 
 Open the pull request from a fork. Only maintainers and the upstream
