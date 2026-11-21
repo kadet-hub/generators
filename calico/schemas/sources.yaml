@@ -4,7 +4,7 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 # installation_v1.json is written without indentation to stay below the 1 MiB
 # file limit; its content is unchanged.
-# Tigera operator v1.44.0 is the operator of Calico v3.33.0.
+# Tigera operator v1.44.1 is the operator of Calico v3.33.1.
 operator.tigera.io:
   software: Tigera operator
   version: 1.44.1

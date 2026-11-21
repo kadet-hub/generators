@@ -10,12 +10,12 @@ Tigera operator installs and manages Calico (or Calico Enterprise / TigeraSecure
 on Kubernetes clusters.
 
 Schema reference: operator.tigera.io/v1
-Built for Calico v3.33.0 (Tigera operator v1.44.0).
+Built for Calico v3.33.1 (Tigera operator v1.44.1).
 See: https://docs.tigera.io/calico/3.33/reference/installation/api
-     https://github.com/tigera/operator/tree/v1.44.0
+     https://github.com/tigera/operator/tree/v1.44.1
 """
 
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 import logging
 from typing import Any
@@ -382,7 +382,7 @@ class Installation(TigeraBase):
         else:
             # cni.type is required by the CRD once cni is set. Use the operator's
             # own default for the provider (fillDefaults in
-            # https://github.com/tigera/operator/blob/v1.44.0/pkg/controller/installation/core_controller.go).
+            # https://github.com/tigera/operator/blob/v1.44.1/pkg/controller/installation/core_controller.go).
             # A type from spec.cni ranks above this default.
             spec_type = (spec.get("cni") or {}).get("type")
             cni_spec["type"] = spec_type or _PROVIDER_CNI_TYPES.get(
@@ -543,7 +543,7 @@ class ImageSet(TigeraBase):
     by immutable digest rather than tags.
 
     The resource name must follow the format ``<variant>-<release>``
-    (e.g. ``calico-v3.33.0``).
+    (e.g. ``calico-v3.33.1``).
 
     Required kwargs:
         name: Resource name.
@@ -691,7 +691,7 @@ def main(input_params: dict | None = None) -> BaseObj:
         if "name" not in imageset_config_dict:
             logger.warning(
                 "calico ImageSet has no 'name'; using 'default', but the operator "
-                "expects '<variant>-<release>' (e.g. calico-v3.33.0)"
+                "expects '<variant>-<release>' (e.g. calico-v3.33.1)"
             )
         imageset_name = imageset_config_dict.get("name", "default")
         imageset = ImageSet(name=imageset_name, config=imageset_config_dict)
@@ -707,7 +707,7 @@ def main(input_params: dict | None = None) -> BaseObj:
         obj.root[f"{name}-{key}"] = resource_class(name=name, config=config)
     if "whisker" in calico_config and "goldmane" not in calico_config:
         # The operator degrades Whisker without a Goldmane CR
-        # (pkg/controller/whisker/controller.go at v1.44.0).
+        # (pkg/controller/whisker/controller.go at v1.44.1).
         logger.warning("calico 'whisker' is set without 'goldmane'; Whisker needs Goldmane")
 
     # projectcalico.org/v3 resources; imported here because resources.py uses this module's helpers
