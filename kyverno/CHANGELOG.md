@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0
+
+Built for Kyverno 1.20.0, which denies creates and spec updates of the legacy `kyverno.io` policies and no longer executes them (kyverno/kyverno#17535, #18164). The sections `cluster_policies`, `policies`, `policy_exceptions`, `cluster_cleanup_policies` and `cleanup_policies` now stop the compile with a `ValueError` that names the `policies.kyverno.io` section to use instead; 1.1.4 rendered them. The `kyverno.io` schemas, CRDs and NOTICE leave the generator. The `policies.kyverno.io` schemas and CRDs gain `autogen.podControllers.enabled` on the validating and mutating policies and `validations` on PolicyException, which `spec` passes through; their kinds stay at the storage version `v1beta1`. Rendered output is unchanged for inventories without the legacy sections.
+
 ## 1.1.4
 
 Built for Kyverno 1.19.2. The ClusterPolicy and Policy schemas and CRDs gain an optional `filter` on `imageExtractors` entries, in rules and in the autogen status; `image_extractors` passes it through. The `policies.kyverno.io` schemas are unchanged. Rendered output is unchanged. The upstream lines the README cites are unchanged at v1.19.2, and their links move to that tag.
