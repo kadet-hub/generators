@@ -196,6 +196,99 @@ and CHANGELOG entry before merging.
   - Test: `tools/test_upstream.py`
   - Since: #39, #61, #158, #160
 
+## Reviewing an upstream pull request
+
+The pull request of UPD-3 proves only that the regenerated schemas accept
+the generator's fixtures. It does not show whether the README, the code or
+the fixtures still describe the new release, and it cannot see behaviour
+that upstream changed outside the CRDs. The maintainer reviews it in the
+order below and pushes the result to the `upstream/<generator>` branch.
+A push does not start a new neat-bot review, so the maintainer requests
+neat-bot again afterwards.
+
+- UPD-9: Before the merge, the generator MUST NOT name the previous
+  upstream version anywhere outside its CHANGELOG and its schema files,
+  unless the sentence is about that version.
+
+  The pull request moves only the "Built for" line. The old version
+  remains in README prose, in upstream links pinned to a tag, in
+  docstrings and code comments, in error messages, in comments in
+  `sources.yaml` and in fixture values. Calico #217 still named 3.33.0
+  in all of these.
+
+  - Test: manual: `git grep -n -e <old version> -- <generator>
+    ':!<generator>/schemas' ':!<generator>/CHANGELOG.md'` prints only
+    lines about that version
+  - Since: this change
+
+- UPD-10: A README link pinned to the previous tag MUST move to the new tag
+  only after its cited file and line range shows the same content at the
+  new tag. Otherwise the claim it supports is checked again at the new tag
+  and rewritten.
+
+  `gh api repos/<owner>/<repo>/compare/<old>...<new>` lists the changed
+  files, but its file list stops at 300 files. For a large release compare
+  the cited line range of both raw files instead. A file that no longer
+  exists at the new tag means the code moved or was removed, as
+  `api/kyverno/v1` and `pkg/validation/policy` did in Kyverno 1.20.0.
+
+  - Test: manual: for every pinned link, the line range at the old and the
+    new tag is identical, or the claim was re-checked
+  - Since: this change
+
+- UPD-11: Fixture and README values that belong to one upstream release,
+  such as image digests and release-named resources, MUST be taken from
+  the new release.
+
+  Calico's ImageSet must be named `calico-<release>` and lists that
+  release's image digests. The digests are the image index digests that
+  the registry returns for the release tag (`docker-content-digest` of the
+  manifest list). Before replacing them, confirm that the old fixture
+  values match the old tag under the same method.
+
+  - Test: manual: the registry returns the fixture's digests for the new
+    tag
+  - Since: this change
+
+- UPD-12: The maintainer MUST read the upstream release notes for kinds or
+  versions that are removed, rejected at admission or no longer acted on,
+  in addition to the schema diff.
+
+  A CRD can stay served while upstream stops accepting or executing its
+  objects. The schemas then regenerate, `./check` passes and the pull
+  request looks harmless. Kyverno 1.20.0 keeps the `kyverno.io` CRDs but
+  denies creates and spec updates of their policies (kyverno#17535) and no
+  longer executes them (kyverno#18164).
+
+  - Test: manual: the pull request names the release notes it read
+  - Since: this change
+
+- UPD-13: If the new release removes, rejects or stops acting on a kind
+  the generator renders, the generator MUST get a major version that
+  fails the compile with a `ValueError` for that kind's section. The error
+  names the section and the upstream migration path.
+
+  A section that is silently dropped removes a policy or a resource from
+  the cluster without any message. Keeping the section renders objects
+  the new release rejects or ignores. The CRDs and schemas of such a kind
+  leave the generator in the same release, together with their
+  `sources.yaml` entry.
+
+  - Test: the generator's unit test for the rejected section
+  - Since: this change
+
+- UPD-14: Before the merge, the maintainer MUST set the generator's
+  version and add its CHANGELOG entry (QA-1 of the registry's gate spec).
+
+  A change only to schemas, README or fixtures is a patch release. A new
+  inventory key is a minor release. UPD-13 requires a major release. The
+  entry names the schema changes per kind, the README changes, and whether
+  rendered output changes for inventories that do not use the change.
+
+  - Test: the registry gate (QA-1) fails a tag without the entry; manual:
+    `__version__` in `<generator>/__init__.py` equals the new heading
+  - Since: this change
+
 ## Credentials
 
 - UPD-5: The workflow MUST authenticate with a token of the kadet-hub GitHub
