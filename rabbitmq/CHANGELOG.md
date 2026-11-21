@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+Built for RabbitMQ Cluster Operator 2.23.3 and Messaging Topology Operator 1.20.6. The RabbitmqCluster schema and CRD gain the `/scale` subresource with `status.replicas`, and the `evictionResponders` of a StatefulSet override take at most 10 entries, each with a non-empty `name` and a `priority` from 0 to 100000. The other `rabbitmq.com` schemas and CRDs are unchanged. The upstream files the README cites are unchanged at the new tags apart from the RabbitmqCluster types, which gain only the scale subresource, and their links move to those tags. Rendered output is unchanged.
+
 ## 1.1.2
 
 ConfigMaps and Secrets are checked against the Kubernetes 1.37.2 schemas instead of 1.37.1, which are the same files. Rendered output is unchanged.
