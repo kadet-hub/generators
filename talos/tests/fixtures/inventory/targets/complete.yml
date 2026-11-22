@@ -53,6 +53,13 @@ parameters:
           secretboxEncryptionSecret: placeholder-secretbox-secret
           serviceAccount:
             key: placeholder-service-account-key
+            # TAL-8: tokens of the endpoint before k8s.example.com stay valid
+            accepted:
+              issuers:
+                - https://old.example.com:6443
+              audiences:
+                - https://k8s.example.com:6443
+                - https://old.example.com:6443
           ca:
             crt: placeholder-cluster-ca-crt
             key: placeholder-cluster-ca-key

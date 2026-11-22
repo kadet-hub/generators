@@ -645,9 +645,16 @@ def _cluster_docs(node: str, cluster: dict, machine: dict, node_cfg: dict) -> li
     if agg and agg.get("key"):
         docs.append(_doc("KubeAggregatorCAConfig", issuingCA={"cert": _pem(agg.get("crt")), "key": _pem(agg["key"])}))
 
-    sa = cluster.pop("serviceAccount", None)
-    if sa and sa.get("key") and endpoint:
-        docs.append(_doc("KubeServiceAccountConfig", issuer={"privateKey": _pem(sa["key"]), "issuerURL": endpoint}))
+    sa = cluster.pop("serviceAccount", None) or {}
+    # TAL-8: old issuers and audiences stay accepted while the endpoint moves
+    sa_accepted = sa.get("accepted")
+    if sa.get("key") and endpoint:
+        docs.append(_doc("KubeServiceAccountConfig", issuer={"privateKey": _pem(sa["key"]), "issuerURL": endpoint},
+                         accepted=sa_accepted or None))
+    elif sa_accepted:
+        # TAL-9: without the document the key would be dropped silently
+        raise ValueError(f"{node}: cluster.serviceAccount.accepted needs cluster.serviceAccount.key and "
+                         "cluster.controlPlane.endpoint, which render KubeServiceAccountConfig")
 
     docs += _api_server(node, cluster, port)
     mcp = machine.get("controlPlane") or {}

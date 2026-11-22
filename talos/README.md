@@ -75,7 +75,7 @@ The dict form keyed by the item's natural key works for `interfaces` (`interface
 | `cluster.id` + `secret`, `discovery` | `DiscoveryIdentityConfig`, `DiscoveryServiceConfig` |
 | `cluster.clusterName`, `controlPlane.endpoint` | `KubeClusterConfig` |
 | `cluster.network` | `KubeNetworkConfig`; CNI `flannel` (the default) `KubeFlannelCNIConfig`, `custom` URLs `KubeExternalManifestConfig`, `none` nothing |
-| `cluster.ca`, `acceptedCAs`, `aggregatorCA`, `serviceAccount` | `KubeAPIServerCAConfig`, `KubeAggregatorCAConfig`, `KubeServiceAccountConfig` |
+| `cluster.ca`, `acceptedCAs`, `aggregatorCA`, `serviceAccount` (with `accepted.issuers` and `accepted.audiences`) | `KubeAPIServerCAConfig`, `KubeAggregatorCAConfig`, `KubeServiceAccountConfig` |
 | `cluster.secretboxEncryptionSecret`, `aescbcEncryptionSecret` | `KubeEtcdEncryptionConfig` with the provider list Talos rendered for them (`key2`, `key1`, `identity`) |
 | `cluster.apiServer`, `controlPlane.localAPIServerPort` | `KubeAPIServerConfig`, `KubeAuthenticationConfig`, `KubeAuthorizerConfig`, `KubeAdmissionControlConfig`, `KubeAuditPolicyConfig` |
 | `cluster.controllerManager`, `scheduler`, `proxy`, `coreDNS`, `machine.controlPlane.*.disabled` | `KubeControllerManagerConfig`, `KubeSchedulerConfig`, `KubeProxyConfig`, `KubeCoreDNSConfig` |
@@ -96,6 +96,7 @@ Some legacy blocks have no multi-document equivalent. They stay in the `v1alpha1
 Keys whose meaning changes with the translation:
 
 - Certificates and keys under `cluster.ca`, `acceptedCAs`, `aggregatorCA`, `serviceAccount` and registry `tls` are base64-encoded PEM in `v1alpha1` and plain PEM in the documents. The generator decodes plain values; it cannot decode a Kapitan ref, so a ref for one of these keys must hold the PEM text. `machine.ca` and `cluster.etcd.ca` stay base64.
+- `cluster.serviceAccount.accepted` has no `v1alpha1` counterpart. Its `issuers` and `audiences` become `accepted` of `KubeServiceAccountConfig`, whose `issuerURL` is the control plane endpoint, so tokens of an earlier endpoint stay valid after the endpoint moves. Talos replaces its default audience, the issuer URL, with `audiences`, so the list names the new URL as well. The compile fails when the key is set without `serviceAccount.key` or `controlPlane.endpoint`, because the document is then not written.
 - `machine.time.servers` become `TimeSyncConfig` `ntp.servers`, or `ptp.devices` when every entry is a PTP device (`/dev/...`); Talos 1.14.5 rejects PTP devices in `ntp.servers` ([time_sync.go](https://github.com/siderolabs/talos/blob/v1.14.5/pkg/machinery/config/types/network/time_sync.go)).
 - `machine.install.disk` becomes the CEL selector `disk.dev_path == "<disk>"`, or `"<disk>" in disk.symlinks` for a `/dev/disk/...` path; `diskSelector` becomes the expression Talos built from it ([DiskMatchExpression](https://github.com/siderolabs/talos/blob/v1.14.5/pkg/machinery/config/types/v1alpha1/v1alpha1_provider.go)).
 - `machine.network.interfaces`: once a link document exists, Talos stops running DHCP on the other physical links ([RunDefaultDHCPOperators](https://github.com/siderolabs/talos/blob/v1.14.5/pkg/machinery/config/container/container.go)). An interface with `ignore: true` therefore emits nothing. A route to `0.0.0.0/0` or `::/0` becomes a route without destination, which `LinkConfig` treats as the default route.
