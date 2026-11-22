@@ -116,6 +116,35 @@ def test_documents_need_apiversion_and_kind():
     assert "wk-1: documents must be a list" in e, e
 
 
+def sa_doc(docs):
+    return next((d for d in docs if d.get("kind") == "KubeServiceAccountConfig"), None)
+
+
+def test_service_account_accepted():
+    old = "https://old.example.com:6443"
+    new = "https://k8s.example.com:6443"
+    accepted = {"issuers": [old], "audiences": [new, old]}
+    base = {"controlPlane": {"endpoint": new}}
+    doc = sa_doc(split("cp-1", config(**base, serviceAccount={"key": "k", "accepted": accepted})))
+    assert doc["issuer"]["issuerURL"] == new and doc["accepted"] == accepted, doc
+    # without the key the document stays as before
+    assert "accepted" not in sa_doc(split("cp-1", config(**base, serviceAccount={"key": "k"})))
+    # a worker drops the document with the other control plane kinds, without an error
+    assert sa_doc(split("wk-1", config("worker", **base, serviceAccount={"key": "k", "accepted": accepted}))) is None
+
+
+def test_service_account_accepted_needs_the_document():
+    accepted = {"issuers": ["https://old.example.com:6443"]}
+    for cluster in ({"serviceAccount": {"key": "k", "accepted": accepted}},
+                    {"controlPlane": {"endpoint": "https://k8s.example.com:6443"}, "serviceAccount": {"accepted": accepted}}):
+        try:
+            split("cp-1", config(**cluster))
+        except ValueError as e:
+            assert "cp-1" in str(e) and "cluster.serviceAccount.accepted" in str(e), e
+        else:
+            raise AssertionError(f"no ValueError for {cluster}")
+
+
 def test_documents_must_not_repeat_generated():
     c = config(proxy={"disabled": True})
     c["machine"]["network"] = {"hostname": "cp-1", "interfaces": [{"interface": "eth0", "addresses": ["192.0.2.11/24"]}]}

@@ -148,10 +148,54 @@ neither the node config nor its userdata Secret would contain them.
   - Test: `talos/tests/test_multidoc.py::test_documents_must_not_repeat_generated`
   - Since: #216
 
+## Service account issuer
+
+The generator writes `KubeServiceAccountConfig` with the control plane
+endpoint as `issuer.issuerURL`, and Talos derives the API server's
+`--service-account-issuer` and, without `accepted.audiences`,
+`--api-audiences` from it (`pkg/machinery/config/types/k8s/service_account.go`, Talos 1.14.6).
+A cluster that moves its endpoint, for example from an address to a DNS
+name, therefore changes both at once. The API server then rejects every
+token a pod still holds, signed for the old issuer and audience, until the
+kubelet renews it. Cilium, operators and webhooks lose the API in that
+window. Kubernetes keeps old tokens valid when the old issuer stays in
+the list of accepted issuers, and Talos takes that list as
+`accepted.issuers` and the audiences as `accepted.audiences`.
+
+The inventory sets them as `cluster.serviceAccount.accepted`, a key
+without a v1alpha1 counterpart, in the shape of the document. A separate
+`issuerURL` key was considered. It would let the issuer stay while the
+endpoint moves, but leave the cluster on the old URL for good.
+
+- TAL-8: `cluster.serviceAccount.accepted` MUST reach
+  `KubeServiceAccountConfig` as its `accepted` field unchanged.
+
+  `issuers` and `audiences` pass through as written. Talos replaces its
+  default audience, the issuer URL, with `audiences` when that list is
+  set, so a list that keeps the old URL names the new one too. Output is
+  unchanged for inventories without the key.
+
+  - Test: `talos/tests/test_multidoc.py::test_service_account_accepted`;
+    `./check talos` (fixture `complete`)
+  - Since: #234
+
+- TAL-9: The compile MUST fail, naming the node, when
+  `cluster.serviceAccount.accepted` is set without
+  `cluster.serviceAccount.key` or `cluster.controlPlane.endpoint`.
+
+  The generator writes `KubeServiceAccountConfig` only from both. Without
+  the check the key would be dropped without a word, and the endpoint move
+  it was meant for would break the tokens after all. A worker with both
+  keys renders without error and without the document, which the control
+  plane filter drops like every control plane kind.
+
+  - Test: `talos/tests/test_multidoc.py::test_service_account_accepted_needs_the_document`
+  - Since: #234
+
 ## Implementation inventory
 
 | Item | Value |
 |---|---|
-| Code | `talos/multidoc.py` (`_component_images`, called from `split`; `IMAGES`; `append_documents`), `talos/__init__.py` (`DEFAULT_INSTALLER_IMAGE`; `main` takes `documents` out of the merged node config and calls `append_documents`) |
+| Code | `talos/multidoc.py` (`_component_images`, called from `split`; `IMAGES`; `append_documents`; `_cluster_docs` writes `KubeServiceAccountConfig`), `talos/__init__.py` (`DEFAULT_INSTALLER_IMAGE`; `main` takes `documents` out of the merged node config and calls `append_documents`) |
 | Unit tests | `talos/tests/test_multidoc.py`, run from the repository root with `PYTHONDONTWRITEBYTECODE=1 uv run -p 3.12 --with pytest --with 'kapitan==0.36.3' --with 'omegaconf==2.4.0.dev4' python3 -m pytest -q -p no:cacheprovider talos/tests` |
 | Upstream repositories | `ghcr.io/siderolabs/kubelet`, `registry.k8s.io/kube-apiserver`, `registry.k8s.io/kube-controller-manager`, `registry.k8s.io/kube-scheduler`, `registry.k8s.io/kube-proxy` |

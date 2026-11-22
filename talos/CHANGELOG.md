@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0
+
+- `cluster.serviceAccount.accepted` with `issuers` and `audiences` becomes `accepted` of `KubeServiceAccountConfig`, so tokens of an earlier control plane endpoint stay valid after the endpoint moves. The compile fails when the key is set without `serviceAccount.key` or `controlPlane.endpoint`. Output is unchanged for inventories without the key.
+
 ## 1.4.0
 
 - `documents` in `base` and `nodes.<name>` takes Talos multi-documents the generator does not translate, such as `FilesystemTrimConfig`, `SecurityProfileConfig` and `UserVolumeConfig`. They are appended unchanged after the node's generated documents, in list order, on workers as well, and the userdata Secret carries them. A node's list replaces the `base` list. The compile fails when an entry lacks `apiVersion` or `kind`, or repeats the `kind` and `name` of a document the generator writes for that node. Output is unchanged for inventories without `documents`.
