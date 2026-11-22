@@ -2,7 +2,7 @@
 
 ## 1.5.0
 
-- `cluster.serviceAccount.accepted` with `issuers` and `audiences` becomes `accepted` of `KubeServiceAccountConfig`, so tokens of an earlier control plane endpoint stay valid after the endpoint moves. The compile fails when the key is set and the node's config gets no `KubeServiceAccountConfig`. Output is unchanged for inventories without the key.
+- `cluster.serviceAccount.accepted` with `issuers` and `audiences` becomes `accepted` of `KubeServiceAccountConfig`, so tokens of an earlier control plane endpoint stay valid after the endpoint moves. The compile fails when the key is set without `serviceAccount.key` or `controlPlane.endpoint`. Output is unchanged for inventories without the key.
 
 ## 1.4.0
 

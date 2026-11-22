@@ -129,6 +129,8 @@ def test_service_account_accepted():
     assert doc["issuer"]["issuerURL"] == new and doc["accepted"] == accepted, doc
     # without the key the document stays as before
     assert "accepted" not in sa_doc(split("cp-1", config(**base, serviceAccount={"key": "k"})))
+    # a worker drops the document with the other control plane kinds, without an error
+    assert sa_doc(split("wk-1", config("worker", **base, serviceAccount={"key": "k", "accepted": accepted}))) is None
 
 
 def test_service_account_accepted_needs_the_document():
