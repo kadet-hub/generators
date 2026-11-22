@@ -180,13 +180,14 @@ endpoint moves, but leave the cluster on the old URL for good.
   - Since: #234
 
 - TAL-9: The compile MUST fail, naming the node, when
-  `cluster.serviceAccount.accepted` is set and the generator writes no
-  `KubeServiceAccountConfig` for that node's config.
+  `cluster.serviceAccount.accepted` is set without
+  `cluster.serviceAccount.key` or `cluster.controlPlane.endpoint`.
 
-  The document needs `cluster.serviceAccount.key` and
-  `cluster.controlPlane.endpoint`. Without the check the key would be
-  dropped without a word, and the endpoint move it was meant for would
-  break the tokens after all.
+  The generator writes `KubeServiceAccountConfig` only from both. Without
+  the check the key would be dropped without a word, and the endpoint move
+  it was meant for would break the tokens after all. A worker with both
+  keys renders without error and without the document, which the control
+  plane filter drops like every control plane kind.
 
   - Test: `talos/tests/test_multidoc.py::test_service_account_accepted_needs_the_document`
   - Since: #234
