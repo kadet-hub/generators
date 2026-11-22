@@ -177,7 +177,7 @@ endpoint moves, but leave the cluster on the old URL for good.
 
   - Test: `talos/tests/test_multidoc.py::test_service_account_accepted`;
     `./check talos` (fixture `complete`)
-  - Since: this change
+  - Since: #234
 
 - TAL-9: The compile MUST fail, naming the node, when
   `cluster.serviceAccount.accepted` is set and the generator writes no
@@ -189,7 +189,7 @@ endpoint moves, but leave the cluster on the old URL for good.
   break the tokens after all.
 
   - Test: `talos/tests/test_multidoc.py::test_service_account_accepted_needs_the_document`
-  - Since: this change
+  - Since: #234
 
 ## Implementation inventory
 
