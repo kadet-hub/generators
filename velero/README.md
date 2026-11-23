@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/velero/) page.
 
-Kapitan kadet generator for [Velero](https://velero.io/) resources (`velero.io/v1`). Built for Velero 1.18.4.
+Kapitan kadet generator for [Velero](https://velero.io/) resources (`velero.io/v1`). Built for Velero 1.19.0.
 
 - **Backup**: one-shot backup of cluster resources and volumes
 - **Schedule**: cron-driven Backup

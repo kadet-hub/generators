@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 velero.io:
   software: Velero
-  version: 1.18.4
-  source: https://github.com/velero-io/velero/tree/v1.18.4/config/crd/v1/bases
+  version: 1.19.0
+  source: https://github.com/velero-io/velero/tree/v1.19.0/config/crd/v1/bases
   license: Apache-2.0
