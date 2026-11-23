@@ -4,11 +4,11 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 postgresql.cnpg.io:
   software: CloudNativePG
-  version: 1.30.1
-  source: https://github.com/cloudnative-pg/cloudnative-pg/tree/v1.30.1/config/crd/bases
+  version: 1.30.2
+  source: https://github.com/cloudnative-pg/cloudnative-pg/tree/v1.30.2/config/crd/bases
   license: Apache-2.0
 barmancloud.cnpg.io:
   software: Barman Cloud Plugin
-  version: 0.15.1
-  source: https://github.com/cloudnative-pg/plugin-barman-cloud/tree/v0.15.1/config/crd/bases
+  version: 0.16.0
+  source: https://github.com/cloudnative-pg/plugin-barman-cloud/tree/v0.16.0/config/crd/bases
   license: Apache-2.0
