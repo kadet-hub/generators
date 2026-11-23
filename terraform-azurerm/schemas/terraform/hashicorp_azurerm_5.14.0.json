@@ -2245,6 +2245,14 @@
          "string"
         ]
        },
+       "advertised_gateway_prefixes": {
+        "description_kind": "plain",
+        "optional": true,
+        "type": [
+         "set",
+         "string"
+        ]
+       },
        "bgp_community": {
         "description_kind": "plain",
         "optional": true,
