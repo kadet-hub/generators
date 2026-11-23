@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/flux/) page.
 
-Kapitan kadet generator for [Flux](https://fluxcd.io/flux/components/) sources and the objects that consume them. Built for Flux 2.10.0, which pins source-controller 1.10.1, kustomize-controller 1.10.1 and helm-controller 1.7.1 ([manifests/bases](https://github.com/fluxcd/flux2/tree/v2.10.0/manifests/bases)).
+Kapitan kadet generator for [Flux](https://fluxcd.io/flux/components/) sources and the objects that consume them. Built for Flux 2.10.0, which pins source-controller 1.10.2, kustomize-controller 1.10.2 and helm-controller 1.7.2 ([manifests/bases](https://github.com/fluxcd/flux2/tree/v2.10.0/manifests/bases)).
 
 - **GitRepository**, **OCIRepository**, **HelmRepository** (`source.toolkit.fluxcd.io/v1`)
 - **Kustomization** (`kustomize.toolkit.fluxcd.io/v1`): applies a directory of a Git or OCI source
