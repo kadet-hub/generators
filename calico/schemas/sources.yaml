@@ -7,11 +7,11 @@
 # Tigera operator v1.44.0 is the operator of Calico v3.33.0.
 operator.tigera.io:
   software: Tigera operator
-  version: 1.44.0
-  source: https://github.com/tigera/operator/tree/v1.44.0/pkg/imports/crds/operator
+  version: 1.44.1
+  source: https://github.com/tigera/operator/tree/v1.44.1/pkg/imports/crds/operator
   license: Apache-2.0
 projectcalico.org:
   software: Calico
-  version: 3.33.0
-  source: https://github.com/projectcalico/calico/blob/v3.33.0/manifests/v3_projectcalico_org.yaml
+  version: 3.33.1
+  source: https://github.com/projectcalico/calico/blob/v3.33.1/manifests/v3_projectcalico_org.yaml
   license: Apache-2.0
