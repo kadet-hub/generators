@@ -606,6 +606,8 @@ parameters:
 
     image-prepuller:
       type: daemonset
+      # The DaemonSet, its name label and main container are named prepuller (K8S-28)
+      workload_name: prepuller
       image: registry.k8s.io/pause:3.10
       init_containers:
         pull-web:
@@ -690,21 +692,37 @@ parameters:
         port: 443
         annotations:
           cert-manager.io/inject-ca-from-secret: shop/policy-webhook-tls
+      # One ValidatingWebhookConfiguration per key (K8S-26), labelled for an
+      # operator that finds its configurations by label (K8S-25)
+      webhook_labels:
+        policy.example.com/component: webhook
       validating_webhooks:
-        - name: validate.policy.example.com
-          admissionReviewVersions: [v1]
-          sideEffects: None
-          failurePolicy: Fail
-          clientConfig:
-            service:
-              name: policy-webhook
-              namespace: shop
-              path: /validate
-          rules:
-            - apiGroups: [apps]
-              apiVersions: [v1]
-              operations: [CREATE, UPDATE]
-              resources: [deployments]
+        policy-validate:
+          - name: validate.policy.example.com
+            admissionReviewVersions: [v1]
+            sideEffects: None
+            failurePolicy: Fail
+            clientConfig:
+              service:
+                name: policy-webhook
+                namespace: shop
+                path: /validate
+            rules:
+              - apiGroups: [apps]
+                apiVersions: [v1]
+                operations: [CREATE, UPDATE]
+                resources: [deployments]
+        policy-audit:
+          - name: audit.policy.example.com
+            failurePolicy: Ignore
+            clientConfig:
+              service:
+                path: /audit
+            rules:
+              - apiGroups: [""]
+                apiVersions: [v1]
+                operations: [CREATE]
+                resources: [configmaps]
       webhooks:
         - name: default.policy.example.com
           failurePolicy: Ignore

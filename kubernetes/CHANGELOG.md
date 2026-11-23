@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.17.0
+
+- `webhook_labels` on a component labels its MutatingWebhookConfiguration and ValidatingWebhookConfigurations. The cert-controller of the External Secrets Operator 2.15.0 writes `caBundle` only into ValidatingWebhookConfigurations labelled `external-secrets.io/component: webhook`.
+- `validating_webhooks` also takes a mapping, which renders one ValidatingWebhookConfiguration per key, named by the key, such as the chart's `secretstore-validate` and `externalsecret-validate`. The list form renders one configuration, as before.
+- `workload_name` names a component's workload, its `name` label, which its selectors use, and its main container. Velero 1.18.4 finds its node agent only as the DaemonSet `node-agent`, while a recipe's component key starts with the recipe's name. The Service, the ServiceAccount, the other objects of the component and the output files keep the component name.
+
+Output is unchanged for inventories without these keys.
+
 ## 1.16.0
 
 - `pod_management_policy` on a StatefulSet component renders as `podManagementPolicy`, such as the `Parallel` that the charts `qdrant` 1.20.0 and `matrix-stack` 26.11.0 set. The API rejects a change of the field on an existing StatefulSet, so one that runs with the default `OrderedReady` switches only after it is deleted with `--cascade=orphan` and applied again.

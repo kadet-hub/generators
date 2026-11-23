@@ -179,6 +179,63 @@ The operator then writes no CA into them, and every call fails.
   - Test: `kubernetes/tests/test_components.py::test_webhook_configuration_names`, `::test_webhook_configuration_default_names`
   - Since: #109
 
+## Webhook configurations found by label
+
+The chart external-secrets 2.15.0 renders two ValidatingWebhookConfigurations
+for its webhook: `secretstore-validate` with two webhooks and
+`externalsecret-validate` with one. Both carry the label
+`external-secrets.io/component: webhook`. The operator's cert-controller
+skips every ValidatingWebhookConfiguration without that label and writes
+no `caBundle` into it (`pkg/controllers/webhookconfig/webhookconfig.go` of
+external-secrets v2.15.0). With `--enable-partial-cache` it does not even
+cache such a configuration (`cmd/controller/certcontroller.go`). The webhooks have `failurePolicy: Fail`, so without the CA the
+API server rejects every SecretStore, ClusterSecretStore and
+ExternalSecret. The generator put only the `name` label on webhook
+configurations and rendered one ValidatingWebhookConfiguration per
+component. kadet-hub/recipes needs both for its `external-secrets` recipe.
+
+- K8S-25: A component's `webhook_labels` MUST render as labels of each of
+  its MutatingWebhookConfigurations and ValidatingWebhookConfigurations.
+  Without the key they MUST carry only the `name` label.
+
+  The key applies to both kinds, as `webhook_annotations` does.
+
+  - Test: `kubernetes/tests/test_components.py::test_webhook_labels`; fixture target `complete`; `manual:` Kapitan 0.36.3 compiles fixture targets `minimal` and `complete` without the keys of K8S-25 to K8S-28 to the same output as 1.16.0, with both inventory backends
+  - Since: #232
+
+- K8S-26: A component's `validating_webhooks` as a mapping MUST render one
+  ValidatingWebhookConfiguration per key, named by the key, with the key's
+  list as its webhooks. A key whose value is `null` or an empty list MUST
+  render none. The list form MUST render one configuration, as before.
+
+  Each key renders as the list form with
+  `validating_webhook_configuration_name` set to the key. K8S-9 and the
+  webhook defaults of the README therefore apply to every configuration,
+  and `webhook_annotations` and `webhook_labels` to all of them. A name
+  from a key is not scoped by namespace, as in K8S-10. `null` lets a target
+  drop a configuration that a class sets.
+
+  - Test: `kubernetes/tests/test_components.py::test_validating_webhooks_mapping`; fixture target `complete`; `manual:` as K8S-25
+  - Since: #232
+
+- K8S-27: A `validating_webhooks` mapping MUST fail the compile, naming the
+  component, when the component also sets
+  `validating_webhook_configuration_name` or a value of the mapping is
+  neither a list nor `null`.
+
+  - Test: `kubernetes/tests/test_components.py::test_validating_webhooks_mapping_fails`
+  - Since: #232
+
+DEC-7: `validating_webhooks` takes a mapping next to the list, as `args`
+does (DEC-1). A second key such as
+`additional_validating_webhook_configurations` was considered. The first
+configuration would then come from `validating_webhooks` and
+`validating_webhook_configuration_name` and the others from the new key,
+so two keys would describe one set of configurations. Labels and
+annotations per configuration were not added, because both configurations
+of the chart carry the same ones. `webhooks` (Mutating) keeps the list
+form, because no recipe needs a second MutatingWebhookConfiguration yet.
+
 ## Volume mounts
 
 A container's `volume_mounts` is a mapping whose keys name the volumes, so
@@ -390,7 +447,8 @@ values of a constraint, are the same in the API reference of Kubernetes
   one counts no pods and spreads nothing: the API reference states that a
   null selector matches no objects, and the PodTopologySpread plugin of
   Kubernetes 1.37.2 keeps it empty when `matchLabelKeys` is set. The pods
-  of a component carry the label `name: <component>` for a selector.
+  of a component carry the label `name` with the workload's name (K8S-28)
+  for a selector.
 
   - Test: `kubernetes/tests/test_components.py::test_topology_spread_constraints`, `::test_no_pod_management_or_spread_renders_as_before`; fixture target `complete`; `manual:` as K8S-23
   - Since: #184
@@ -403,6 +461,55 @@ as `app.kubernetes.io/instance: <release>-synapse-main` in matrix-stack,
 and an inventory converted from the chart sets it. A default would turn a
 constraint that spreads nothing into one that spreads, without the
 inventory saying so.
+
+## Workload name
+
+Velero 1.18.4 finds its node agent by the DaemonSet name `node-agent`
+(`daemonSet = "node-agent"` in `pkg/nodeagent/node_agent.go`, read by
+`IsReady`, `GetPodSpec` and `GetHostPodPath`), and the chart velero 12.2.5
+renders it under that name. A recipe's component keys start with the
+recipe's name (RCP-18 in kadet-hub/recipes). The `velero` recipe's
+component `velero-node-agent` therefore rendered a DaemonSet that Velero
+does not find.
+
+- K8S-28: A component's `workload_name` MUST name its workload, the
+  workload's `name` label and its main container. Without the key, or
+  with `null`, all three MUST keep the component name.
+
+  The selectors use the `name` label. The workload's `matchLabels`, its
+  pod template, the selectors of the component's Services,
+  PodDisruptionBudget and NetworkPolicies and the
+  `prefer_pods_in_different_*` anti-affinity terms therefore follow it.
+  The HPA, the VPA and the Chainsaw assert find the workload by its name.
+  A CronJob takes the name as well.
+
+  All other objects keep the component name: the output files, the
+  Service unless `service.service_name` names it, the ServiceAccount
+  unless `service_account.name` names it, ConfigMaps, Secrets, roles and
+  bindings, webhook configurations, the PodDisruptionBudget, HPA, VPA and
+  NetworkPolicies with their `name` labels, a StatefulSet's default
+  `serviceName`, `additional_containers`, `init_containers` and the
+  Chainsaw StepTemplate. The recommended label `app.kubernetes.io/name`
+  keeps the component name as well. Two components of one namespace and kind with the
+  same `workload_name` collide, and the generator does not detect it. A
+  changed `workload_name` renders a new object. The one of the old name
+  stays until it is deleted or pruned.
+
+  Related: K8S-17, K8S-24
+
+  - Test: `kubernetes/tests/test_components.py::test_workload_name`, `::test_workload_name_derived_objects`, `::test_no_workload_name_renders_as_before`; fixture target `complete`; `manual:` as K8S-25
+  - Since: #232
+
+DEC-8: `workload_name` renames the workload, the label its selectors use
+and its main container, and nothing else. The main container follows
+because the generator names it after its workload, and `check` of
+kadet-hub/recipes accepts a first container name that differs from the
+chart's only when it is the workload's name (RCP-12 there,
+`check/compare.py`). Renaming the component's other objects with the
+workload was considered. A chart names them independently, and velero
+12.2.5 runs the node agent under the server's ServiceAccount
+`velero-server`. The two names a pod refers to already have their own
+keys, `service.service_name` and `service_account.name`.
 
 ## RBAC for one workload
 
@@ -542,7 +649,9 @@ because it already sits below `namespaces`.
 | Container args, tty, stdin, workingDir, unnamed ports | `kubernetes/base.py` (`Container.body`) |
 | Routes, path redirects | `kubernetes/generators.py` (`_generate_routes`), `kubernetes/networking.py` (`GatewayRoute`) |
 | Webhook CA | `kubernetes/webhooks.py` (`_webhooks`) |
-| Webhook configuration names | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
+| Webhook configuration names, labels | `kubernetes/webhooks.py` (`MutatingWebhookConfiguration`, `ValidatingWebhookConfiguration`) |
+| ValidatingWebhookConfigurations of a `validating_webhooks` mapping | `kubernetes/generators.py` (`_build_workload_extras`) |
+| Workload name | `kubernetes/base.py` (`Workload.body`), `kubernetes/scaling.py` (`HorizontalPodAutoscaler.body`, `VerticalPodAutoscaler.body`) |
 | Chainsaw Test, external workloads | `kubernetes/generators.py` (`generate_chainsaw_asserts`, `_EXTERNAL_WORKLOADS`, `_resource_asserts`) |
 | Volume mounts | `kubernetes/base.py` (`Container.add_volume_mounts`) |
 | Namespace output path | `kubernetes/generators.py` (`generate_resource_manifests`) |
