@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/calico/) page.
 
-Kapitan kadet generator for the [Tigera operator](https://github.com/tigera/operator) resources that install and configure Calico. Built for Calico 3.33.0 (Tigera operator 1.44.0).
+Kapitan kadet generator for the [Tigera operator](https://github.com/tigera/operator) resources that install and configure Calico. Built for Calico 3.33.1 (Tigera operator 1.44.1).
 
 - **Installation** (`operator.tigera.io/v1`): Calico networking, CNI, IP pools and control plane settings
 - **APIServer** (`operator.tigera.io/v1`): the Calico API server
