@@ -14,6 +14,6 @@ pkg.crossplane.io:
   license: Apache-2.0
 aws.m.upbound.io:
   software: Crossplane Provider AWS
-  version: 2.9.0
-  source: https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.9.0/package/crds/aws.m.upbound.io_providerconfigs.yaml https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.9.0/package/crds/aws.m.upbound.io_clusterproviderconfigs.yaml
+  version: 2.10.0
+  source: https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.10.0/package/crds/aws.m.upbound.io_providerconfigs.yaml https://github.com/crossplane-contrib/provider-upjet-aws/blob/v2.10.0/package/crds/aws.m.upbound.io_clusterproviderconfigs.yaml
   license: Apache-2.0
