@@ -4,6 +4,6 @@
 # allOf/anyOf/oneOf/not branches. Unknown fields in the output therefore fail.
 grafana.integreatly.org:
   software: Grafana Operator
-  version: 5.25.0
-  source: https://github.com/grafana/grafana-operator/tree/v5.25.0/config/crd/bases
+  version: 5.26.0
+  source: https://github.com/grafana/grafana-operator/tree/v5.26.0/config/crd/bases
   license: Apache-2.0

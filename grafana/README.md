@@ -2,7 +2,7 @@
 
 Published on kadet-hub: pin a released version by digest from its [catalog](https://kadet-hub.org/generators/grafana/) page.
 
-Built for Grafana Operator 5.25.0 (`grafana.integreatly.org/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled JSON Schemas come from the operator's CRDs at that release, which are Apache-2.0; Grafana itself is not used.
+Built for Grafana Operator 5.26.0 (`grafana.integreatly.org/v1beta1`, the only served and storage version of every kind, not deprecated). The bundled JSON Schemas come from the operator's CRDs at that release, which are Apache-2.0; Grafana itself is not used.
 
 Kapitan kadet generator for the [Grafana Operator](https://grafana.github.io/grafana-operator/) custom resources. It emits only these custom resources; dashboards and datasources are not rendered as ConfigMaps.
 
